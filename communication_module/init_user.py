@@ -7,7 +7,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 # Todo: Define all the scopes that the application will need in scope.py
-SCOPES = ["https://www.googleapis.com/auth/tasks.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/tasks"]
 
 USER_DATA_PATH = os.path.join(os.path.dirname(__file__), "user_data")
 
