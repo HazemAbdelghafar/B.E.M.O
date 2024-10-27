@@ -348,3 +348,6 @@ credentials_*.json
 # User Data
 !user_data/
 user_data/*
+
+# Notes
+overthinking.txt
