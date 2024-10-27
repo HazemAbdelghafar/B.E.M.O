@@ -1,13 +1,15 @@
 import os
+import pickle
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 # Todo: Define all the scopes that the application will need in scope.py
-SCOPES = ["https://www.googleapis.com/auth/tasks"]
+SCOPES = [
+    "https://www.googleapis.com/auth/tasks",
+]
 
 USER_DATA_PATH = os.path.join(os.path.dirname(__file__), "user_data")
 
@@ -39,8 +41,8 @@ def new_user(id: str) -> Credentials:
     )
 
     # Save the credentials for the next run
-    with open(f"{USER_DATA_PATH}/token_{id}.json", "w") as token:
-        token.write(creds.to_json())
+    with open(f"{USER_DATA_PATH}/token_{id}.pkl", "wb") as token:
+        pickle.dump(creds, token)
 
     return creds
 
@@ -64,11 +66,10 @@ def init_user(id: str) -> Credentials:
         return new_user(id)
 
     # If the user is not new, load the token file
-    if os.path.exists(f"{USER_DATA_PATH}/token_{id}.json"):
+    if os.path.exists(f"{USER_DATA_PATH}/token_{id}.pkl"):
         print("Loading existing user...")
-        creds = Credentials.from_authorized_user_file(
-            f"{USER_DATA_PATH}/token_{id}.json", SCOPES
-        )
+        with open(f"{USER_DATA_PATH}/token_{id}.pkl", "rb") as token:
+            creds = pickle.load(token)
 
     # If there are credentials but they are not valid, refresh the token
     if creds and creds.expired and creds.refresh_token:
