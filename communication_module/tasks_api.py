@@ -22,7 +22,7 @@ class TasksApi:
         This method gets all the task lists
 
         Args:
-            max_results (int): The maximum number of tasks to get
+            max_results (int): The maximum number of tasks to get (default is 10)
 
         Returns:
             list: The task lists or None if no task lists were found
@@ -239,10 +239,10 @@ class TasksApi:
 
         Args:
             task_list_id (str): The task list id
-            max_results (int): The maximum number of tasks to get
-            show_completed (bool): Whether to show completed tasks
-            show_deleted (bool): Whether to show deleted tasks
-            show_hidden (bool): Whether to show hidden tasks
+            max_results (int): The maximum number of tasks to get (default is 10)
+            show_completed (bool): Whether to show completed tasks (default is True)
+            show_deleted (bool): Whether to show deleted tasks (default is True)
+            show_hidden (bool): Whether to show hidden tasks (default is True)
 
         Returns:
             dict: The tasks or None if no tasks were found
@@ -313,10 +313,10 @@ class TasksApi:
         This method gets all the tasks
 
         Args:
-            max_results (int): The maximum number of tasks to get
-            show_completed (bool): Whether to show completed tasks
-            show_deleted (bool): Whether to show deleted tasks
-            show_hidden (bool): Whether to show hidden tasks
+            max_results (int): The maximum number of tasks to get (default is 10)
+            show_completed (bool): Whether to show completed tasks (default is True)
+            show_deleted (bool): Whether to show deleted tasks (default is True)
+            show_hidden (bool): Whether to show hidden tasks (default is True)
 
         Returns:
             list: The tasks or None if no tasks were found
@@ -482,9 +482,9 @@ class TasksApi:
         Args:
             list_id (str): The task list id
             name (str): The task title
-            due_date (str): The task due date
-            notes (str): The task notes
-            parent_id (str): The task parent id
+            due_date (datetime): The task due date (default is None)
+            notes (str): The task notes (default is None)
+            parent_id (str): The task parent id (default is None)
 
         Returns:
             dict: The task id, title, and updated time or None if the task was not inserted
@@ -537,9 +537,9 @@ class TasksApi:
         Args:
             list_name (str): The task list title
             name (str): The task title
-            due_date (str): The task due date
-            notes (str): The task notes
-            parent_name (str): The task parent title
+            due_date (str): The task due date (default is None)
+            notes (str): The task notes (default is None)
+            parent_name (str): The task parent title (default is None)
 
         Returns:
             dict: The task id, title, and updated time or None if the task was not inserted
@@ -590,7 +590,8 @@ class TasksApi:
         Args:
             list_id (str): The task list id
             task_id (str): The task id
-            parent_id (str): The task parent id
+            parent_id (str): The task parent id (default is None)
+            new_list_id (str): The new task list id (default is None)
 
         Returns:
             bool: True if the task was moved, False otherwise
@@ -625,7 +626,8 @@ class TasksApi:
         Args:
             list_name (str): The task list title
             task_name (str): The task title
-            parent_name (str): The task parent title
+            parent_name (str): The task parent title (default is None)
+            new_list_name (str): The new task list title (default is None)
 
         Returns:
             bool: True if the task was moved, False otherwise
@@ -681,11 +683,11 @@ class TasksApi:
         Args:
             list_id (str): The task list id
             task_id (str): The task id
-            new_task_name (str): The new task title
-            due_date (datetime): The new task due date
-            notes (str): The new task notes
-            parent_id (str): The new task parent id
-            is_done (bool): Whether the task is done
+            new_task_name (str): The new task title (default is None)
+            due_date (datetime): The new task due date (default is None)
+            notes (str): The new task notes (default is None)
+            parent_id (str): The new task parent id (default is None)
+            is_done (bool): Whether the task is done (default is None)
 
         Returns:
             dict: The task id, title, and updated time or None if the task was not patched
@@ -747,10 +749,10 @@ class TasksApi:
         Args:
             list_name (str): The task list title
             task_name (str): The task title
-            new_task_name (str): The new task title
-            due_date (str): The new task due date
-            notes (str): The new task notes
-            parent_name (str): The new task parent title
+            new_task_name (str): The new task title (default is None)
+            due_date (str): The new task due date (default is None)
+            notes (str): The new task notes (default is None)
+            parent_name (str): The new task parent title (default is None)
 
         Returns:
             dict: The task id, title, and updated time or None if the task was not patched
