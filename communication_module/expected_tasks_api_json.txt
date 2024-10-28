@@ -1,0 +1,23 @@
+# This file contains the expected JSON format for the tasks that are to be performed by the communication module (tasks api)
+
+{
+    "other_data": "other_data", # other data that will not be used by the communication module (optional)
+    
+    "list_or_task": "list", # type of object on which the action is to be performed (required) (list, task)
+    
+    "list_name": "list_name" # name of the list (required)
+    "task_name": "task_name", # name of the task if the action is to be performed on a task (optional)
+    
+    "action": "add", # action to be performed (required) (list, insert, remove, update, get)
+    "max_output": 10, # maximum number of tasks to be returned (optional) (default: 10) (only for list action)
+    "list_all_tasks": false, # name of the list by which the tasks are to be filtered (optional) (only for list action) (only for task type) (default: false) (true, false) (if false, list_name will be used as the name of the list, else all tasks will be returned)
+    
+    "new_list_name": "new_list_name", # new name of the list (optional) (only for update action) (for both list and task type)
+    "new_task_name": "new_task_name", # new name of the task (optional) (only for update action) (only for task type)
+    
+    
+    "due_date": "2024-11-01T00:00:00", # due date of the task (optional) (only for insert and update actions) (only for task type) (format: YYYY-MM-DDTHH:MM:SS)
+    "notes": "notes", # notes of the task (optional) (only for insert and update actions) (only for task type)
+    "parent_task": "parent_task", # name of the parent task (optional) (only for insert and update actions) (only for task type)
+    "mark_as_done": false, # mark the task as done (optional) (only for update action) (only for task type) (default: false) (true, false)
+}
