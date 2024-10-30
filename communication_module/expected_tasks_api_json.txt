@@ -15,9 +15,8 @@
     "new_list_name": "new_list_name", # new name of the list (optional) (only for update action) (for both list and task type)
     "new_task_name": "new_task_name", # new name of the task (optional) (only for update action) (only for task type)
     
-    
     "due_date": "2024-11-01T00:00:00", # due date of the task (optional) (only for insert and update actions) (only for task type) (format: YYYY-MM-DDTHH:MM:SS)
     "notes": "notes", # notes of the task (optional) (only for insert and update actions) (only for task type)
     "parent_task": "parent_task", # name of the parent task (optional) (only for insert and update actions) (only for task type)
-    "mark_as_done": false, # mark the task as done (optional) (only for update action) (only for task type) (default: false) (true, false)
+    "mark_as_done": false # mark the task as done (optional) (only for update action) (only for task type) (default: false) (true, false)
 }
