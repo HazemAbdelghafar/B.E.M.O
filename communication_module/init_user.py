@@ -4,12 +4,7 @@ import pickle
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-
-
-# Todo: Define all the scopes that the application will need in scope.py
-SCOPES = [
-    "https://www.googleapis.com/auth/tasks",
-]
+from scopes import SCOPES
 
 USER_DATA_PATH = os.path.join(os.path.dirname(__file__), "user_data")
 
