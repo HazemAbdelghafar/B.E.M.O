@@ -400,7 +400,7 @@ if __name__ == "__main__":
     message_id = drafts["drafts"][0]["message"]["id"]
 
     print("Draft content:")
-    with open("draft_content.json", "w") as f:
+    with open("Test/draft_content.json", "w") as f:
         json.dump(gmail_api.list_drafts_content(), f, indent=4)
 
     print("Get Draft by:")
