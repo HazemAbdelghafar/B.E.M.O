@@ -12,7 +12,16 @@ DEFAULT_NOTE = "CREATED BY BEMO"
 
 
 class TasksApi:
-    def __init__(self, user_id: str):
+    def __init__(self, user_id: str) -> None:
+        """
+        This method initializes the tasks API
+
+        Args:
+            user_id (str): The user id
+
+        Returns:
+            None
+        """
 
         self._creds = init_user(user_id)
         self._service = build("tasks", "v1", credentials=self._creds)
