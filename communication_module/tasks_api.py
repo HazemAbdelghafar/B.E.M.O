@@ -10,6 +10,9 @@ from utils import RFC3339_to_date, datetime_to_RFC3339
 
 DEFAULT_NOTE = "CREATED BY BEMO"
 
+# Todo: Add strip and lower to all strings
+# Todo: Add comment separators
+
 
 class TasksApi:
     def __init__(self, user_id: str) -> None:
