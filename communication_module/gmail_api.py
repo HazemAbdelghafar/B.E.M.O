@@ -14,7 +14,10 @@ from utils import epoch_to_date
 
 import json
 
-DEFAULT_NOTE = "\n--\nSent from BEMO"
+# Todo: Fix default note appearing twice
+DEFAULT_NOTE = "\n\n<Sent from BEMO>\n"
+
+# Todo: Add capitilize title
 
 
 class GmailAPI:
@@ -965,6 +968,7 @@ class GmailAPI:
     # Draft (Create)
     ##############################################################################################################
 
+    # Todo: fix empty recipients, cc, bcc
     def create_draft(
         self,
         subject: str = "No subject",
@@ -973,7 +977,7 @@ class GmailAPI:
         cc: list = [],
         bcc: list = [],
         content: str = DEFAULT_NOTE,
-    ) -> bool:
+    ) -> str:
         """
         Create a draft
 
@@ -996,15 +1000,21 @@ class GmailAPI:
 
         subject = subject.lower().strip()
         sender = sender.lower().strip()
-        content += DEFAULT_NOTE
+
+        if content != DEFAULT_NOTE:
+            content += DEFAULT_NOTE
 
         message = EmailMessage()
 
         message["Subject"] = subject
         message["From"] = sender
-        message["To"] = ", ".join(recipients)
-        message["Cc"] = ", ".join(cc)
-        message["Bcc"] = ", ".join(bcc)
+
+        if recipients != []:
+            message["To"] = ", ".join(recipients)
+        if cc != []:
+            message["Cc"] = ", ".join(cc)
+        if bcc != []:
+            message["Bcc"] = ", ".join(bcc)
         message.set_content(content)
 
         encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
@@ -1022,6 +1032,343 @@ class GmailAPI:
         except HttpError as e:
             print(f"An error occurred: {e}")
             return None
+
+    def create_drafts(
+        self,
+        subjects: list = ["No subject"],
+        senders: list = ["me"],
+        recipients: list = [[]],
+        cc: list = [[]],
+        bcc: list = [[]],
+        contents: list = [DEFAULT_NOTE],
+    ) -> list:
+        """
+        Create drafts
+
+        Args:
+            subjects (list): The subjects
+            senders (list): The senders
+            recipients (list): The recipients
+            cc (list): The cc
+            bcc (list): The bcc
+            contents (list): The contents
+
+        Returns:
+            list: The draft IDs or None if an error occurred
+        """
+
+        return_list = []
+
+        if (
+            len(subjects)
+            != len(senders)
+            != len(recipients)
+            != len(cc)
+            != len(bcc)
+            != len(contents)
+        ):
+            return None
+
+        for subject, sender, recipient, c, bcc, content in zip(
+            subjects, senders, recipients, cc, bcc, contents
+        ):
+            draft_id = self.create_draft(
+                subject=subject,
+                sender=sender,
+                recipients=recipient,
+                cc=c,
+                bcc=bcc,
+                content=content,
+            )
+
+            if draft_id is not None:
+                return_list.append(draft_id)
+
+        if return_list == []:
+            return None
+
+        return return_list
+
+    def create_send_draft(
+        self,
+        subject: str = "No subject",
+        sender: str = "me",
+        recipients: list = [],
+        cc: list = [],
+        bcc: list = [],
+        content: str = DEFAULT_NOTE,
+    ) -> bool:
+        """
+        Create and send a draft
+
+        Args:
+            subject (str): The subject
+            sender (str): The sender
+            recipients (list): The recipients
+            cc (list): The cc
+            bcc (list): The bcc
+            content (str): The content
+
+        Returns:
+            bool: True if the draft was sent successfully, False otherwise
+        """
+
+        draft_id = self.create_draft(
+            subject=subject,
+            sender=sender,
+            recipients=recipients,
+            cc=cc,
+            bcc=bcc,
+            content=content,
+        )
+
+        if draft_id is None:
+            return False
+
+        return self._send_draft_by_id(draft_id)
+
+    def create_send_drafts(
+        self,
+        subjects: list = ["No subject"],
+        senders: list = ["me"],
+        recipients: list = [[]],
+        cc: list = [[]],
+        bcc: list = [[]],
+        contents: list = [DEFAULT_NOTE],
+    ) -> bool:
+        """
+        Create and send drafts
+
+        Args:
+            subjects (list): The subjects
+            senders (list): The senders
+            recipients (list): The recipients
+            cc (list): The cc
+            bcc (list): The bcc
+            contents (list): The contents
+
+        Returns:
+            bool: True if the drafts were sent successfully, False otherwise
+        """
+
+        return_list = []
+
+        if (
+            len(subjects)
+            != len(senders)
+            != len(recipients)
+            != len(cc)
+            != len(bcc)
+            != len(contents)
+        ):
+            return False
+
+        for subject, sender, recipient, c, bcc, content in zip(
+            subjects, senders, recipients, cc, bcc, contents
+        ):
+            draft_id = self.create_draft(
+                subject=subject,
+                sender=sender,
+                recipients=recipient,
+                cc=c,
+                bcc=bcc,
+                content=content,
+            )
+
+            if draft_id is not None:
+                return_list.append(self._send_draft_by_id(draft_id))
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    # Draft (Update)
+    ##############################################################################################################
+
+    def _update_draft_by_id(
+        self,
+        draft_id: str,
+        subject: str = None,
+        sender: str = None,
+        recipients: list = [],
+        cc: list = [],
+        bcc: list = [],
+        content: str = None,
+    ) -> str:
+        """
+        Update a draft
+
+        Args:
+            draft_id (str): The draft ID
+            subject (str): The subject
+            sender (str): The sender
+            recipients (list): The recipients
+            cc (list): The cc
+            bcc (list): The bcc
+            content (str): The content
+
+        Returns:
+            str: The draft ID or None if an error occurred
+        """
+
+        draft = self._get_draft_content(draft_id)[0]
+
+        if subject is not None:
+            subject = subject.lower().strip()
+        else:
+            subject = draft["subject"]
+
+        if sender is not None:
+            sender = sender.lower().strip()
+        else:
+            sender = draft["sender"]
+
+        if recipients != []:
+            recipients = [recipient.lower().strip() for recipient in recipients]
+        else:
+            recipients = draft["recipients"]
+
+        if cc != []:
+            cc = [recipient.lower().strip() for recipient in cc]
+        else:
+            cc = draft["Cc"]
+
+        if bcc != []:
+            bcc = [recipient.lower().strip() for recipient in bcc]
+        else:
+            bcc = draft["Bcc"]
+
+        if content is not None:
+            content += DEFAULT_NOTE
+        else:
+            # matches = re.findall(r"<(.*?)>", draft["content"])
+            # print("Matches:")
+            # print(matches)
+            # default_note_cleaned = DEFAULT_NOTE.split("<")[0][:-1]
+            # print("Default Note Cleaned:")
+            # print(default_note_cleaned)
+            # Todo: Try HTML Content
+            content = draft["content"] + DEFAULT_NOTE
+
+        message = EmailMessage()
+
+        if subject is not None:
+            message["Subject"] = subject
+        if sender is not None:
+            message["From"] = sender
+        if recipients is not [] or recipients is not None:
+            message["To"] = ", ".join(recipients)
+        if cc is not [] or cc is not None:
+            message["Cc"] = ", ".join(cc)
+        if bcc is not [] or bcc is not None:
+            message["Bcc"] = ", ".join(bcc)
+        if content is not None:
+            message.set_content(content)
+
+        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
+
+        draft = {"message": {"raw": encoded_message}}
+
+        try:
+            id = (
+                self._service.users()
+                .drafts()
+                .update(userId="me", id=draft_id, body=draft)
+                .execute()["id"]
+            )
+            return id
+        except HttpError as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    def _update_drafts_by_id(
+        self,
+        draft_ids: list,
+        new_subject: str = None,
+        new_sender: str = None,
+        new_recipients: list = [],
+        new_cc: list = [],
+        new_bcc: list = [],
+        new_content: str = None,
+    ) -> list:
+        """
+        Update the drafts by ID
+
+        Args:
+            draft_ids (list): The draft IDs
+            new_subject (str): The new subject
+            new_content (str): The new content
+            new_sender (str): The new sender
+            new_recipients (list): The new recipients
+            new_cc (list): The new cc
+            new_bcc (list): The new bcc
+
+        Returns:
+            list: The draft IDs or None if an error occurred
+        """
+
+        return_list = []
+
+        for draft_id in draft_ids:
+            new_draft_id = self._update_draft_by_id(
+                draft_id,
+                subject=new_subject,
+                sender=new_sender,
+                recipients=new_recipients,
+                cc=new_cc,
+                bcc=new_bcc,
+                content=new_content,
+            )
+
+            if new_draft_id is not None:
+                return_list.append(new_draft_id)
+
+        if return_list == []:
+            return None
+
+        return return_list
+
+    def update_drafts_by_subjects(
+        self,
+        subjects: list,
+        new_subject: str = None,
+        new_sender: str = None,
+        new_recipients: list = [],
+        new_cc: list = [],
+        new_bcc: list = [],
+        new_content: str = None,
+    ) -> str:
+        """
+        Update the drafts by subject
+
+        Args:
+            subjects (list): The subjects
+            new_subject (str): The new subject
+            new_content (str): The new content
+            new_sender (str): The new sender
+            new_recipients (list): The new recipients
+            new_cc (list): The new cc
+            new_bcc (list): The new bcc
+
+        Returns:
+            str: The draft ID or None if an error occurred
+        """
+
+        drafts = self.get_draft_content_by_subjects(subjects)
+
+        if drafts is None:
+            return None
+
+        return self._update_drafts_by_id(
+            [draft["draft_id"] for draft in drafts],
+            new_subject=new_subject,
+            new_sender=new_sender,
+            new_recipients=new_recipients,
+            new_cc=new_cc,
+            new_bcc=new_bcc,
+            new_content=new_content,
+        )
 
     # Thread
     ##############################################################################################################
@@ -1482,14 +1829,16 @@ if __name__ == "__main__":
     # print("Send all drafts:")
     # print(gmail_api.send_all_drafts())
 
-    # print("Create Draft:")
-    # print(
-    #     gmail_api.create_draft(
-    #         "Test 1",
-    #         "me",
-    #         ["begadtAmim.a@gmail.coM", "ZomAboss23@gmail.com"],
-    #         ["begadtAmim.a@gmail.coM"],
-    #         ["begadtAmim.a@gmail.coM"],
-    #         "Test 1",
-    #     )
-    # )
+    print("Create Draft:")
+    print(
+        gmail_api.create_draft(
+            "Test 12",
+            "me",
+            ["begadtAmim.a@gmail.coM"],
+            ["begadtAmim.a@gmail.coM"],
+        )
+    )
+
+    print("Update Draft:")
+    print("By Subject:")
+    print(gmail_api.update_drafts_by_subjects(["tEst 1"], new_subject="Test 2"))
