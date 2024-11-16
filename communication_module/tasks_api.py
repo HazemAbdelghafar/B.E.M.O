@@ -8,10 +8,13 @@ from init_user import init_user
 from utils import RFC3339_to_date, datetime_to_RFC3339
 
 
+# Todo: Fix default note appearing twice
 DEFAULT_NOTE = "CREATED BY BEMO"
 
 # Todo: Add strip and lower to all strings
 # Todo: Add comment separators
+# Todo: Add capitilize title
+# Todo: Add DEFAULT PATH
 
 
 class TasksApi:
