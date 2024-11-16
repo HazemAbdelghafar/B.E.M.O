@@ -1,4 +1,6 @@
 from datetime import datetime
+from colory.color import Color
+import webcolors
 
 # Todo: Implement relative time conversion functions
 
@@ -45,6 +47,14 @@ def epoch_to_datetime(epoch: int) -> datetime:
     return datetime.fromtimestamp(epoch)
 
 
+def hex_to_color_name(hex: str) -> str:
+    return Color(hex).name
+
+
+def color_name_to_hex(color_name: str) -> str:
+    return webcolors.name_to_hex(color_name)
+
+
 if __name__ == "__main__":
     print(date_to_RFC3339(2022, 1, 1, 0, 0, 0))
     print(RFC3339_to_datetime("2022-01-01T00:00:00.00Z"))
@@ -54,3 +64,5 @@ if __name__ == "__main__":
     print(datetime_to_epoch(datetime(2022, 1, 1, 0, 0, 0)))
     print(epoch_to_date(1640995200))
     print(date_to_epoch(2022, 1, 1, 0, 0, 0))
+    print(hex_to_color_name("#FF0000"))
+    print(color_name_to_hex("red"))
