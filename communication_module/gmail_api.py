@@ -11,6 +11,7 @@ from googleapiclient.errors import HttpError
 
 from init_user import init_user
 from utils import epoch_to_date
+from utils import hex_to_color_name
 
 import os
 import json
@@ -1582,6 +1583,14 @@ class GmailAPI:
             return_dict["name"] = found_label["name"]
             return_dict["num_messages"] = found_label["messagesTotal"]
             return_dict["num_unread_messages"] = found_label["messagesUnread"]
+            try:
+                color = found_label["color"]
+                return_dict["background_color"] = hex_to_color_name(
+                    color["backgroundColor"]
+                )
+                return_dict["text_color"] = hex_to_color_name(color["textColor"])
+            except KeyError:
+                return_dict["color"] = "None"
 
             if return_dict["name"].split("_")[0] == "CATEGORY":
                 return_dict["type"] = "category"
@@ -1602,6 +1611,84 @@ class GmailAPI:
             return_list.append(return_dict)
 
         return return_list
+
+    # Label (Delete)
+    ##############################################################################################################
+    def _delete_label_by_id(self, label_id: str) -> bool:
+        """
+        Delete the label by ID
+
+        Args:
+            label_id (str): The label ID
+
+        Returns:
+            bool: True if the label was deleted successfully, False otherwise
+        """
+        try:
+            self._service.users().labels().delete(userId="me", id=label_id).execute()
+            return True
+        except HttpError as e:
+            print(f"An error occurred: {e}")
+            return False
+
+    def delete_all_labels(self) -> bool:
+        """
+        Delete all labels
+
+        Args:
+            None
+
+        Returns:
+            bool: True if the labels were deleted successfully, False otherwise
+        """
+        labels = self.list_labels_content("user")
+
+        if labels is None:
+            return False
+
+        return_list = []
+
+        for label in labels:
+            if not self._delete_label_by_id(label["id"]):
+                return_list.append(False)
+            else:
+                return_list.append(True)
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    def delete_labels_by_name(self, label_names: list) -> bool:
+        """
+        Delete the labels by name
+
+        Args:
+            label_names (list): The label names
+
+        Returns:
+            bool: True if the labels were deleted successfully, False otherwise
+        """
+        labels = [self._get_label_by_name_id(label_name) for label_name in label_names]
+
+        if labels is None:
+            return False
+
+        return_list = []
+
+        for label in labels:
+            if not self._delete_label_by_id(label["id"]):
+                return_list.append(False)
+            else:
+                return_list.append(True)
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    # Label (Create)
+    ##############################################################################################################
 
     # Message
     ##############################################################################################################
@@ -2012,11 +2099,8 @@ if __name__ == "__main__":
     print()
 
     labels = gmail_api.list_labels_content(type="all")
-    # label_id = labels[-2]["id"]
-    # label_name = labels[-2]["name"]
-
-    label_id = "INBOX"
-    label_name = "INBOX"
+    label_id = labels[-1]["id"]
+    label_name = labels[-1]["name"]
 
     print(f"Label ID: {label_id}")
     print(f"Label Name: {label_name}")
@@ -2028,5 +2112,11 @@ if __name__ == "__main__":
 
     print("Label by Name:")
     pprint(gmail_api.get_labels_by_name(label_name))
+
+    # print("Delete all labels:")
+    # print(gmail_api.delete_all_labels())
+
+    # print("Delete labels by name:")
+    # print(gmail_api.delete_labels_by_name([label_name]))
 
     print("-" * 100)
