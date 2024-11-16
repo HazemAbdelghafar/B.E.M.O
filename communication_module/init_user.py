@@ -6,7 +6,9 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from scopes import SCOPES
 
-USER_DATA_PATH = os.path.join(os.path.dirname(__file__), "user_data")
+DEFAULT_PATH = os.path.dirname(__file__)
+USER_DATA_PATH = os.path.join(DEFAULT_PATH, "user_data")
+SECRET_PATH = os.path.join(DEFAULT_PATH, "credentials_tasks.json")
 
 
 def new_user(id: str) -> Credentials:
@@ -25,9 +27,7 @@ def new_user(id: str) -> Credentials:
     # Initialize the credentials
     creds = None
 
-    flow = InstalledAppFlow.from_client_secrets_file(
-        "communication_module\credentials_tasks.json", SCOPES
-    )
+    flow = InstalledAppFlow.from_client_secrets_file(SECRET_PATH, SCOPES)
     creds = flow.run_local_server(
         open_browser=True,
         port=8080,
@@ -69,7 +69,11 @@ def init_user(id: str) -> Credentials:
     # If there are credentials but they are not valid, refresh the token
     if creds and creds.expired and creds.refresh_token:
         print("Refreshing token...")
-        creds.refresh(Request())
+        try:
+            creds.refresh(Request())
+        except:
+            print("Error refreshing token, Re-creating user...")
+            return new_user(id)
 
     # If the user is new (no token file), create a new user
     if not creds:
