@@ -27,6 +27,7 @@ def new_user(id: str) -> Credentials:
     # Initialize the credentials
     creds = None
 
+    # Todo: Get login url
     flow = InstalledAppFlow.from_client_secrets_file(SECRET_PATH, SCOPES)
     creds = flow.run_local_server(
         open_browser=True,
