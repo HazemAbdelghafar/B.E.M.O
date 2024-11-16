@@ -12,10 +12,12 @@ from googleapiclient.errors import HttpError
 from init_user import init_user
 from utils import epoch_to_date
 
+import os
 import json
 
 # Todo: Fix default note appearing twice
 DEFAULT_NOTE = "\n\n<Sent from BEMO>\n"
+DEFAULT_PATH = os.path.dirname(__file__)
 
 # Todo: Add capitilize title
 
@@ -968,7 +970,6 @@ class GmailAPI:
     # Draft (Create)
     ##############################################################################################################
 
-    # Todo: fix empty recipients, cc, bcc
     def create_draft(
         self,
         subject: str = "No subject",
@@ -1338,7 +1339,7 @@ class GmailAPI:
         new_cc: list = [],
         new_bcc: list = [],
         new_content: str = None,
-    ) -> str:
+    ) -> list:
         """
         Update the drafts by subject
 
@@ -1352,10 +1353,51 @@ class GmailAPI:
             new_bcc (list): The new bcc
 
         Returns:
-            str: The draft ID or None if an error occurred
+            list: The draft IDs or None if an error occurred
         """
 
         drafts = self.get_draft_content_by_subjects(subjects)
+
+        if drafts is None:
+            return None
+
+        return self._update_drafts_by_id(
+            [draft["draft_id"] for draft in drafts],
+            new_subject=new_subject,
+            new_sender=new_sender,
+            new_recipients=new_recipients,
+            new_cc=new_cc,
+            new_bcc=new_bcc,
+            new_content=new_content,
+        )
+
+    def update_drafts_by_recipients(
+        self,
+        recipients: list,
+        new_subject: str = None,
+        new_sender: str = None,
+        new_recipients: list = [],
+        new_cc: list = [],
+        new_bcc: list = [],
+        new_content: str = None,
+    ) -> list:
+        """
+        Update the drafts by recipients
+
+        Args:
+            recipients (list): The recipients
+            new_subject (str): The new subject
+            new_content (str): The new content
+            new_sender (str): The new sender
+            new_recipients (list): The new recipients
+            new_cc (list): The new cc
+            new_bcc (list): The new bcc
+
+        Returns:
+            list: The draft IDs or None if an error occurred
+        """
+
+        drafts = self.get_draft_content_by_recipients(recipients)
 
         if drafts is None:
             return None
@@ -1417,6 +1459,57 @@ class GmailAPI:
             print(f"An error occurred: {e}")
             return None
 
+    def list_labels_content(self, type="all") -> list:
+        """
+        List all labels content
+
+        Args:
+            type (str): The label type (default is all) (supported types are: all, category, user, system)
+
+        Returns:
+            list: The list of labels content or None if an error occurred
+        """
+        labels = self._list_labels()
+
+        if labels is None:
+            return None
+
+        return_list = []
+
+        for label in labels["labels"]:
+            return_dict = {}
+            return_dict["id"] = label["id"]
+            return_dict["name"] = label["name"]
+
+            if return_dict["name"].split("_")[0] == "CATEGORY":
+                return_dict["type"] = "category"
+            else:
+                return_dict["type"] = label["type"]
+
+            if len(return_dict["name"].split("/")) > 1:
+                splitted_names = return_dict["name"].split("/")
+                return_dict["parent_name"] = splitted_names[0]
+                return_dict["name"] = splitted_names[1]
+                return_dict["parent_id"] = self._get_label_by_name_id(
+                    return_dict["parent_name"]
+                )["id"]
+            else:
+                return_dict["parent_name"] = ""
+                return_dict["parent_id"] = ""
+
+            return_list.append(return_dict)
+
+        if type == "all":
+            return return_list
+        elif type == "category":
+            return [label for label in return_list if label["type"] == "category"]
+        elif type == "user":
+            return [label for label in return_list if label["type"] == "user"]
+        elif type == "system":
+            return [label for label in return_list if label["type"] == "system"]
+        else:
+            return return_list
+
     # Label (Get)
     ##############################################################################################################
     def _get_label_by_id(self, label_id: str) -> dict:
@@ -1437,9 +1530,9 @@ class GmailAPI:
             print(f"An error occurred: {e}")
             return None
 
-    def _get_label_by_name(self, label_name: str) -> dict:
+    def _get_label_by_name_id(self, label_name: str) -> dict:
         """
-        Get the label by name
+        Get the label by name ID
 
         Args:
             label_name (str): The label name
@@ -1457,6 +1550,58 @@ class GmailAPI:
                 return label
 
         return None
+
+    def get_labels_by_name(self, label_name: str) -> list:
+        """
+        Get the label by name
+
+        Args:
+            label_name (str): The label name
+
+        Returns:
+            list: The labels or None if an error occurred
+        """
+        labels = self.list_labels_content()
+
+        if labels is None:
+            return None
+
+        return_list = []
+        found_labels = []
+
+        for label in labels:
+            if label["name"] == label_name:
+                found_labels.append(self._get_label_by_id(label["id"]))
+
+        if found_labels == []:
+            return None
+
+        for found_label in found_labels:
+            return_dict = {}
+            return_dict["id"] = found_label["id"]
+            return_dict["name"] = found_label["name"]
+            return_dict["num_messages"] = found_label["messagesTotal"]
+            return_dict["num_unread_messages"] = found_label["messagesUnread"]
+
+            if return_dict["name"].split("_")[0] == "CATEGORY":
+                return_dict["type"] = "category"
+            else:
+                return_dict["type"] = found_label["type"]
+
+            if len(return_dict["name"].split("/")) > 1:
+                splitted_names = return_dict["name"].split("/")
+                return_dict["parent_name"] = splitted_names[0]
+                return_dict["name"] = splitted_names[1]
+                return_dict["parent_id"] = self._get_label_by_name_id(
+                    return_dict["parent_name"]
+                )["id"]
+            else:
+                return_dict["parent_name"] = ""
+                return_dict["parent_id"] = ""
+
+            return_list.append(return_dict)
+
+        return return_list
 
     # Message
     ##############################################################################################################
@@ -1672,26 +1817,33 @@ class GmailAPI:
 
 if __name__ == "__main__":
 
-    # Initialize the Gmail API
     gmail_api = GmailAPI("1")
+
+    print("USER:")
+    print()
 
     print(f"Email: {gmail_api.get_user_email_address()}")
     print(f"Total emails: {gmail_api.get_user_total_emails()}")
     print(f"Total threads: {gmail_api.get_user_total_threads()}")
 
-    drafts = gmail_api._list_drafts_ids()
+    print("-" * 100)
 
-    message_id = drafts["drafts"][0]["message"]["id"]
-    draft_id = drafts["drafts"][0]["id"]
-    thread_id = drafts["drafts"][0]["message"]["threadId"]
-    print(f"Message ID: {message_id}")
-    print(f"Draft ID: {draft_id}")
-    print(f"Thread ID: {thread_id}")
+    # print("DRAFTS:")
+    # print()
 
-    drafts = gmail_api.list_drafts_content()
-    with open("communication_module/test/draft_content.json", "w") as f:
-        json.dump(drafts, f, indent=4)
-    print("Draft content saved to communication_module/test/draft_content.json")
+    # drafts = gmail_api._list_drafts_ids()
+
+    # message_id = drafts["drafts"][0]["message"]["id"]
+    # draft_id = drafts["drafts"][0]["id"]
+    # thread_id = drafts["drafts"][0]["message"]["threadId"]
+    # print(f"Message ID: {message_id}")
+    # print(f"Draft ID: {draft_id}")
+    # print(f"Thread ID: {thread_id}")
+
+    # drafts = gmail_api.list_drafts_content()
+    # with open(DEFAULT_PATH + "/test/draft_content.json", "w") as f:
+    #     json.dump(drafts, f, indent=4)
+    # print(f"Draft content saved to {DEFAULT_PATH + '/test/draft_content.json'}")
 
     # print("Get Draft by:")
 
@@ -1829,16 +1981,52 @@ if __name__ == "__main__":
     # print("Send all drafts:")
     # print(gmail_api.send_all_drafts())
 
-    print("Create Draft:")
-    print(
-        gmail_api.create_draft(
-            "Test 12",
-            "me",
-            ["begadtAmim.a@gmail.coM"],
-            ["begadtAmim.a@gmail.coM"],
-        )
-    )
+    # print("Create Draft:")
+    # print(gmail_api.create_draft(subject="Test 33", content="Hello"))
 
-    print("Update Draft:")
-    print("By Subject:")
-    print(gmail_api.update_drafts_by_subjects(["tEst 1"], new_subject="Test 2"))
+    # print("Update Draft:")
+    # print("By Subject:")
+    # print(
+    #     gmail_api.update_drafts_by_subjects(
+    #         ["tEst 1"],
+    #         new_subject="Test 2",
+    #         new_content="Hello",
+    #         new_recipients=["begadtAmim.a@gmail.coM"],
+    #         new_cc=["begadtAmim.a@gmail.coM"],
+    #         new_bcc=["begadtAmim.a@gmail.coM"],
+    #     )
+    # )
+
+    # print("By Recipients:")
+    # print(
+    #     gmail_api.update_drafts_by_recipients(
+    #         ["begadtAmim.a@gmail.coM"],
+    #         new_subject="Test 2",
+    #         new_content="Hello 2",
+    #     )
+    # )
+
+    # print("-" * 100)
+
+    print("LABELS:")
+    print()
+
+    labels = gmail_api.list_labels_content(type="all")
+    # label_id = labels[-2]["id"]
+    # label_name = labels[-2]["name"]
+
+    label_id = "INBOX"
+    label_name = "INBOX"
+
+    print(f"Label ID: {label_id}")
+    print(f"Label Name: {label_name}")
+
+    with open(DEFAULT_PATH + "/test/labels.json", "w") as f:
+        json.dump(labels, f, indent=4)
+
+    print(f"Labels saved to {DEFAULT_PATH + '/test/labels.json'}")
+
+    print("Label by Name:")
+    pprint(gmail_api.get_labels_by_name(label_name))
+
+    print("-" * 100)
