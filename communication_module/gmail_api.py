@@ -229,7 +229,7 @@ class GmailAPI:
             list: The draft content or None if an error occurred
         """
         try:
-            drafts = self._get_message_content(
+            drafts = self._get_message_thread_content(
                 self._get_draft_by_id(draft_id)["message"]["threadId"]
             )
 
@@ -1908,6 +1908,199 @@ class GmailAPI:
             new_text_colors=new_text_colors,
         )
 
+    # Label (Count)
+    ##############################################################################################################
+    def _count_by_label_id(self, label_id: str) -> int:
+        """
+        Count the number of messages by label ID
+
+        Args:
+            label_id (str): The label ID
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        try:
+            return (
+                self._service.users()
+                .messages()
+                .list(userId="me", labelIds=label_id)
+                .execute()["resultSizeEstimate"]
+            )
+        except HttpError as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    def count_by_label_name(self, label_name: str) -> int:
+        """
+        Count the number of messages by label name
+
+        Args:
+            label_name (str): The label name
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        label = self._get_label_by_name_raw(label_name)
+
+        if label is None:
+            return None
+
+        return self._count_by_label_id(label["id"])
+
+    def count_by_label_chat(self) -> int:
+        """
+        Count the number of messages by label chat
+
+        Args:
+            None
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        label = self._get_label_by_id("CHAT")
+
+        if label is None:
+            return None
+
+        return self._count_by_label_id(label["id"])
+
+    def count_by_label_sent(self) -> int:
+        """
+        Count the number of messages by label sent
+
+        Args:
+            None
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        label = self._get_label_by_id("SENT")
+
+        if label is None:
+            return None
+
+        return self._count_by_label_id(label["id"])
+
+    def count_by_label_inbox(self) -> int:
+        """
+        Count the number of messages by label inbox
+
+        Args:
+            None
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        label = self._get_label_by_id("INBOX")
+
+        if label is None:
+            return None
+
+        return self._count_by_label_id(label["id"])
+
+    def count_by_label_important(self) -> int:
+        """
+        Count the number of messages by label important
+
+        Args:
+            None
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        label = self._get_label_by_id("IMPORTANT")
+
+        if label is None:
+            return None
+
+        return self._count_by_label_id(label["id"])
+
+    def count_by_label_trash(self) -> int:
+        """
+        Count the number of messages by label trash
+
+        Args:
+            None
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        label = self._get_label_by_id("TRASH")
+
+        if label is None:
+            return None
+
+        return self._count_by_label_id(label["id"])
+
+    def count_by_label_draft(self) -> int:
+        """
+        Count the number of messages by label draft
+
+        Args:
+            None
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        label = self._get_label_by_id("DRAFT")
+
+        if label is None:
+            return None
+
+        return self._count_by_label_id(label["id"])
+
+    def count_by_label_spam(self) -> int:
+        """
+        Count the number of messages by label spam
+
+        Args:
+            None
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        label = self._get_label_by_id("SPAM")
+
+        if label is None:
+            return None
+
+        return self._count_by_label_id(label["id"])
+
+    def count_by_label_starred(self) -> int:
+        """
+        Count the number of messages by label starred
+
+        Args:
+            None
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        label = self._get_label_by_id("STARRED")
+
+        if label is None:
+            return None
+
+        return self._count_by_label_id(label["id"])
+
+    def count_by_label_unread(self) -> int:
+        """
+        Count the number of messages by label unread
+
+        Args:
+            None
+
+        Returns:
+            int: The number of messages or None if an error occurred
+        """
+        label = self._get_label_by_id("UNREAD")
+
+        if label is None:
+            return None
+
+        return self._count_by_label_id(label["id"])
+
     # Thread
     ##############################################################################################################
 
@@ -1937,6 +2130,89 @@ class GmailAPI:
     # Message
     ##############################################################################################################
 
+    # Message (List)
+    ##############################################################################################################
+    def _list_messages(
+        self,
+        max_results: int = 200,
+        include_spam_trash: bool = True,
+        label_ids: list = [],
+        query: str = "",
+    ) -> dict:
+        """
+        List all messages
+
+        Args:
+            max_results (int): The maximum number of results (default is 100)
+            query (str): The query
+            label_ids (list): The label IDs
+            include_spam_trash (bool): Whether to include spam and trash (default is False)
+
+        Returns:
+            dict: The list of messages or None if an error occurred
+        """
+        try:
+            return (
+                self._service.users()
+                .messages()
+                .list(
+                    userId="me",
+                    maxResults=max_results,
+                    q=query,
+                    labelIds=label_ids,
+                    includeSpamTrash=include_spam_trash,
+                )
+                .execute()
+            )
+        except HttpError as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    def list_messages_content(
+        self,
+        max_results: int = 200,
+        include_spam_trash: bool = True,
+        label_names: list = [],
+        query: str = "",
+    ) -> list:
+        """
+        List all messages content
+
+        Args:
+            max_results (int): The maximum number of results (default is 100)
+            query (str): The query
+            label_names (list): The label IDs
+            include_spam_trash (bool): Whether to include spam and trash (default is False)
+
+        Returns:
+            list: The list of messages content or None if an error occurred
+        """
+
+        label_ids = [
+            self._get_label_by_name_raw(label_name)["id"] for label_name in label_names
+        ]
+
+        messages = self._list_messages(
+            max_results=max_results,
+            include_spam_trash=include_spam_trash,
+            label_ids=label_ids,
+            query=query,
+        )
+
+        if messages is None:
+            return None
+
+        thread_ids = [message["threadId"] for message in messages["messages"]]
+
+        thread_ids = list(dict.fromkeys(thread_ids))
+
+        return_list = []
+
+        for thread_id in thread_ids:
+            return_list.extend(self._get_message_thread_content(thread_id))
+
+        return return_list
+
     # Message (Get)
     ##############################################################################################################
     def _get_message_by_id(self, message_id: str) -> dict:
@@ -1960,7 +2236,7 @@ class GmailAPI:
             print(f"An error occurred: {e}")
             return None
 
-    def _get_message_content(self, thread_id: str) -> list:
+    def _get_message_thread_content(self, thread_id: str) -> list:
         """
         Get the message content
 
@@ -2165,9 +2441,9 @@ if __name__ == "__main__":
     print()
 
     drafts = gmail_api.list_drafts_content()
-    with open(DEFAULT_PATH + "/test/draft_content.json", "w") as f:
+    with open(DEFAULT_PATH + "/test/drafts.json", "w") as f:
         json.dump(drafts, f, indent=4)
-    print(f"Draft content saved to {DEFAULT_PATH + '/test/draft_content.json'}")
+    print(f"Drafts saved to {DEFAULT_PATH + '/test/drafts.json'}")
 
     # print("Get Draft by:")
 
@@ -2353,4 +2629,19 @@ if __name__ == "__main__":
     #     )
     # )
 
+    # print("Count by Label:")
+    # print("Inbox:")
+    # print(gmail_api.count_by_label_inbox())
+    # print("Drafts:")
+    # print(gmail_api.count_by_label_draft())
+
     print("-" * 100)
+
+    print("MESSAGES:")
+    print()
+
+    messages = gmail_api.list_messages_content(max_results=5)
+
+    with open(DEFAULT_PATH + "/test/messages.json", "w") as f:
+        json.dump(messages, f, indent=4)
+    print(f"Messages saved to {DEFAULT_PATH + '/test/messages.json'}")
