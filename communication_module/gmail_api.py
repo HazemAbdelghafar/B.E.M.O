@@ -131,7 +131,7 @@ class GmailAPI:
     # Draft (List)
     ##############################################################################################################
 
-    def _list_drafts_ids(
+    def _list_drafts(
         self, max_results: int = 10, include_spam_trash: bool = False, query: str = None
     ) -> dict:
         """
@@ -174,7 +174,7 @@ class GmailAPI:
         Returns:
             list: The drafts content or None if an error occurred
         """
-        drafts = self._list_drafts_ids(
+        drafts = self._list_drafts(
             max_results=max_results, include_spam_trash=include_spam_trash, query=query
         )
 
@@ -2631,52 +2631,633 @@ class GmailAPI:
 
         if subjects != []:
             subjects = [subject.lower().strip() for subject in subjects]
+            for message in messages:
+                if message["subject"].lower().strip() in subjects:
+                    return_list.append(message)
 
         if recipients != []:
             recipients = [recipient.lower().strip() for recipient in recipients]
+            for message in messages:
+                if any(recipient in message["recipients"] for recipient in recipients):
+                    return_list.append(message)
 
         if senders != []:
             senders = [sender.lower().strip() for sender in senders]
+            for message in messages:
+                if any(sender in message["sender"] for sender in senders):
+                    return_list.append(message)
 
         if attachment_names != []:
             attachment_names = [
                 attachment_name.lower().strip() for attachment_name in attachment_names
             ]
+            for message in messages:
+                if any(
+                    attachment_name in message["attachment_name"]
+                    for attachment_name in attachment_names
+                ):
+                    return_list.append(message)
+
+        if has_attachment:
+            for message in messages:
+                if message["num_attachments"] > 0:
+                    return_list.append(message)
 
         if labels != []:
             label_ids = [
                 self._get_label_by_name_raw(label_name)["id"] for label_name in labels
             ]
+            for message in messages:
+                if any(label_id in message["label_ids"] for label_id in label_ids):
+                    return_list.append(message)
 
-        for message in messages:
-            if (
-                (subjects == [] or message["subject"].lower().strip() in subjects)
-                and (
-                    recipients == []
-                    or any(
-                        recipient in message["recipients"] for recipient in recipients
-                    )
-                )
-                and (
-                    senders == []
-                    or any(sender in message["sender"] for sender in senders)
-                )
-                and (
-                    attachment_names == []
-                    or any(
-                        attachment_name in message["attachment_name"]
-                        for attachment_name in attachment_names
-                    )
-                )
-                and (has_attachment == False or message["num_attachments"] > 0)
-                and (
-                    labels == []
-                    or any(label_id in message["label_ids"] for label_id in label_ids)
-                )
-            ):
-                return_list.append(message)
+        cleaned_return_list = []
+        for message in return_list:
+            message_id = message["id"]
+            if message_id not in [message["id"] for message in cleaned_return_list]:
+                cleaned_return_list.append(message)
 
         return return_list
+
+    # Message (Delete)
+    ##############################################################################################################
+    def _delete_message_by_id(self, message_id: str) -> bool:
+        """
+        Delete the message by ID
+
+        Args:
+            message_id (str): The message ID
+
+        Returns:
+            bool: True if the message was deleted successfully, False otherwise
+        """
+        try:
+            self._service.users().messages().trash(userId="me", id=message_id).execute()
+            return True
+        except HttpError as e:
+            print(f"An error occurred: {e}")
+            return False
+
+    def delete_all_messages(self) -> bool:
+        """
+        Delete all messages
+
+        Args:
+            None
+
+        Returns:
+            bool: True if the messages were deleted successfully, False otherwise
+        """
+        messages = self.list_messages_content()
+
+        if messages is None:
+            return False
+
+        return_list = []
+
+        for message in messages:
+            if not self._delete_message_by_id(message["id"]):
+                return_list.append(False)
+            else:
+                return_list.append(True)
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    def delete_messages_by_subjects(self, subjects: list) -> bool:
+        """
+        Delete the messages by subjects
+
+        Args:
+            subjects (list): The subjects
+
+        Returns:
+            bool: True if the messages were deleted successfully, False otherwise
+        """
+        messages = self.get_message_content_by_subjects(subjects)
+
+        if messages is None:
+            return False
+
+        return_list = []
+
+        for message in messages:
+            if not self._delete_message_by_id(message["id"]):
+                return_list.append(False)
+            else:
+                return_list.append(True)
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    def delete_messages_by_recipients(self, recipients: list) -> bool:
+        """
+        Delete the messages by recipients
+
+        Args:
+            recipients (list): The recipients
+
+        Returns:
+            bool: True if the messages were deleted successfully, False otherwise
+        """
+        messages = self.get_message_content_by_recipients(recipients)
+
+        if messages is None:
+            return False
+
+        return_list = []
+
+        for message in messages:
+            if not self._delete_message_by_id(message["id"]):
+                return_list.append(False)
+            else:
+                return_list.append(True)
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    def delete_messages_by_senders(self, senders: list) -> bool:
+        """
+        Delete the messages by senders
+
+        Args:
+            senders (list): The senders
+
+        Returns:
+            bool: True if the messages were deleted successfully, False otherwise
+        """
+        messages = self.get_message_content_by_senders(senders)
+
+        if messages is None:
+            return False
+
+        return_list = []
+
+        for message in messages:
+            if not self._delete_message_by_id(message["id"]):
+                return_list.append(False)
+            else:
+                return_list.append(True)
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    def delete_messages_by_attachment_names(self, attachment_names: list) -> bool:
+        """
+        Delete the messages by attachment names
+
+        Args:
+            attachment_names (list): The attachment names
+
+        Returns:
+            bool: True if the messages were deleted successfully, False otherwise
+        """
+        messages = self.get_message_content_by_attachment_names(attachment_names)
+
+        if messages is None:
+            return False
+
+        return_list = []
+
+        for message in messages:
+            if not self._delete_message_by_id(message["id"]):
+                return_list.append(False)
+            else:
+                return_list.append(True)
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    def delete_messages_by_has_attachment(self) -> bool:
+        """
+        Delete the messages by has attachment
+
+        Args:
+            None
+
+        Returns:
+            bool: True if the messages were deleted successfully, False otherwise
+        """
+        messages = self.get_message_by_has_attachment()
+
+        if messages is None:
+            return False
+
+        return_list = []
+
+        for message in messages:
+            if not self._delete_message_by_id(message["id"]):
+                return_list.append(False)
+            else:
+                return_list.append(True)
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    def delete_messages_by_labels(self, label_names: list) -> bool:
+        """
+        Delete the messages by labels
+
+        Args:
+            label_names (list): The label names
+
+        Returns:
+            bool: True if the messages were deleted successfully, False otherwise
+        """
+        messages = self.get_messages_by_labels(label_names)
+
+        if messages is None:
+            return False
+
+        return_list = []
+
+        for message in messages:
+            if not self._delete_message_by_id(message["id"]):
+                return_list.append(False)
+            else:
+                return_list.append(True)
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    def delete_messages_by_multiple(
+        self,
+        subjects: list = [],
+        recipients: list = [],
+        senders: list = [],
+        attachment_names: list = [],
+        has_attachment: bool = False,
+        labels: list = [],
+    ) -> bool:
+        """
+        Delete the messages by multiple
+
+        Args:
+            subjects (list): The subjects
+            recipients (list): The recipients
+            senders (list): The senders
+            attachment_names (list): The attachment names
+            has_attachment (bool): Whether the message has an attachment
+            labels (list): The labels
+
+        Returns:
+            bool: True if the messages were deleted successfully, False otherwise
+        """
+        messages = self.get_messages_by_multiple(
+            subjects=subjects,
+            recipients=recipients,
+            senders=senders,
+            attachment_names=attachment_names,
+            has_attachment=has_attachment,
+            labels=labels,
+        )
+
+        if messages is None:
+            return False
+
+        return_list = []
+
+        for message in messages:
+            if not self._delete_message_by_id(message["id"]):
+                return_list.append(False)
+            else:
+                return_list.append(True)
+
+        if return_list == []:
+            return False
+
+        return all(return_list)
+
+    # Message (Update)
+    ##############################################################################################################
+    def _update_messages_by_ids(
+        self,
+        message_ids: list,
+        add_label_ids: list = [],
+        remove_label_ids: list = [],
+    ) -> list:
+        """
+        Update the messages by IDs
+
+        Args:
+            message_ids (list): The message IDs
+            add_label_names (list): The label names to add
+            remove_label_names (list): The label names to remove
+
+        Returns:
+            list: The message IDs or None if an error occurred
+        """
+
+        try:
+            self._service.users().messages().batchModify(
+                userId="me",
+                body={
+                    "ids": message_ids,
+                    "addLabelIds": add_label_ids,
+                    "removeLabelIds": remove_label_ids,
+                },
+            ).execute()
+        except HttpError as e:
+            print(f"An error occurred: {e}")
+            return None
+
+        return message_ids
+
+    def _update_message_by_id(
+        self,
+        message_id: str,
+        add_label_ids: list = [],
+        remove_label_ids: list = [],
+    ) -> str:
+        """
+        Update the message by ID
+
+        Args:
+            message_id (str): The message ID
+            add_label_ids (list): The label IDs to add
+            remove_label_ids (list): The label IDs to remove
+
+        Returns:
+            str: The message ID or None if an error occurred
+        """
+
+        return self._update_messages_by_ids(
+            [message_id], add_label_ids=add_label_ids, remove_label_ids=remove_label_ids
+        )[0]
+
+    def update_messages_by_subjects(
+        self,
+        subjects: list,
+        add_label_names: list = [],
+        remove_label_names: list = [],
+    ) -> list:
+        """
+        Update the messages by subjects
+
+        Args:
+            subjects (list): The subjects
+            add_label_names (list): The label names to add
+            remove_label_names (list): The label names to remove
+
+        Returns:
+            list: The message IDs or None if an error occurred
+        """
+
+        messages = self.get_message_content_by_subjects(subjects)
+
+        if messages is None:
+            return None
+
+        return self._update_messages_by_ids(
+            [message["id"] for message in messages],
+            add_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in add_label_names
+            ],
+            remove_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in remove_label_names
+            ],
+        )
+
+    def update_messages_by_recipients(
+        self,
+        recipients: list,
+        add_label_names: list = [],
+        remove_label_names: list = [],
+    ) -> list:
+        """
+        Update the messages by recipients
+
+        Args:
+            recipients (list): The recipients
+            add_label_names (list): The label names to add
+            remove_label_names (list): The label names to remove
+
+        Returns:
+            list: The message IDs or None if an error occurred
+        """
+
+        messages = self.get_message_content_by_recipients(recipients)
+
+        if messages is None:
+            return None
+
+        return self._update_messages_by_ids(
+            [message["id"] for message in messages],
+            add_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in add_label_names
+            ],
+            remove_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in remove_label_names
+            ],
+        )
+
+    def update_messages_by_senders(
+        self,
+        senders: list,
+        add_label_names: list = [],
+        remove_label_names: list = [],
+    ) -> list:
+        """
+        Update the messages by senders
+
+        Args:
+            senders (list): The senders
+            add_label_names (list): The label names to add
+            remove_label_names (list): The label names to remove
+
+        Returns:
+            list: The message IDs or None if an error occurred
+        """
+
+        messages = self.get_message_content_by_senders(senders)
+
+        if messages is None:
+            return None
+
+        return self._update_messages_by_ids(
+            [message["id"] for message in messages],
+            add_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in add_label_names
+            ],
+            remove_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in remove_label_names
+            ],
+        )
+
+    def update_messages_by_attachment_names(
+        self,
+        attachment_names: list,
+        add_label_names: list = [],
+        remove_label_names: list = [],
+    ) -> list:
+        """
+        Update the messages by attachment names
+
+        Args:
+            attachment_names (list): The attachment names
+            add_label_names (list): The label names to add
+            remove_label_names (list): The label names to remove
+
+        Returns:
+            list: The message IDs or None if an error occurred
+        """
+
+        messages = self.get_message_content_by_attachment_names(attachment_names)
+
+        if messages is None:
+            return None
+
+        return self._update_messages_by_ids(
+            [message["id"] for message in messages],
+            add_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in add_label_names
+            ],
+            remove_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in remove_label_names
+            ],
+        )
+
+    def update_messages_by_has_attachment(
+        self,
+        add_label_names: list = [],
+        remove_label_names: list = [],
+    ) -> list:
+        """
+        Update the messages by has attachment
+
+        Args:
+            add_label_names (list): The label names to add
+            remove_label_names (list): The label names to remove
+
+        Returns:
+            list: The message IDs or None if an error occurred
+        """
+
+        messages = self.get_message_by_has_attachment()
+
+        if messages is None:
+            return None
+
+        return self._update_messages_by_ids(
+            [message["id"] for message in messages],
+            add_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in add_label_names
+            ],
+            remove_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in remove_label_names
+            ],
+        )
+
+    def update_messages_by_labels(
+        self,
+        label_names: list,
+        add_label_names: list = [],
+        remove_label_names: list = [],
+    ) -> list:
+        """
+        Update the messages by labels
+
+        Args:
+            label_names (list): The label names
+            add_label_names (list): The label names to add
+            remove_label_names (list): The label names to remove
+
+        Returns:
+            list: The message IDs or None if an error occurred
+        """
+
+        messages = self.get_messages_by_labels(label_names)
+
+        if messages is None:
+            return None
+
+        return self._update_messages_by_ids(
+            [message["id"] for message in messages],
+            add_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in add_label_names
+            ],
+            remove_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in remove_label_names
+            ],
+        )
+
+    def update_messages_by_multiple(
+        self,
+        subjects: list = [],
+        recipients: list = [],
+        senders: list = [],
+        attachment_names: list = [],
+        has_attachment: bool = False,
+        labels: list = [],
+        add_label_names: list = [],
+        remove_label_names: list = [],
+    ) -> list:
+        """
+        Update the messages by multiple
+
+        Args:
+            subjects (list): The subjects
+            recipients (list): The recipients
+            senders (list): The senders
+            attachment_names (list): The attachment names
+            has_attachment (bool): Whether the message has an attachment
+            labels (list): The labels
+            add_label_names (list): The label names to add
+            remove_label_names (list): The label names to remove
+
+        Returns:
+            list: The message IDs or None if an error occurred
+        """
+
+        messages = self.get_messages_by_multiple(
+            subjects=subjects,
+            recipients=recipients,
+            senders=senders,
+            attachment_names=attachment_names,
+            has_attachment=has_attachment,
+            labels=labels,
+        )
+
+        if messages is None:
+            return None
+
+        return self._update_messages_by_ids(
+            [message["id"] for message in messages],
+            add_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in add_label_names
+            ],
+            remove_label_ids=[
+                self._get_label_by_name_raw(label_name)["id"]
+                for label_name in remove_label_names
+            ],
+        )
 
 
 if __name__ == "__main__":
@@ -2904,62 +3485,61 @@ if __name__ == "__main__":
     print(f"Messages saved to {DEFAULT_PATH + '/test/messages.json'}")
 
     print("Get Message by:")
-    print("Subject:")
-    messages = gmail_api.get_message_content_by_subjects(["WeLcome to Airtm!"])
-    if messages:
-        for message in messages:
-            print(message["id"])
-    else:
-        print("No messages found")
+    # print("Subject:")
+    # messages = gmail_api.get_message_content_by_subjects(["WeLcome to Airtm!"])
+    # if messages:
+    #     for message in messages:
+    #         print(message["id"])
+    # else:
+    #     print("No messages found")
 
-    print("Recipients:")
-    messages = gmail_api.get_message_content_by_recipients(
-        ["notmomadoo55555@gmail.com"]
-    )
-    if messages:
-        for message in messages:
-            print(message["id"])
-    else:
-        print("No messages found")
+    # print("Recipients:")
+    # messages = gmail_api.get_message_content_by_recipients(
+    #     ["notmomadoo55555@gmail.com"]
+    # )
+    # if messages:
+    #     for message in messages:
+    #         print(message["id"])
+    # else:
+    #     print("No messages found")
 
-    print("Senders:")
-    messages = gmail_api.get_message_content_by_senders(
-        ["noreply@airtM.com", "no-reply@accounts.google.com"]
-    )
-    if messages:
-        for message in messages:
-            print(message["id"])
-    else:
-        print("No messages found")
+    # print("Senders:")
+    # messages = gmail_api.get_message_content_by_senders(
+    #     ["noreply@airtM.com", "no-reply@accounts.google.com"]
+    # )
+    # if messages:
+    #     for message in messages:
+    #         print(message["id"])
+    # else:
+    #     print("No messages found")
 
-    print("Attachment:")
-    messages = gmail_api.get_message_content_by_attachment_names(["Airtm"])
-    if messages:
-        for message in messages:
-            print(message["id"])
-    else:
-        print("No messages found")
+    # print("Attachment:")
+    # messages = gmail_api.get_message_content_by_attachment_names(["Airtm"])
+    # if messages:
+    #     for message in messages:
+    #         print(message["id"])
+    # else:
+    #     print("No messages found")
 
-    print("Has Attachment:")
-    messages = gmail_api.get_message_by_has_attachment()
-    if messages:
-        for message in messages:
-            print(message["id"])
-    else:
-        print("No messages found")
+    # print("Has Attachment:")
+    # messages = gmail_api.get_message_by_has_attachment()
+    # if messages:
+    #     for message in messages:
+    #         print(message["id"])
+    # else:
+    #     print("No messages found")
 
-    print("Labels:")
-    messages = gmail_api.get_messages_by_labels(["Test LABEL 1"])
-    if messages:
-        for message in messages:
-            print(message["id"])
-    else:
-        print("No messages found")
+    # print("Labels:")
+    # messages = gmail_api.get_messages_by_labels(["Test LABEL 1"])
+    # if messages:
+    #     for message in messages:
+    #         print(message["id"])
+    # else:
+    #     print("No messages found")
 
     print("Messages by Multiple:")
     messages = gmail_api.get_messages_by_multiple(
         subjects=["WeLcome to Airtm!"],
-        has_attachment=True,
         labels=["Test LABEL 1"],
     )
     if messages:
@@ -2967,5 +3547,84 @@ if __name__ == "__main__":
             print(message["id"])
     else:
         print("No messages found")
+
+    print("Delete Messages by:")
+    # print("Subject:")
+    # print(gmail_api.delete_messages_by_subjects(["WeLcome to Airtm!"]))
+    # print("Recipients:")
+    # print(gmail_api.delete_messages_by_recipients(["no-reply@accounts.google.com"]))
+    # print("Senders:")
+    # print(gmail_api.delete_messages_by_senders(["no-reply@accounts.google.com"]))
+    # print("Attachment:")
+    # print(gmail_api.delete_messages_by_attachment_names(["Airtm"]))
+    # print("Has Attachment:")
+    # print(gmail_api.delete_messages_by_has_attachment())
+    # print("Labels:")
+    # print(gmail_api.delete_messages_by_labels(["Test LABEL 1"]))
+    print("Messages by Multiple:")
+    print(
+        gmail_api.delete_messages_by_multiple(
+            subjects=["WeLcome to Airtm!"],
+            labels=["Test LABEL 1"],
+        )
+    )
+
+    print("Update Messages by:")
+    # print("Subject:")
+    # print(
+    #     gmail_api.update_messages_by_subjects(
+    #         ["WeLcome to Airtm!"],
+    #         add_label_names=["Test LABEL 1"],
+    #         remove_label_names=[],
+    #     )
+    # )
+    # print("Recipients:")
+    # print(
+    #     gmail_api.update_messages_by_recipients(
+    #         ["no-reply@accounts.google.com"],
+    #         add_label_names=["Test LABEL 1"],
+    #         remove_label_names=[],
+    #     )
+    # )
+    # print("Senders:")
+    # print(
+    #     gmail_api.update_messages_by_senders(
+    #         ["no-reply@accounts.google.com"],
+    #         add_label_names=["Test LABEL 1"],
+    #         remove_label_names=[],
+    #     )
+    # )
+    # print("Attachment:")
+    # print(
+    #     gmail_api.update_messages_by_attachment_names(
+    #         ["Airtm"],
+    #         add_label_names=["Test LABEL 1"],
+    #         remove_label_names=[],
+    #     )
+    # )
+    # print("Has Attachment:")
+    # print(
+    #     gmail_api.update_messages_by_has_attachment(
+    #         add_label_names=["Test LABEL 1"],
+    #         remove_label_names=[],
+    #     )
+    # )
+    # print("Labels:")
+    # print(
+    #     gmail_api.update_messages_by_labels(
+    #         ["Test LABEL 1"],
+    #         add_label_names=["Test LABEL 2"],
+    #         remove_label_names=[],
+    #     )
+    # )
+    print("Messages by Multiple:")
+    print(
+        gmail_api.update_messages_by_multiple(
+            subjects=["WeLcome to Airtm!"],
+            senders=["no-reply@accounts.google.com"],
+            add_label_names=["Test LABEL 2"],
+            remove_label_names=[],
+        )
+    )
 
     print("-" * 100)
