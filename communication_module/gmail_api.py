@@ -2302,6 +2302,10 @@ class GmailAPI:
                     .strip()
                 )
 
+                text = text.encode("ascii", "ignore").decode("ascii")
+
+                text = " ".join(text.split())
+
                 return_dict["html_content"] = content
                 return_dict["content"] = text
 
@@ -2645,3 +2649,5 @@ if __name__ == "__main__":
     with open(DEFAULT_PATH + "/test/messages.json", "w") as f:
         json.dump(messages, f, indent=4)
     print(f"Messages saved to {DEFAULT_PATH + '/test/messages.json'}")
+
+    print("-" * 100)
