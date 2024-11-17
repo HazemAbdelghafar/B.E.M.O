@@ -1368,32 +1368,6 @@ class GmailAPI:
             new_content=new_content,
         )
 
-    # Thread
-    ##############################################################################################################
-
-    # Thread (Get)
-    ##############################################################################################################
-    def _get_thread_by_id(self, thread_id: str) -> dict:
-        """
-        Get the thread by ID
-
-        Args:
-            thread_id (str): The thread ID
-
-        Returns:
-            dict: The thread or None if an error occurred
-        """
-        try:
-            return (
-                self._service.users()
-                .threads()
-                .get(userId="me", id=thread_id, format="full")
-                .execute()
-            )
-        except HttpError as e:
-            print(f"An error occurred: {e}")
-            return None
-
     # Label
     ##############################################################################################################
 
@@ -1933,7 +1907,33 @@ class GmailAPI:
             new_background_colors=new_background_colors,
             new_text_colors=new_text_colors,
         )
-    
+
+    # Thread
+    ##############################################################################################################
+
+    # Thread (Get)
+    ##############################################################################################################
+    def _get_thread_by_id(self, thread_id: str) -> dict:
+        """
+        Get the thread by ID
+
+        Args:
+            thread_id (str): The thread ID
+
+        Returns:
+            dict: The thread or None if an error occurred
+        """
+        try:
+            return (
+                self._service.users()
+                .threads()
+                .get(userId="me", id=thread_id, format="full")
+                .execute()
+            )
+        except HttpError as e:
+            print(f"An error occurred: {e}")
+            return None
+
     # Message
     ##############################################################################################################
 
