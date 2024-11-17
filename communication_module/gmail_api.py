@@ -349,12 +349,40 @@ class GmailAPI:
 
         return return_list
 
-    def get_drafts_by_or(
+    def get_drafts_by_labels(self, labels: list) -> list:
+        """
+        Get the drafts by labels
+
+        Args:
+            labels (list): The labels
+
+        Returns:
+            list: The draft content or None if an error occurred
+        """
+        drafts = self.list_drafts_content()
+
+        if drafts is None:
+            return None
+
+        labels_ids = [self._get_label_by_name_raw(label)["id"] for label in labels]
+
+        return_list = []
+
+        for draft in drafts:
+            draft_label_ids = draft["label_ids"]
+            for label_id in draft_label_ids:
+                if label_id in labels_ids:
+                    return_list.append(draft)
+
+        return return_list
+
+    def get_drafts_by_multiple(
         self,
         subjects: list = None,
         recipients: list = None,
         attachment_names: list = None,
         has_attachment: bool = False,
+        labels: list = None,
     ) -> list:
         """
         Get the drafts by subjects, recipients, attachment names, and has attachment (OR)
@@ -364,6 +392,7 @@ class GmailAPI:
             recipients (list): The recipients
             attachment_names (list): The attachment names
             has_attachment (bool): Whether the draft has an attachment (default is False)
+            labels (list): The labels
 
         Returns:
             list: The draft content or None if an error occurred
@@ -406,72 +435,21 @@ class GmailAPI:
                 if draft["num_attachments"] > 0:
                     return_list.append(draft)
 
+            if labels is not None:
+                labels_ids = [
+                    self._get_label_by_name_raw(label)["id"] for label in labels
+                ]
+                draft_label_ids = draft["label_ids"]
+                for label_id in draft_label_ids:
+                    if label_id in labels_ids:
+                        return_list.append(draft)
+
             return_list_cleaned = []
             for draft in return_list:
                 if draft["id"] not in [draft["id"] for draft in return_list_cleaned]:
                     return_list_cleaned.append(draft)
 
         return return_list_cleaned
-
-    def get_drafts_by_and(
-        self,
-        subjects: list = None,
-        recipients: list = None,
-        attachment_names: list = None,
-        has_attachment: bool = False,
-    ) -> list:
-        """
-        Get the drafts by subjects, recipients, attachment names, and has attachment (AND)
-
-        Args:
-            subjects (list): The subjects
-            recipients (list): The recipients
-            attachment_names (list): The attachment names
-            has_attachment (bool): Whether the draft has an attachment (default is False)
-
-        Returns:
-            list: The draft content or None if an error occurred
-        """
-
-        if (
-            subjects is None
-            and recipients is None
-            and attachment_names is None
-            and not has_attachment
-        ):
-            return self.list_drafts_content()
-
-        if subjects is None:
-            subjects_drafts = []
-        else:
-            subjects_drafts = self.get_draft_content_by_subjects(subjects)
-
-        if recipients is None:
-            recipients_drafts = []
-        else:
-            recipients_drafts = self.get_draft_content_by_recipients(recipients)
-
-        if attachment_names is None:
-            attachment_names_drafts = []
-        else:
-            attachment_names_drafts = self.get_draft_content_by_attachment_names(
-                attachment_names
-            )
-
-        if has_attachment:
-            has_attachment_drafts = self.get_draft_by_has_attachment()
-        else:
-            has_attachment_drafts = []
-
-        return_list = []
-
-        for draft in subjects_drafts:
-            if draft["id"] in [draft["id"] for draft in recipients_drafts]:
-                if draft["id"] in [draft["id"] for draft in attachment_names_drafts]:
-                    if draft["id"] in [draft["id"] for draft in has_attachment_drafts]:
-                        return_list.append(draft)
-
-        return return_list
 
     # Draft (Delete)
     ##############################################################################################################
@@ -633,32 +611,17 @@ class GmailAPI:
 
         return all(return_list)
 
-    def delete_drafts_by_or(
-        self,
-        subjects: list = None,
-        recipients: list = None,
-        attachment_names: list = None,
-        has_attachment: bool = False,
-    ) -> bool:
+    def delete_drafts_by_labels(self, labels: list) -> bool:
         """
-        Delete the drafts by subjects, recipients, attachment names, and has attachment (OR)
+        Delete the drafts by labels
 
         Args:
-            subjects (list): The subjects
-            recipients (list): The recipients
-            attachment_names (list): The attachment names
-            has_attachment (bool): Whether the draft has an attachment (default is False)
+            labels (list): The labels
 
         Returns:
             bool: True if the drafts were deleted successfully, False otherwise
         """
-
-        drafts = self.get_drafts_by_or(
-            subjects=subjects,
-            recipients=recipients,
-            attachment_names=attachment_names,
-            has_attachment=has_attachment,
-        )
+        drafts = self.get_drafts_by_labels(labels)
 
         if drafts is None:
             return False
@@ -676,31 +639,34 @@ class GmailAPI:
 
         return all(return_list)
 
-    def delete_drafts_by_and(
+    def delete_drafts_by_multiple(
         self,
         subjects: list = None,
         recipients: list = None,
         attachment_names: list = None,
         has_attachment: bool = False,
+        labels: list = None,
     ) -> bool:
         """
-        Delete the drafts by subjects, recipients, attachment names, and has attachment (AND)
+        Delete the drafts by subjects, recipients, attachment names, and has attachment (OR)
 
         Args:
             subjects (list): The subjects
             recipients (list): The recipients
             attachment_names (list): The attachment names
             has_attachment (bool): Whether the draft has an attachment (default is False)
+            labels (list): The labels
 
         Returns:
             bool: True if the drafts were deleted successfully, False otherwise
         """
 
-        drafts = self.get_drafts_by_and(
+        drafts = self.get_drafts_by_multiple(
             subjects=subjects,
             recipients=recipients,
             attachment_names=attachment_names,
             has_attachment=has_attachment,
+            labels=labels,
         )
 
         if drafts is None:
@@ -883,32 +849,17 @@ class GmailAPI:
 
         return all(return_list)
 
-    def send_drafts_by_or(
-        self,
-        subjects: list = None,
-        recipients: list = None,
-        attachment_names: list = None,
-        has_attachment: bool = False,
-    ) -> bool:
+    def send_drafts_by_labels(self, labels: list) -> bool:
         """
-        Send the drafts by subjects, recipients, attachment names, and has attachment (OR)
+        Send the drafts by labels
 
         Args:
-            subjects (list): The subjects
-            recipients (list): The recipients
-            attachment_names (list): The attachment names
-            has_attachment (bool): Whether the draft has an attachment (default is False)
+            labels (list): The labels
 
         Returns:
             bool: True if the drafts were sent successfully, False otherwise
         """
-
-        drafts = self.get_drafts_by_or(
-            subjects=subjects,
-            recipients=recipients,
-            attachment_names=attachment_names,
-            has_attachment=has_attachment,
-        )
+        drafts = self.get_drafts_by_labels(labels)
 
         if drafts is None:
             return False
@@ -926,15 +877,16 @@ class GmailAPI:
 
         return all(return_list)
 
-    def send_drafts_by_and(
+    def send_drafts_by_multiple(
         self,
         subjects: list = None,
         recipients: list = None,
         attachment_names: list = None,
         has_attachment: bool = False,
+        labels: list = None,
     ) -> bool:
         """
-        Send the drafts by subjects, recipients, attachment names, and has attachment (AND)
+        Send the drafts by subjects, recipients, attachment names, and has attachment (OR)
 
         Args:
             subjects (list): The subjects
@@ -946,11 +898,12 @@ class GmailAPI:
             bool: True if the drafts were sent successfully, False otherwise
         """
 
-        drafts = self.get_drafts_by_and(
+        drafts = self.get_drafts_by_multiple(
             subjects=subjects,
             recipients=recipients,
             attachment_names=attachment_names,
             has_attachment=has_attachment,
+            labels=labels,
         )
 
         if drafts is None:
@@ -1018,6 +971,7 @@ class GmailAPI:
             message["Cc"] = ", ".join(cc)
         if bcc != []:
             message["Bcc"] = ", ".join(bcc)
+
         message.set_content(content)
 
         encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
@@ -1493,7 +1447,7 @@ class GmailAPI:
                 return_dict["parent_name"] = splitted_names[0]
                 return_dict["name"] = splitted_names[1]
                 try:
-                    return_dict["parent_id"] = self._get_label_by_name_id(
+                    return_dict["parent_id"] = self._get_label_by_name_raw(
                         return_dict["parent_name"]
                     )["id"]
                 except TypeError:
@@ -1536,7 +1490,7 @@ class GmailAPI:
             print(f"An error occurred: {e}")
             return None
 
-    def _get_label_by_name_id(self, label_name: str) -> dict:
+    def _get_label_by_name_raw(self, label_name: str) -> dict:
         """
         Get the label by name ID
 
@@ -1616,7 +1570,7 @@ class GmailAPI:
                 return_dict["parent_name"] = splitted_names[0]
                 return_dict["name"] = splitted_names[1]
                 try:
-                    return_dict["parent_id"] = self._get_label_by_name_id(
+                    return_dict["parent_id"] = self._get_label_by_name_raw(
                         return_dict["parent_name"]
                     )["id"]
                 except TypeError:
@@ -1687,7 +1641,7 @@ class GmailAPI:
         Returns:
             bool: True if the labels were deleted successfully, False otherwise
         """
-        labels = [self._get_label_by_name_id(label_name) for label_name in label_names]
+        labels = [self._get_label_by_name_raw(label_name) for label_name in label_names]
 
         if labels is None:
             return False
@@ -1962,7 +1916,7 @@ class GmailAPI:
             list: The label IDs or None if an error occurred
         """
 
-        labels = [self._get_label_by_name_id(label_name) for label_name in label_names]
+        labels = [self._get_label_by_name_raw(label_name) for label_name in label_names]
 
         if labels is None:
             return None
@@ -1979,7 +1933,7 @@ class GmailAPI:
             new_background_colors=new_background_colors,
             new_text_colors=new_text_colors,
         )
-
+    
     # Message
     ##############################################################################################################
 
@@ -2031,16 +1985,18 @@ class GmailAPI:
             return_dict["id"] = message["id"]
             return_dict["thread_id"] = thread_id
             label_names = []
+            label_ids = []
             for label_id in message["labelIds"]:
-                name = self._get_label_by_id(label_id)["name"]
-                # Todo: Check
-                if name != "SENT":
-                    label_names.append(name)
+                label = self._get_label_by_id(label_id)
 
-                if name == None:
-                    label_names.append("UNLABELED")
+                if label is None:
+                    continue
+
+                label_names.append(label["name"])
+                label_ids.append(label["id"])
 
             return_dict["label_names"] = label_names
+            return_dict["label_ids"] = label_ids
             return_dict["created_at"] = epoch_to_date(
                 int(message["internalDate"]) / 1000
             )
@@ -2205,22 +2161,22 @@ if __name__ == "__main__":
 
     print("-" * 100)
 
-    # print("DRAFTS:")
-    # print()
+    print("DRAFTS:")
+    print()
 
-    # drafts = gmail_api._list_drafts_ids()
+    drafts = gmail_api._list_drafts_ids()
 
-    # message_id = drafts["drafts"][0]["message"]["id"]
-    # draft_id = drafts["drafts"][0]["id"]
-    # thread_id = drafts["drafts"][0]["message"]["threadId"]
-    # print(f"Message ID: {message_id}")
-    # print(f"Draft ID: {draft_id}")
-    # print(f"Thread ID: {thread_id}")
+    message_id = drafts["drafts"][0]["message"]["id"]
+    draft_id = drafts["drafts"][0]["id"]
+    thread_id = drafts["drafts"][0]["message"]["threadId"]
+    print(f"Message ID: {message_id}")
+    print(f"Draft ID: {draft_id}")
+    print(f"Thread ID: {thread_id}")
 
-    # drafts = gmail_api.list_drafts_content()
-    # with open(DEFAULT_PATH + "/test/draft_content.json", "w") as f:
-    #     json.dump(drafts, f, indent=4)
-    # print(f"Draft content saved to {DEFAULT_PATH + '/test/draft_content.json'}")
+    drafts = gmail_api.list_drafts_content()
+    with open(DEFAULT_PATH + "/test/draft_content.json", "w") as f:
+        json.dump(drafts, f, indent=4)
+    print(f"Draft content saved to {DEFAULT_PATH + '/test/draft_content.json'}")
 
     # print("Get Draft by:")
 
@@ -2258,32 +2214,21 @@ if __name__ == "__main__":
     # else:
     #     print("No drafts found")
 
-    # print("Drafts by OR:")
-    # drafts = gmail_api.get_drafts_by_or(
-    #     subjects=["hi 1"],
-    #     recipients=["zomAboss23@gmail.com", "begadtAmim.a@gmail.com"],
-    #     attachment_names=["3D prInting Sheet"],
-    #     has_attachment=False,
-    # )
-    # drafts = gmail_api.get_drafts_by_or(
-    #     subjects=["test 1"],
-    #     recipients=["zomAboss23@gmail.com"],
-    #     attachment_names=["3D prInting Sheet"],
-    #     has_attachment=True,
-    # )
-
+    # print("Labels:")
+    # drafts = gmail_api.get_drafts_by_labels(["Test LABEL 1"])
     # if drafts:
     #     for draft in drafts:
     #         print(draft["id"])
     # else:
     #     print("No drafts found")
 
-    # print("Drafts by AND:")
-    # drafts = gmail_api.get_drafts_by_and(
-    #     subjects=["test 1"],
-    #     recipients=["zomAboss23@gmail.com"],
+    # print("Drafts by Multiple:")
+    # drafts = gmail_api.get_drafts_by_multiple(
+    #     subjects=["hi 1"],
+    #     # recipients=["zomAboss23@gmail.com", "begadtAmim.a@gmail.com"],
     #     attachment_names=["3D prInting Sheet"],
     #     has_attachment=False,
+    #     labels=["Test LABEL 1"],
     # )
 
     # if drafts:
@@ -2301,22 +2246,14 @@ if __name__ == "__main__":
     # print(gmail_api.delete_drafts_by_attachment_names(["3D prInting Sheet"]))
     # print("Attachment:")
     # print(gmail_api.delete_drafts_by_has_attachment())
+    # print("Labels:")
+    # print(gmail_api.delete_drafts_by_labels(["Test LABEL 1"]))
 
-    # print("Drafts by OR:")
+    # print("Drafts by Multiple:")
     # print(
-    #     gmail_api.delete_drafts_by_or(
+    #     gmail_api.delete_drafts_by_multiple(
     #         subjects=["test 1"],
     #         recipients=["ZomAboss23@gmail.com"],
-    #         attachment_names=["3D prInting Sheet"],
-    #         has_attachment=False,
-    #     )
-    # )
-
-    # print("Drafts by AND:")
-    # print(
-    #     gmail_api.delete_drafts_by_and(
-    #         subjects=["test 1"],
-    #         recipients=["begadtAmim.a@gmail.coM"],
     #         attachment_names=["3D prInting Sheet"],
     #         has_attachment=False,
     #     )
@@ -2335,21 +2272,11 @@ if __name__ == "__main__":
     # print("Attachment:")
     # print(gmail_api.send_drafts_by_has_attachment())
 
-    # print("Drafts by OR:")
+    # print("Drafts by Multiple:")
     # print(
-    #     gmail_api.send_drafts_by_or(
+    #     gmail_api.send_drafts_by_multiple(
     #         subjects=["test 1"],
     #         recipients=["ZomAboss23@gmail.com"],
-    #         attachment_names=["3D prInting Sheet"],
-    #         has_attachment=False,
-    #     )
-    # )
-
-    # print("Drafts by AND:")
-    # print(
-    #     gmail_api.send_drafts_by_and(
-    #         subjects=["test 1"],
-    #         recipients=["begadtAmim.a@gmail.coM"],
     #         attachment_names=["3D prInting Sheet"],
     #         has_attachment=False,
     #     )
@@ -2359,7 +2286,11 @@ if __name__ == "__main__":
     # print(gmail_api.send_all_drafts())
 
     # print("Create Draft:")
-    # print(gmail_api.create_draft(subject="Test 33", content="Hello"))
+    # print(
+    #     gmail_api.create_draft(
+    #         subject="Test 33", content="Hello"
+    #     )
+    # )
 
     # print("Update Draft:")
     # print("By Subject:")
@@ -2385,23 +2316,23 @@ if __name__ == "__main__":
 
     # print("-" * 100)
 
-    print("LABELS:")
-    print()
+    # print("LABELS:")
+    # print()
 
-    labels = gmail_api.list_labels_content(type="all")
-    label_id = labels[-1]["id"]
-    label_name = labels[-1]["name"]
+    # labels = gmail_api.list_labels_content(type="all")
+    # label_id = labels[-1]["id"]
+    # label_name = labels[-1]["name"]
 
-    print(f"Label ID: {label_id}")
-    print(f"Label Name: {label_name}")
+    # print(f"Label ID: {label_id}")
+    # print(f"Label Name: {label_name}")
 
-    with open(DEFAULT_PATH + "/test/labels.json", "w") as f:
-        json.dump(labels, f, indent=4)
+    # with open(DEFAULT_PATH + "/test/labels.json", "w") as f:
+    #     json.dump(labels, f, indent=4)
 
-    print(f"Labels saved to {DEFAULT_PATH + '/test/labels.json'}")
+    # print(f"Labels saved to {DEFAULT_PATH + '/test/labels.json'}")
 
-    print("Label by Name:")
-    pprint(gmail_api.get_labels_by_name(label_name))
+    # print("Label by Name:")
+    # pprint(gmail_api.get_labels_by_name(label_name))
 
     # print("Delete all labels:")
     # print(gmail_api.delete_all_labels())
@@ -2425,13 +2356,13 @@ if __name__ == "__main__":
     #     )
     # )
 
-    print("Update Label:")
-    print(
-        gmail_api.update_labels_by_name(
-            label_names=["Test LabEl 3"],
-            new_background_colors=["Yellow"],
-            new_text_colors=["green"],
-        )
-    )
+    # print("Update Label:")
+    # print(
+    #     gmail_api.update_labels_by_name(
+    #         label_names=["Test LabEl 3"],
+    #         new_background_colors=["Yellow"],
+    #         new_text_colors=["green"],
+    #     )
+    # )
 
-    print("-" * 100)
+    # print("-" * 100)
