@@ -2164,15 +2164,6 @@ if __name__ == "__main__":
     print("DRAFTS:")
     print()
 
-    drafts = gmail_api._list_drafts_ids()
-
-    message_id = drafts["drafts"][0]["message"]["id"]
-    draft_id = drafts["drafts"][0]["id"]
-    thread_id = drafts["drafts"][0]["message"]["threadId"]
-    print(f"Message ID: {message_id}")
-    print(f"Draft ID: {draft_id}")
-    print(f"Thread ID: {thread_id}")
-
     drafts = gmail_api.list_drafts_content()
     with open(DEFAULT_PATH + "/test/draft_content.json", "w") as f:
         json.dump(drafts, f, indent=4)
@@ -2314,22 +2305,22 @@ if __name__ == "__main__":
     #     )
     # )
 
-    # print("-" * 100)
+    print("-" * 100)
 
-    # print("LABELS:")
-    # print()
+    print("LABELS:")
+    print()
 
-    # labels = gmail_api.list_labels_content(type="all")
-    # label_id = labels[-1]["id"]
-    # label_name = labels[-1]["name"]
+    labels = gmail_api.list_labels_content(type="all")
+    label_id = labels[-1]["id"]
+    label_name = labels[-1]["name"]
 
-    # print(f"Label ID: {label_id}")
-    # print(f"Label Name: {label_name}")
+    print(f"Label ID: {label_id}")
+    print(f"Label Name: {label_name}")
 
-    # with open(DEFAULT_PATH + "/test/labels.json", "w") as f:
-    #     json.dump(labels, f, indent=4)
+    with open(DEFAULT_PATH + "/test/labels.json", "w") as f:
+        json.dump(labels, f, indent=4)
 
-    # print(f"Labels saved to {DEFAULT_PATH + '/test/labels.json'}")
+    print(f"Labels saved to {DEFAULT_PATH + '/test/labels.json'}")
 
     # print("Label by Name:")
     # pprint(gmail_api.get_labels_by_name(label_name))
@@ -2365,4 +2356,4 @@ if __name__ == "__main__":
     #     )
     # )
 
-    # print("-" * 100)
+    print("-" * 100)
