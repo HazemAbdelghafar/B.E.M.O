@@ -2314,9 +2314,6 @@ if __name__ == "__main__":
     label_id = labels[-1]["id"]
     label_name = labels[-1]["name"]
 
-    print(f"Label ID: {label_id}")
-    print(f"Label Name: {label_name}")
-
     with open(DEFAULT_PATH + "/test/labels.json", "w") as f:
         json.dump(labels, f, indent=4)
 
