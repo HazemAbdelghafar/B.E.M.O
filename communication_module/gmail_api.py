@@ -12,6 +12,7 @@ from googleapiclient.errors import HttpError
 from init_user import init_user
 from utils import epoch_to_date
 from utils import hex_to_color_name
+from utils import color_name_to_hex
 
 import os
 import json
@@ -1491,9 +1492,13 @@ class GmailAPI:
                 splitted_names = return_dict["name"].split("/")
                 return_dict["parent_name"] = splitted_names[0]
                 return_dict["name"] = splitted_names[1]
-                return_dict["parent_id"] = self._get_label_by_name_id(
-                    return_dict["parent_name"]
-                )["id"]
+                try:
+                    return_dict["parent_id"] = self._get_label_by_name_id(
+                        return_dict["parent_name"]
+                    )["id"]
+                except TypeError:
+                    return_dict["parent_id"] = ""
+                    return_dict["parent_name"] = ""
             else:
                 return_dict["parent_name"] = ""
                 return_dict["parent_id"] = ""
@@ -1546,9 +1551,18 @@ class GmailAPI:
         if labels is None:
             return None
 
-        for label in labels["labels"]:
-            if label["name"] == label_name:
-                return label
+        label_name = label_name.lower().strip()
+        label_names = [label["name"].lower().strip() for label in labels["labels"]]
+
+        for i, name in enumerate(label_names):
+
+            try:
+                name = name.split("/")[1]
+            except IndexError:
+                pass
+
+            if name == label_name:
+                return labels["labels"][i]
 
         return None
 
@@ -1571,7 +1585,7 @@ class GmailAPI:
         found_labels = []
 
         for label in labels:
-            if label["name"] == label_name:
+            if label["name"].lower().strip() == label_name.lower().strip():
                 found_labels.append(self._get_label_by_id(label["id"]))
 
         if found_labels == []:
@@ -1601,9 +1615,13 @@ class GmailAPI:
                 splitted_names = return_dict["name"].split("/")
                 return_dict["parent_name"] = splitted_names[0]
                 return_dict["name"] = splitted_names[1]
-                return_dict["parent_id"] = self._get_label_by_name_id(
-                    return_dict["parent_name"]
-                )["id"]
+                try:
+                    return_dict["parent_id"] = self._get_label_by_name_id(
+                        return_dict["parent_name"]
+                    )["id"]
+                except TypeError:
+                    return_dict["parent_id"] = ""
+                    return_dict["parent_name"] = ""
             else:
                 return_dict["parent_name"] = ""
                 return_dict["parent_id"] = ""
@@ -1689,6 +1707,278 @@ class GmailAPI:
 
     # Label (Create)
     ##############################################################################################################
+    def create_label(
+        self,
+        label_name: str,
+        parent_label_name: str = None,
+        background_color: str = None,
+        text_color: str = None,
+    ) -> str:
+        """
+        Create a label
+
+        Args:
+            label_name (str): The label name
+            parent_label_name (str): The parent label name
+            background_color (str): The background color
+            text_color (str): The text color
+
+        Returns:
+            str: The label ID or None if an error occurred
+        """
+        label_name = label_name.lower().strip()
+
+        if parent_label_name is not None:
+            parent_label_name = parent_label_name.lower().strip()
+
+        if background_color is not None:
+            background_color = color_name_to_hex(background_color)
+
+        if text_color is not None:
+            text_color = color_name_to_hex(text_color)
+
+        if parent_label_name is not None:
+            label_name = parent_label_name + "/" + label_name
+
+        label = {
+            "name": label_name,
+            "type": "user",
+            "color": {"backgroundColor": background_color, "textColor": text_color},
+        }
+
+        try:
+            return (
+                self._service.users()
+                .labels()
+                .create(userId="me", body=label)
+                .execute()["id"]
+            )
+        except HttpError as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    def create_labels(
+        self,
+        label_names: list,
+        parent_label_names: list = [],
+        background_colors: list = [],
+        text_colors: list = [],
+    ) -> list:
+        """
+        Create labels
+
+        Args:
+            label_names (list): The label names
+            parent_label_names (list): The parent label names
+            background_colors (list): The background colors
+            text_colors (list): The text colors
+
+        Returns:
+            list: The label IDs or None if an error occurred
+        """
+
+        return_list = []
+
+        if (
+            len(label_names)
+            != len(parent_label_names)
+            != len(background_colors)
+            != len(text_colors)
+        ):
+            return None
+
+        for label_name, parent_label_name, background_color, text_color in zip(
+            label_names, parent_label_names, background_colors, text_colors
+        ):
+            label_id = self.create_label(
+                label_name, parent_label_name, background_color, text_color
+            )
+
+            if label_id is not None:
+                return_list.append(label_id)
+
+        if return_list == []:
+            return None
+
+        return return_list
+
+    # Label (Update)
+    ##############################################################################################################
+    def _update_label_by_id(
+        self,
+        label_id: str,
+        new_label_name: str = None,
+        new_parent_label_name: str = None,
+        new_background_color: str = None,
+        new_text_color: str = None,
+    ) -> str:
+        """
+        Update a label
+
+        Args:
+            label_id (str): The label ID
+            new_label_name (str): The new label name
+            new_parent_label_name (str): The new parent label name
+            new_background_color (str): The new background color
+            new_text_color (str): The new text color
+
+        Returns:
+            str: The label ID or None if an error occurred
+        """
+        label = self._get_label_by_id(label_id)
+
+        if new_label_name is not None:
+            new_label_name = new_label_name.lower().strip()
+        else:
+            new_label_name = label["name"]
+
+        if new_parent_label_name is not None:
+            new_parent_label_name = new_parent_label_name.lower().strip()
+            new_label_name = new_parent_label_name + "/" + new_label_name
+        else:
+            new_parent_label_name = label["name"].split("/")[0]
+
+        if new_background_color is not None:
+            new_background_color = color_name_to_hex(new_background_color)
+        else:
+            new_background_color = label["color"]["backgroundColor"]
+
+        if new_text_color is not None:
+            new_text_color = color_name_to_hex(new_text_color)
+        else:
+            new_text_color = label["color"]["textColor"]
+
+        label = {
+            "name": new_label_name,
+            "type": "user",
+            "color": {
+                "backgroundColor": new_background_color,
+                "textColor": new_text_color,
+            },
+        }
+
+        try:
+            return (
+                self._service.users()
+                .labels()
+                .patch(userId="me", id=label_id, body=label)
+                .execute()["id"]
+            )
+        except HttpError as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    def _update_labels_by_id(
+        self,
+        label_ids: list,
+        new_label_names: list = [],
+        new_parent_label_names: list = [],
+        new_background_colors: list = [],
+        new_text_colors: list = [],
+    ) -> list:
+        """
+        Update the labels by ID
+
+        Args:
+            label_ids (list): The label IDs
+            new_label_names (list): The new label names
+            new_parent_label_names (list): The new parent label names
+            new_background_colors (list): The new background colors
+            new_text_colors (list): The new text colors
+
+        Returns:
+            list: The label IDs or None if an error occurred
+        """
+
+        return_list = []
+
+        if (
+            len(label_ids) != len(new_label_names)
+            and len(new_label_names) != 0 != len(new_parent_label_names)
+            and len(new_parent_label_names) != 0 != len(new_background_colors)
+            and len(new_background_colors) != 0 != len(new_text_colors)
+            and len(new_text_colors) != 0
+        ):
+            return None
+
+        if len(new_label_names) == 0:
+            new_label_names = [None] * len(label_ids)
+        if len(new_parent_label_names) == 0:
+            new_parent_label_names = [None] * len(label_ids)
+        if len(new_background_colors) == 0:
+            new_background_colors = [None] * len(label_ids)
+        if len(new_text_colors) == 0:
+            new_text_colors = [None] * len(label_ids)
+
+        for (
+            label_id,
+            new_label_name,
+            new_parent_label_name,
+            new_background_color,
+            new_text_color,
+        ) in zip(
+            label_ids,
+            new_label_names,
+            new_parent_label_names,
+            new_background_colors,
+            new_text_colors,
+        ):
+
+            new_label_id = self._update_label_by_id(
+                label_id,
+                new_label_name,
+                new_parent_label_name,
+                new_background_color,
+                new_text_color,
+            )
+
+            if new_label_id is not None:
+                return_list.append(new_label_id)
+
+        if return_list == []:
+            return None
+
+        return return_list
+
+    def update_labels_by_name(
+        self,
+        label_names: list,
+        new_label_names: list = [],
+        new_parent_label_names: list = [],
+        new_background_colors: list = [],
+        new_text_colors: list = [],
+    ) -> list:
+        """
+        Update the labels by name
+
+        Args:
+            label_names (list): The label names
+            new_label_names (list): The new label names
+            new_parent_label_names (list): The new parent label names
+            new_background_colors (list): The new background colors
+            new_text_colors (list): The new text colors
+
+        Returns:
+            list: The label IDs or None if an error occurred
+        """
+
+        labels = [self._get_label_by_name_id(label_name) for label_name in label_names]
+
+        if labels is None:
+            return None
+
+        labels = [label for label in labels if label is not None]
+
+        if labels == []:
+            return None
+
+        return self._update_labels_by_id(
+            [label["id"] for label in labels],
+            new_label_names=new_label_names,
+            new_parent_label_names=new_parent_label_names,
+            new_background_colors=new_background_colors,
+            new_text_colors=new_text_colors,
+        )
 
     # Message
     ##############################################################################################################
@@ -2118,5 +2408,30 @@ if __name__ == "__main__":
 
     # print("Delete labels by name:")
     # print(gmail_api.delete_labels_by_name([label_name]))
+
+    # print("Create Label:")
+    # print(
+    #     gmail_api.create_label(
+    #         label_name="Test Label 1", background_color="red", text_color="black"
+    #     )
+    # )
+
+    # print(
+    #     gmail_api.create_label(
+    #         label_name="Test Label 2",
+    #         parent_label_name="Test Label 1",
+    #         background_color="blue",
+    #         text_color="white",
+    #     )
+    # )
+
+    print("Update Label:")
+    print(
+        gmail_api.update_labels_by_name(
+            label_names=["Test LabEl 3"],
+            new_background_colors=["Yellow"],
+            new_text_colors=["green"],
+        )
+    )
 
     print("-" * 100)
