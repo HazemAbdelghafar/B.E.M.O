@@ -229,7 +229,7 @@ class GmailAPI:
             list: The draft content or None if an error occurred
         """
         try:
-            drafts = self._get_message_thread_content(
+            drafts = self._get_message_content_by_thread_id(
                 self._get_draft_by_id(draft_id)["message"]["threadId"]
             )
 
@@ -2209,7 +2209,7 @@ class GmailAPI:
         return_list = []
 
         for thread_id in thread_ids:
-            return_list.extend(self._get_message_thread_content(thread_id))
+            return_list.extend(self._get_message_content_by_thread_id(thread_id))
 
         return return_list
 
@@ -2236,7 +2236,7 @@ class GmailAPI:
             print(f"An error occurred: {e}")
             return None
 
-    def _get_message_thread_content(self, thread_id: str) -> list:
+    def _get_message_content_by_thread_id(self, thread_id: str) -> list:
         """
         Get the message content
 
@@ -2424,6 +2424,257 @@ class GmailAPI:
             return_dict["num_attachments"] = len(return_dict["attachment_name"])
 
             return_list.append(return_dict)
+
+        return return_list
+
+    def _get_message_content_by_id(self, message_id: str) -> dict:
+        """
+        Get the message content
+
+        Args:
+            message_id (str): The message ID
+
+        Returns:
+            dict: The message content
+        """
+        message = self._get_message_by_id(message_id)
+
+        if message is None:
+            return None
+
+        return self._get_message_content_by_thread_id(message["threadId"])[0]
+
+    def get_message_content_by_subjects(self, subjects: list) -> list:
+        """
+        Get the message content by subjects
+
+        Args:
+            subjects (list): The subjects
+
+        Returns:
+            list: The message content or None if an error occurred
+        """
+        messages = self.list_messages_content()
+
+        if messages is None:
+            return None
+
+        subjects = [subject.lower().strip() for subject in subjects]
+
+        return_list = []
+
+        for message in messages:
+            if message["subject"].lower().strip() in subjects:
+                return_list.append(message)
+
+        return return_list
+
+    def get_message_content_by_recipients(self, recipients: list) -> list:
+        """
+        Get the message content by recipients
+
+        Args:
+            recipients (list): The recipients
+
+        Returns:
+            list: The message content or None if an error occurred
+        """
+        messages = self.list_messages_content()
+
+        if messages is None:
+            return None
+
+        recipients = [recipient.lower().strip() for recipient in recipients]
+
+        return_list = []
+
+        for message in messages:
+            if any(recipient in message["recipients"] for recipient in recipients):
+                return_list.append(message)
+
+        return return_list
+
+    def get_message_content_by_senders(self, senders: list) -> list:
+        """
+        Get the message content by senders
+
+        Args:
+            senders (list): The senders
+
+        Returns:
+            list: The message content or None if an error occurred
+        """
+        messages = self.list_messages_content()
+
+        if messages is None:
+            return None
+
+        senders = [sender.lower().strip() for sender in senders]
+
+        return_list = []
+
+        for message in messages:
+            if any(sender in message["sender"] for sender in senders):
+                return_list.append(message)
+
+        return return_list
+
+    def get_message_content_by_attachment_names(self, attachment_names: list) -> list:
+        """
+        Get the message content by attachment names
+
+        Args:
+            attachment_names (list): The attachment names
+
+        Returns:
+            list: The message content or None if an error occurred
+        """
+        messages = self.list_messages_content()
+
+        if messages is None:
+            return None
+
+        attachment_names = [
+            attachment_name.lower().strip() for attachment_name in attachment_names
+        ]
+
+        return_list = []
+
+        for message in messages:
+            if any(
+                attachment_name in message["attachment_name"]
+                for attachment_name in attachment_names
+            ):
+                return_list.append(message)
+
+        return return_list
+
+    def get_message_by_has_attachment(self) -> list:
+        """
+        Get the message content by has attachment
+
+        Args:
+            None
+
+        Returns:
+            list: The message content or None if an error occurred
+        """
+        messages = self.list_messages_content()
+
+        if messages is None:
+            return None
+
+        return_list = []
+
+        for message in messages:
+            if message["num_attachments"] > 0:
+                return_list.append(message)
+
+        return return_list
+
+    def get_messages_by_labels(self, label_names: list) -> list:
+        """
+        Get the messages by labels
+
+        Args:
+            label_names (list): The label names
+
+        Returns:
+            list: The messages or None if an error occurred
+        """
+        messages = self.list_messages_content()
+
+        if messages is None:
+            return None
+
+        label_ids = [
+            self._get_label_by_name_raw(label_name)["id"] for label_name in label_names
+        ]
+
+        return_list = []
+
+        for message in messages:
+            if any(label_id in message["label_ids"] for label_id in label_ids):
+                return_list.append(message)
+
+        return return_list
+
+    def get_messages_by_multiple(
+        self,
+        subjects: list = [],
+        recipients: list = [],
+        senders: list = [],
+        attachment_names: list = [],
+        has_attachment: bool = False,
+        labels: list = [],
+    ) -> list:
+        """
+        Get the messages by multiple
+
+        Args:
+            subjects (list): The subjects
+            recipients (list): The recipients
+            senders (list): The senders
+            attachment_names (list): The attachment names
+            has_attachment (bool): Whether the message has an attachment
+            labels (list): The labels
+
+        Returns:
+            list: The messages or None if an error occurred
+        """
+        messages = self.list_messages_content()
+
+        if messages is None:
+            return None
+
+        return_list = []
+
+        if subjects != []:
+            subjects = [subject.lower().strip() for subject in subjects]
+
+        if recipients != []:
+            recipients = [recipient.lower().strip() for recipient in recipients]
+
+        if senders != []:
+            senders = [sender.lower().strip() for sender in senders]
+
+        if attachment_names != []:
+            attachment_names = [
+                attachment_name.lower().strip() for attachment_name in attachment_names
+            ]
+
+        if labels != []:
+            label_ids = [
+                self._get_label_by_name_raw(label_name)["id"] for label_name in labels
+            ]
+
+        for message in messages:
+            if (
+                (subjects == [] or message["subject"].lower().strip() in subjects)
+                and (
+                    recipients == []
+                    or any(
+                        recipient in message["recipients"] for recipient in recipients
+                    )
+                )
+                and (
+                    senders == []
+                    or any(sender in message["sender"] for sender in senders)
+                )
+                and (
+                    attachment_names == []
+                    or any(
+                        attachment_name in message["attachment_name"]
+                        for attachment_name in attachment_names
+                    )
+                )
+                and (has_attachment == False or message["num_attachments"] > 0)
+                and (
+                    labels == []
+                    or any(label_id in message["label_ids"] for label_id in label_ids)
+                )
+            ):
+                return_list.append(message)
 
         return return_list
 
@@ -2645,9 +2896,76 @@ if __name__ == "__main__":
     print()
 
     messages = gmail_api.list_messages_content(max_results=5)
+    message_id = messages[-1]["id"]
+    message_thread_id = messages[-1]["thread_id"]
 
     with open(DEFAULT_PATH + "/test/messages.json", "w") as f:
         json.dump(messages, f, indent=4)
     print(f"Messages saved to {DEFAULT_PATH + '/test/messages.json'}")
+
+    print("Get Message by:")
+    print("Subject:")
+    messages = gmail_api.get_message_content_by_subjects(["WeLcome to Airtm!"])
+    if messages:
+        for message in messages:
+            print(message["id"])
+    else:
+        print("No messages found")
+
+    print("Recipients:")
+    messages = gmail_api.get_message_content_by_recipients(
+        ["notmomadoo55555@gmail.com"]
+    )
+    if messages:
+        for message in messages:
+            print(message["id"])
+    else:
+        print("No messages found")
+
+    print("Senders:")
+    messages = gmail_api.get_message_content_by_senders(
+        ["noreply@airtM.com", "no-reply@accounts.google.com"]
+    )
+    if messages:
+        for message in messages:
+            print(message["id"])
+    else:
+        print("No messages found")
+
+    print("Attachment:")
+    messages = gmail_api.get_message_content_by_attachment_names(["Airtm"])
+    if messages:
+        for message in messages:
+            print(message["id"])
+    else:
+        print("No messages found")
+
+    print("Has Attachment:")
+    messages = gmail_api.get_message_by_has_attachment()
+    if messages:
+        for message in messages:
+            print(message["id"])
+    else:
+        print("No messages found")
+
+    print("Labels:")
+    messages = gmail_api.get_messages_by_labels(["Test LABEL 1"])
+    if messages:
+        for message in messages:
+            print(message["id"])
+    else:
+        print("No messages found")
+
+    print("Messages by Multiple:")
+    messages = gmail_api.get_messages_by_multiple(
+        subjects=["WeLcome to Airtm!"],
+        has_attachment=True,
+        labels=["Test LABEL 1"],
+    )
+    if messages:
+        for message in messages:
+            print(message["id"])
+    else:
+        print("No messages found")
 
     print("-" * 100)
