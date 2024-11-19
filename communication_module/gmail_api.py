@@ -10,9 +10,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from init_user import init_user
-from utils import epoch_to_date
-from utils import hex_to_color_name
-from utils import color_name_to_hex
+from utils import epoch_to_date_and_time, epoch_to_relative_time
+from utils import hex_to_color_name, color_name_to_hex
 
 import os
 import json
@@ -20,23 +19,26 @@ import json
 # Todo: Fix default note appearing twice
 DEFAULT_NOTE = "\n\n<Sent from BEMO>\n"
 DEFAULT_PATH = os.path.dirname(__file__)
+DEFAULT_TIMEZONE = "Africa/Cairo"
 
 # Todo: Add capitilize title
 
 
 class GmailAPI:
-    def __init__(self, user_id: str) -> None:
+    def __init__(self, user_id: str, time_zone: str = DEFAULT_TIMEZONE) -> None:
         """
         Initialize the Gmail API
 
         Args:
             user_id (str): The user ID
+            time_zone (str): The time zone (default is Africa/Cairo)
 
         Returns:
             None
         """
         self._creds = init_user(user_id)
         self._service = build("gmail", "v1", credentials=self._creds)
+        self._time_zone = time_zone
 
     # User Profile
     ##############################################################################################################
@@ -2366,8 +2368,11 @@ class GmailAPI:
 
             return_dict["label_names"] = label_names
             return_dict["label_ids"] = label_ids
-            return_dict["created_at"] = epoch_to_date(
+            return_dict["created_at"] = epoch_to_date_and_time(
                 int(message["internalDate"]) / 1000
+            )
+            return_dict["created_at_relative"] = epoch_to_relative_time(
+                int(message["internalDate"]) / 1000, timezone=self._time_zone
             )
             return_dict["snippet"] = message["snippet"]
 
