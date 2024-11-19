@@ -1,6 +1,10 @@
 from datetime import datetime
 from colory.color import Color
 import webcolors
+import pytz
+
+tz = pytz.timezone("Europe/Berlin")
+berlin_now = datetime.now(tz)
 
 allowed_hex_colors = [
     "000000",
@@ -107,57 +111,492 @@ allowed_hex_colors = [
     "16a765",
 ]
 
-# Todo: Implement relative time conversion functions
+allowed_timezones = [tz for tz in pytz.all_timezones]
+
+# Time Conversion Functions
+## Supported Formats: RFC3339, Datetime, Date and Time, Epoch, Relative Time
 
 
-def date_to_RFC3339(
-    year: int, month: int, day: int, hour: int, minute: int, second: int
-) -> str:
-    return f"{year:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:{second:02d}Z"
+## RFC3339
+########################################################################################
+def RFC3339_to_date_and_time(date: str) -> tuple:
+    """
+    Converts an RFC3339 formatted date string to separate date and time strings.
 
+    Args:
+        date (str): The RFC3339 formatted date string.
 
-def RFC3339_to_date(date: str) -> tuple:
-    return (
-        f"{date[:4]}-{date[5:7]}-{date[8:10]} ",
-        f"{date[11:13]}:{date[14:16]}:{date[17:19]}",
-    )
+    Returns:
+        tuple: A tuple containing the date and time strings in the format (date, time) if the conversion is successful, otherwise a tuple containing ("Invalid Date", "Invalid Time").
+    """
+    try:
+        return (
+            f"{date[:4]}-{date[5:7]}-{date[8:10]} ",
+            f"{date[11:13]}:{date[14:16]}:{date[17:19]}",
+        )
+    except:
+        return ("Invalid Date", "Invalid Time")
 
 
 def RFC3339_to_datetime(date: datetime) -> datetime:
-    return datetime.strptime(str(date), "%Y-%m-%dT%H:%M:%S.%fZ")
+    """
+    Converts a date string in RFC3339 format to a datetime object.
+
+    Args:
+        date (datetime): The date string in RFC3339 format.
+
+    Returns:
+        datetime: The converted datetime object if the conversion is successful, otherwise the current time.
+    """
+    try:
+        return datetime.strptime(str(date), "%Y-%m-%dT%H:%M:%S.%fZ")
+    except:
+        return datetime.now()
 
 
-def datetime_to_RFC3339(date: datetime) -> str:
-    return date.strftime("%Y-%m-%dT%H:%M:%SZ")
+def RFC3339_to_epoch(date: str) -> int:
+    """
+    Converts a date string in RFC3339 format to epoch timestamp.
+
+    Args:
+        date (str): The date string in RFC3339 format ("%Y-%m-%dT%H:%M:%S.%fZ").
+
+    Returns:
+        int: The epoch timestamp corresponding to the input date string.
+             Returns -1 if the conversion fails.
+    """
+    try:
+        return int(datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ").timestamp())
+    except:
+        return -1
 
 
-def date_to_epoch(
-    year: int, month: int, day: int, hour: int, minute: int, second: int
-) -> int:
-    return int(datetime(year, month, day, hour, minute, second).timestamp())
+def RFC3339_to_relative_time(date: str, timezone: str = "UTC") -> str:
+    """
+    Converts an RFC3339 formatted date string to a relative time string.
 
+    Args:
+        date (str): The RFC3339 formatted date string.
+        timezone (str, optional): The timezone to use for the conversion. Defaults to "UTC".
 
-def epoch_to_date(epoch: int) -> str:
-    return (
-        f"{datetime.fromtimestamp(epoch).year}-{datetime.fromtimestamp(epoch).month}-{datetime.fromtimestamp(epoch).day} "
-        f"{datetime.fromtimestamp(epoch).hour}:{datetime.fromtimestamp(epoch).minute}:{datetime.fromtimestamp(epoch).second}"
+    Returns:
+        str: The relative time string if the conversion is successful, otherwise "Invalid Date" or "Invalid Timezone" or "Future Date".
+    """
+    try:
+        year, month, day, hour, minute, second = (
+            int(date[:4]),
+            int(date[5:7]),
+            int(date[8:10]),
+            int(date[11:13]),
+            int(date[14:16]),
+            int(date[17:19]),
+        )
+    except:
+        return "Invalid Date"
+
+    return date_and_time_to_relative_time(
+        year, month, day, hour, minute, second, timezone
     )
 
 
+## Datetime
+########################################################################################
+def datetime_to_RFC3339(date: datetime) -> str:
+    """
+    Converts a datetime object to a string in RFC3339 format.
+
+    Args:
+        date (datetime): The datetime object to be converted.
+
+    Returns:
+        str: The datetime string in RFC3339 format if the conversion is successful, otherwise "Invalid Date".
+    """
+    try:
+        return date.strftime("%Y-%m-%dT%H:%M:%SZ")
+    except:
+        return "Invalid Date"
+
+
+def datetime_to_date_and_time(date: datetime) -> tuple:
+    """
+    Converts a datetime object to a tuple containing the date and time components.
+
+    Args:
+        date (datetime): The datetime object to convert.
+
+    Returns:
+        tuple: A tuple containing the date and time components in the format (date, time) if the conversion is successful, otherwise a tuple containing ("Invalid Date", "Invalid Time").
+    """
+    try:
+        return (
+            f"{date.year}-{date.month}-{date.day} ",
+            f"{date.hour}:{date.minute}:{date.second}",
+        )
+    except:
+        return ("Invalid Date", "Invalid Time")
+
+
 def datetime_to_epoch(date: datetime) -> int:
-    return int(date.timestamp())
+    """
+    Converts a datetime object to epoch timestamp.
+
+    Args:
+        date (datetime): The datetime object to be converted.
+
+    Returns:
+        int: The epoch timestamp of the given datetime object, returns -1 if the conversion fails.
+    """
+    try:
+        return int(date.timestamp())
+    except:
+        return -1
+
+
+def datetime_to_relative_time(date: datetime, timezone: str = "UTC") -> str:
+    """
+    Converts a datetime object to a relative time string.
+
+    Args:
+        date (datetime): The datetime object to convert.
+        timezone (str, optional): The timezone to use for the conversion. Defaults to "UTC".
+
+    Returns:
+        str: The relative time string representing the datetime object if the conversion is successful, otherwise "Invalid Date" or "Invalid Timezone" or "Future Date".
+    """
+    year, month, day, hour, minute, second = (
+        date.year,
+        date.month,
+        date.day,
+        date.hour,
+        date.minute,
+        date.second,
+    )
+
+    return date_and_time_to_relative_time(
+        year, month, day, hour, minute, second, timezone
+    )
+
+
+## Date and Time
+########################################################################################
+def date_and_time_to_RFC3339(
+    year: int, month: int, day: int, hour: int, minute: int, second: int
+) -> str:
+    """
+    Converts the given date and time components to RFC3339 format.
+
+    Args:
+        year (int): The year component of the date.
+        month (int): The month component of the date.
+        day (int): The day component of the date.
+        hour (int): The hour component of the time.
+        minute (int): The minute component of the time.
+        second (int): The second component of the time.
+
+    Returns:
+        str: The date and time in RFC3339 format if the conversion is successful, otherwise "Invalid Date".
+    """
+    if year < 0 or month < 0 or day < 0 or hour < 0 or minute < 0 or second < 0:
+        return "Invalid Date"
+
+    if month > 12 or day > 31 or hour > 23 or minute > 59 or second > 59:
+        return "Invalid Date"
+
+    return f"{year:04d}-{month:02d}-{day:02d}T{hour:02d}:{minute:02d}:{second:02d}Z"
+
+
+def date_and_time_to_epoch(
+    year: int, month: int, day: int, hour: int, minute: int, second: int
+) -> int:
+    """
+    Converts a given date and time to epoch timestamp.
+
+    Args:
+        year (int): The year.
+        month (int): The month.
+        day (int): The day.
+        hour (int): The hour.
+        minute (int): The minute.
+        second (int): The second.
+
+    Returns:
+        int: The epoch timestamp if the conversion is successful, otherwise -1.
+    """
+    if year < 0 or month < 0 or day < 0 or hour < 0 or minute < 0 or second < 0:
+        return -1
+
+    if month > 12 or day > 31 or hour > 23 or minute > 59 or second > 59:
+        return -1
+
+    return int(datetime(year, month, day, hour, minute, second).timestamp())
+
+
+def date_and_time_to_datetime(
+    year: int, month: int, day: int, hour: int, minute: int, second: int
+) -> datetime:
+    """
+    Convert the given date and time components into a datetime object.
+
+    Args:
+        year (int): The year component of the date.
+        month (int): The month component of the date.
+        day (int): The day component of the date.
+        hour (int): The hour component of the time.
+        minute (int): The minute component of the time.
+        second (int): The second component of the time.
+
+    Returns:
+        datetime: The datetime object representing the given date and time if the conversion is successful, otherwise the current time.
+    """
+    if year < 0 or month < 0 or day < 0 or hour < 0 or minute < 0 or second < 0:
+        return datetime.now()
+
+    if month > 12 or day > 31 or hour > 23 or minute > 59 or second > 59:
+        return datetime.now()
+
+    return datetime(year, month, day, hour, minute, second)
+
+
+def date_and_time_to_relative_time(
+    year: int,
+    month: int,
+    day: int,
+    hour: int,
+    minute: int,
+    second: int,
+    timezone: str = "UTC",
+) -> str:
+    """
+    Converts a given date and time to a relative time string.
+
+    Args:
+        year (int): The year of the date.
+        month (int): The month of the date.
+        day (int): The day of the date.
+        hour (int): The hour of the time.
+        minute (int): The minute of the time.
+        second (int): The second of the time.
+        timezone (str, optional): The timezone of the date and time. Defaults to "UTC".
+
+    Returns:
+        str: The relative time string representing the time difference between the given date and time and the current time,
+        or "Invalid Date" or "Invalid Timezone" or "Future Date" if the date, time, or timezone is invalid.
+    """
+
+    if year < 0 or month < 0 or day < 0 or hour < 0 or minute < 0 or second < 0:
+        return "Invalid Date"
+
+    if month > 12 or day > 31 or hour > 23 or minute > 59 or second > 59:
+        return "Invalid Date"
+
+    if timezone not in allowed_timezones:
+        print("Invalid timezone, Defaulting to UTC")
+        timezone = "UTC"
+
+    current_time = datetime.now(pytz.timezone(timezone))
+
+    current_second = current_time.second
+    current_minute = current_time.minute
+    current_hour = current_time.hour
+    current_day = current_time.day
+    current_month = current_time.month
+    current_year = current_time.year
+
+    if year > current_year:
+        return "Future Date"
+    if year == current_year:
+        if month > current_month:
+            return "Future Date"
+        if month == current_month:
+            if day > current_day:
+                return "Future Date"
+            if day == current_day:
+                if hour > current_hour:
+                    return "Future Date"
+                if hour == current_hour:
+                    if minute > current_minute:
+                        return "Future Date"
+                    if minute == current_minute:
+                        if second > current_second:
+                            return "Future Date"
+
+    current_time = datetime.now(pytz.timezone(timezone))
+    time_difference = current_time - datetime(
+        year, month, day, hour, minute, second, tzinfo=pytz.timezone(timezone)
+    )
+
+    diff_years = time_difference.days // 365
+    diff_months = time_difference.days // 30
+    diff_weeks = time_difference.days // 7
+    diff_days = time_difference.days
+    diff_hours = time_difference.seconds // 3600
+    diff_minutes = time_difference.seconds // 60
+    diff_seconds = time_difference.seconds % 60
+
+    if diff_years > 0:
+        if diff_years == 1:
+            return "1 year ago"
+        return f"{diff_years} years ago"
+
+    if diff_months > 0:
+        if diff_months == 1:
+            return "1 month ago"
+        return f"{diff_months} months ago"
+
+    if diff_weeks > 0:
+        if diff_weeks == 1:
+            return "1 week ago"
+        return f"{diff_weeks} weeks ago"
+
+    if diff_days > 0:
+        if diff_days == 1:
+            return "1 day ago"
+        return f"{diff_days} days ago"
+
+    moved_diff_minutes = diff_minutes - 65
+
+    if diff_hours > 0:
+        if diff_hours == 1:
+            if moved_diff_minutes == 0:
+                return f"{diff_hours} hours ago"
+            return f"1 hour ago, {moved_diff_minutes} minutes ago"
+        if moved_diff_minutes == 0:
+            return f"{diff_hours} hours ago"
+        return f"{diff_hours} hours ago, {moved_diff_minutes} minutes ago"
+
+    moved_diff_minutes = diff_minutes - 5
+
+    if moved_diff_minutes > 0:
+        if moved_diff_minutes == 1:
+            if diff_seconds == 0:
+                return "1 minute ago"
+            return f"1 minute ago, {diff_seconds} seconds ago"
+        if diff_seconds == 0:
+            return f"{moved_diff_minutes} minutes ago"
+        return f"{moved_diff_minutes} minutes ago, {diff_seconds} seconds ago"
+
+    if diff_seconds == 0:
+        return "Just Now"
+
+    if diff_seconds > 0:
+        if diff_seconds == 1:
+            return "1 second ago"
+        return f"{diff_seconds} seconds ago"
+
+
+## Epoch
+########################################################################################
+def epoch_to_date_and_time(epoch: int) -> tuple:
+    """
+    Converts an epoch timestamp to a formatted date and time string.
+
+    Args:
+        epoch (int): The epoch timestamp to convert.
+
+    Returns:
+        tuple: A tuple containing the formatted date and time string in the format "YYYY-MM-DD HH:MM:SS" if the conversion is successful, otherwise a tuple containing "Invalid Date" and "Invalid Time".
+    """
+    try:
+        return (
+            f"{datetime.fromtimestamp(epoch).year}-{datetime.fromtimestamp(epoch).month}-{datetime.fromtimestamp(epoch).day} "
+            f"{datetime.fromtimestamp(epoch).hour}:{datetime.fromtimestamp(epoch).minute}:{datetime.fromtimestamp(epoch).second}"
+        )
+    except:
+        return ("Invalid Date", "Invalid Time")
 
 
 def epoch_to_datetime(epoch: int) -> datetime:
-    return datetime.fromtimestamp(epoch)
+    """
+    Converts an epoch timestamp to a datetime object.
+
+    Args:
+        epoch (int): The epoch timestamp to convert.
+
+    Returns:
+        datetime: The corresponding datetime object if the conversion is successful, otherwise the current time.
+    """
+    try:
+        return datetime.fromtimestamp(epoch)
+    except:
+        return datetime.now()
+
+
+def epoch_to_RFC3339(epoch: int) -> str:
+    """
+    Converts an epoch timestamp to RFC3339 format.
+
+    Args:
+        epoch (int): The epoch timestamp to convert.
+
+    Returns:
+        str: The RFC3339 formatted timestamp if the conversion is successful, otherwise "Invalid Date".
+    """
+    try:
+        return datetime.fromtimestamp(epoch).strftime("%Y-%m-%dT%H:%M:%SZ")
+    except:
+        return "Invalid Date"
+
+
+def epoch_to_relative_time(epoch: int, timezone: str = "UTC") -> str:
+    """
+    Converts an epoch timestamp to a relative time string.
+
+    Args:
+        epoch (int): The epoch timestamp to convert.
+        timezone (str, optional): The timezone to use for the conversion. Defaults to "UTC".
+
+    Returns:
+        str: The relative time string if the conversion is successful, otherwise "Invalid Date" or "Invalid Timezone" or "Future Date".
+
+    """
+    year, month, day, hour, minute, second = (
+        datetime.fromtimestamp(epoch).year,
+        datetime.fromtimestamp(epoch).month,
+        datetime.fromtimestamp(epoch).day,
+        datetime.fromtimestamp(epoch).hour,
+        datetime.fromtimestamp(epoch).minute,
+        datetime.fromtimestamp(epoch).second,
+    )
+
+    return date_and_time_to_relative_time(
+        year, month, day, hour, minute, second, timezone
+    )
+
+
+# Color Conversion Functions
+## Supported Formats: Hex, Color Name
 
 
 def hex_to_color_name(hex: str) -> str:
-    return Color(hex).name
+    """
+    Converts a hexadecimal color code to its corresponding color name.
+
+    Args:
+        hex (str): The hexadecimal color code.
+
+    Returns:
+        str: The corresponding color name if the conversion is successful, otherwise "Invalid Color".
+    """
+    try:
+        return Color(hex).name
+    except:
+        return "Invalid Color"
 
 
 def color_name_to_hex(color_name: str) -> str:
-    hex_color = webcolors.name_to_hex(color_name)
+    """
+    Converts a color name to its corresponding hexadecimal value.
+
+    Args:
+        color_name (str): The name of the color.
+
+    Returns:
+        str: The hexadecimal value of the closest matching color or "Invalid Color" if the color name is invalid.
+    """
+    try:
+        hex_color = webcolors.name_to_hex(color_name)
+    except:
+        return "Invalid Color"
 
     hex_color = hex_color.lstrip("#")
 
@@ -175,13 +614,18 @@ def color_name_to_hex(color_name: str) -> str:
 
 
 if __name__ == "__main__":
-    print(date_to_RFC3339(2022, 1, 1, 0, 0, 0))
+    print(date_and_time_to_RFC3339(2022, 1, 1, 0, 0, 0))
     print(RFC3339_to_datetime("2022-01-01T00:00:00.00Z"))
     print(datetime_to_RFC3339(datetime(2022, 1, 1, 0, 0, 0)))
-    print(RFC3339_to_date("2022-01-01T00:00:00.00Z"))
+    print(RFC3339_to_date_and_time("2022-01-01T00:00:00.00Z"))
     print(epoch_to_datetime(1640995200))
     print(datetime_to_epoch(datetime(2022, 1, 1, 0, 0, 0)))
-    print(epoch_to_date(1640995200))
-    print(date_to_epoch(2022, 1, 1, 0, 0, 0))
+    print(epoch_to_date_and_time(1640995200))
+    print(date_and_time_to_epoch(2022, 1, 1, 0, 0, 0))
+    print(date_and_time_to_relative_time(2024, 11, 19, 22, 29, 20, "Africa/Cairo"))
+    print(RFC3339_to_relative_time("2024-11-19T22:29:20.00Z", "Africa/Cairo"))
+    print(datetime_to_relative_time(datetime.now(), "Africa/Cairo"))
+    print(epoch_to_relative_time(1640995200, "Africa/Cairo"))
+
     print(hex_to_color_name("#FF0000"))
     print(color_name_to_hex("red"))
