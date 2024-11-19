@@ -117,6 +117,23 @@ allowed_timezones = [tz for tz in pytz.all_timezones]
 ## Supported Formats: RFC3339, Datetime, Date and Time, Epoch, Relative Time
 
 
+def get_current_time(timezone: str = "UTC") -> datetime:
+    """
+    Get the current time in the specified timezone.
+
+    Args:
+        timezone (str, optional): The timezone to get the current time in. Defaults to "UTC".
+
+    Returns:
+        datetime: The current time in the specified timezone.
+    """
+    if timezone not in allowed_timezones:
+        print("Invalid timezone, Defaulting to UTC")
+        timezone = "UTC"
+
+    return datetime.now(pytz.timezone(timezone))
+
+
 ## RFC3339
 ########################################################################################
 def RFC3339_to_date_and_time(date: str) -> tuple:
