@@ -8,7 +8,7 @@
     "list_name": "list_name" # name of the list (required)
     "task_name": "task_name", # name of the task if the action is to be performed on a task (optional)
     
-    "action": "add", # action to be performed (required) (list, insert, remove, update, get)
+    "action": "insert", # action to be performed (required) (list, insert, remove, update, get)
     "max_output": 10, # maximum number of tasks to be returned (optional) (default: 10) (only for list action)
     "list_all_tasks": false, # name of the list by which the tasks are to be filtered (optional) (only for list action) (only for task type) (default: false) (true, false) (if false, list_name will be used as the name of the list, else all tasks will be returned)
     
