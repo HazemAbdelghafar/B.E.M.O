@@ -27,13 +27,19 @@ def new_user(id: str) -> Credentials:
     # Initialize the credentials
     creds = None
 
-    # Todo: Get login url
-    flow = InstalledAppFlow.from_client_secrets_file(SECRET_PATH, SCOPES)
+    flow = InstalledAppFlow.from_client_secrets_file(
+        SECRET_PATH, SCOPES, redirect_uri="urn:ietf:wg:oauth:2.0:oob"
+    )
+
+    auth_url, _ = flow.authorization_url(prompt="consent")
+
+    print("Please go to this URL if you are not redirected: ", auth_url)
+
     creds = flow.run_local_server(
         open_browser=True,
         port=8080,
-        authorization_prompt_message="Please visit this URL if the browser does not open automatically: {url}",
-        success_message="The auth flow is complete; you may close this window.",
+        authorization_prompt_message="",
+        success_message="You have successfully authenticated the user to B.E.M.O, you can now safely close this tab.",
     )
 
     # Save the credentials for the next run
