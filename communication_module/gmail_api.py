@@ -3055,6 +3055,14 @@ class GmailAPI:
             list: The message IDs or None if an error occurred
         """
 
+        add_label_ids = [label_id for label_id in add_label_ids if label_id is not None]
+        remove_label_ids = [
+            label_id for label_id in remove_label_ids if label_id is not None
+        ]
+
+        if len(add_label_ids) == 0 and len(remove_label_ids) == 0:
+            return message_ids
+
         try:
             self._service.users().messages().batchModify(
                 userId="me",
@@ -3088,9 +3096,14 @@ class GmailAPI:
             str: The message ID or None if an error occurred
         """
 
-        return self._update_messages_by_ids(
-            [message_id], add_label_ids=add_label_ids, remove_label_ids=remove_label_ids
-        )[0]
+        try:
+            return self._update_messages_by_ids(
+                [message_id],
+                add_label_ids=add_label_ids,
+                remove_label_ids=remove_label_ids,
+            )[0]
+        except:
+            return None
 
     def update_messages_by_subjects(
         self,
@@ -3487,6 +3500,13 @@ if __name__ == "__main__":
     #         subjects=["Test 1"],
     #         contents=["Hello"],
     #         labels=[["Test LABEL 1"]],
+    #     )
+    # )
+    # print(
+    #     gmail_api.create_send_draft(
+    #         subject="Hi Foad",
+    #         content="Hello Foad",
+    #         recipients=["foad.ouda546@gmail.com"],
     #     )
     # )
 
