@@ -183,20 +183,11 @@ def RFC3339_to_relative_time(date: str, timezone: str = "UTC") -> str:
         str: The relative time string if the conversion is successful, otherwise "Invalid Date" or "Invalid Timezone" or "Future Date".
     """
     try:
-        year, month, day, hour, minute, second = (
-            int(date[:4]),
-            int(date[5:7]),
-            int(date[8:10]),
-            int(date[11:13]),
-            int(date[14:16]),
-            int(date[17:19]),
-        )
+        date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
     except:
         return "Invalid Date"
 
-    return date_and_time_to_relative_time(
-        year, month, day, hour, minute, second, timezone
-    )
+    return epoch_to_relative_time(date.timestamp(), timezone)
 
 
 ## Datetime
@@ -263,18 +254,8 @@ def datetime_to_relative_time(date: datetime, timezone: str = "UTC") -> str:
     Returns:
         str: The relative time string representing the datetime object if the conversion is successful, otherwise "Invalid Date" or "Invalid Timezone" or "Future Date".
     """
-    year, month, day, hour, minute, second = (
-        date.year,
-        date.month,
-        date.day,
-        date.hour,
-        date.minute,
-        date.second,
-    )
 
-    return date_and_time_to_relative_time(
-        year, month, day, hour, minute, second, timezone
-    )
+    return epoch_to_relative_time(date.timestamp(), timezone)
 
 
 ## Date and Time
@@ -393,95 +374,9 @@ def date_and_time_to_relative_time(
         print("Invalid timezone, Defaulting to UTC")
         timezone = "UTC"
 
-    current_time = datetime.now(pytz.timezone(timezone))
-
-    current_second = current_time.second
-    current_minute = current_time.minute
-    current_hour = current_time.hour
-    current_day = current_time.day
-    current_month = current_time.month
-    current_year = current_time.year
-
-    if year > current_year:
-        return "Future Date"
-    if year == current_year:
-        if month > current_month:
-            return "Future Date"
-        if month == current_month:
-            if day > current_day:
-                return "Future Date"
-            if day == current_day:
-                if hour > current_hour:
-                    return "Future Date"
-                if hour == current_hour:
-                    if minute > current_minute:
-                        return "Future Date"
-                    if minute == current_minute:
-                        if second > current_second:
-                            return "Future Date"
-
-    current_time = datetime.now(pytz.timezone(timezone))
-    time_difference = current_time - datetime(
-        year, month, day, hour, minute, second, tzinfo=pytz.timezone(timezone)
+    return epoch_to_relative_time(
+        datetime(year, month, day, hour, minute, second).timestamp(), timezone
     )
-
-    diff_years = time_difference.days // 365
-    diff_months = time_difference.days // 30
-    diff_weeks = time_difference.days // 7
-    diff_days = time_difference.days
-    diff_hours = time_difference.seconds // 3600
-    diff_minutes = time_difference.seconds // 60
-    diff_seconds = time_difference.seconds % 60
-
-    if diff_years > 0:
-        if diff_years == 1:
-            return "1 year ago"
-        return f"{diff_years} years ago"
-
-    if diff_months > 0:
-        if diff_months == 1:
-            return "1 month ago"
-        return f"{diff_months} months ago"
-
-    if diff_weeks > 0:
-        if diff_weeks == 1:
-            return "1 week ago"
-        return f"{diff_weeks} weeks ago"
-
-    if diff_days > 0:
-        if diff_days == 1:
-            return "1 day ago"
-        return f"{diff_days} days ago"
-
-    moved_diff_minutes = diff_minutes - 65
-
-    if diff_hours > 0:
-        if diff_hours == 1:
-            if moved_diff_minutes == 0:
-                return f"{diff_hours} hours ago"
-            return f"1 hour ago, {moved_diff_minutes} minutes ago"
-        if moved_diff_minutes == 0:
-            return f"{diff_hours} hours ago"
-        return f"{diff_hours} hours ago, {moved_diff_minutes} minutes ago"
-
-    moved_diff_minutes = diff_minutes - 5
-
-    if moved_diff_minutes > 0:
-        if moved_diff_minutes == 1:
-            if diff_seconds == 0:
-                return "1 minute ago"
-            return f"1 minute ago, {diff_seconds} seconds ago"
-        if diff_seconds == 0:
-            return f"{moved_diff_minutes} minutes ago"
-        return f"{moved_diff_minutes} minutes ago, {diff_seconds} seconds ago"
-
-    if diff_seconds == 0:
-        return "Just Now"
-
-    if diff_seconds > 0:
-        if diff_seconds == 1:
-            return "1 second ago"
-        return f"{diff_seconds} seconds ago"
 
 
 ## Epoch
@@ -549,18 +444,76 @@ def epoch_to_relative_time(epoch: int, timezone: str = "UTC") -> str:
         str: The relative time string if the conversion is successful, otherwise "Invalid Date" or "Invalid Timezone" or "Future Date".
 
     """
-    year, month, day, hour, minute, second = (
-        datetime.fromtimestamp(epoch).year,
-        datetime.fromtimestamp(epoch).month,
-        datetime.fromtimestamp(epoch).day,
-        datetime.fromtimestamp(epoch).hour,
-        datetime.fromtimestamp(epoch).minute,
-        datetime.fromtimestamp(epoch).second,
+    if timezone not in allowed_timezones:
+        print("Invalid timezone, Defaulting to UTC")
+        timezone = "UTC"
+
+    current_time = datetime.now(pytz.timezone(timezone))
+
+    if epoch > current_time.timestamp():
+        return "Future Date"
+
+    time_difference = current_time - datetime.fromtimestamp(
+        epoch, tz=pytz.timezone(timezone)
     )
 
-    return date_and_time_to_relative_time(
-        year, month, day, hour, minute, second, timezone
-    )
+    diff_years = time_difference.days // 365
+    diff_months = time_difference.days // 30
+    diff_weeks = time_difference.days // 7
+    diff_days = time_difference.days
+    diff_hours = time_difference.seconds // 3600 % 24
+    diff_minutes = time_difference.seconds // 60 % 60
+    diff_seconds = time_difference.seconds % 60
+
+    if diff_years > 0:
+        if diff_years == 1:
+            return "1 year ago"
+        return f"{diff_years} years ago"
+
+    if diff_months > 0:
+        if diff_months == 1:
+            return "1 month ago"
+        return f"{diff_months} months ago"
+
+    if diff_weeks > 0:
+        if diff_weeks == 1:
+            return "1 week ago"
+        return f"{diff_weeks} weeks ago"
+
+    if diff_days > 0:
+        if diff_days == 1:
+            return "1 day ago"
+        return f"{diff_days} days ago"
+
+    moved_diff_minutes = diff_minutes
+
+    if diff_hours > 0:
+        if diff_hours == 1:
+            if moved_diff_minutes == 0:
+                return f"{diff_hours} hours ago"
+            return f"1 hour ago, {moved_diff_minutes} minutes ago"
+        if moved_diff_minutes == 0:
+            return f"{diff_hours} hours ago"
+        return f"{diff_hours} hours ago, {moved_diff_minutes} minutes ago"
+
+    moved_diff_minutes = diff_minutes - 5
+
+    if moved_diff_minutes > 0:
+        if moved_diff_minutes == 1:
+            if diff_seconds == 0:
+                return "1 minute ago"
+            return f"1 minute ago, {diff_seconds} seconds ago"
+        if diff_seconds == 0:
+            return f"{moved_diff_minutes} minutes ago"
+        return f"{moved_diff_minutes} minutes ago, {diff_seconds} seconds ago"
+
+    if diff_seconds == 0:
+        return "Just Now"
+
+    if diff_seconds > 0:
+        if diff_seconds == 1:
+            return "1 second ago"
+        return f"{diff_seconds} seconds ago"
 
 
 # Color Conversion Functions
@@ -614,18 +567,19 @@ def color_name_to_hex(color_name: str) -> str:
 
 
 if __name__ == "__main__":
-    print(date_and_time_to_RFC3339(2022, 1, 1, 0, 0, 0))
-    print(RFC3339_to_datetime("2022-01-01T00:00:00.00Z"))
-    print(datetime_to_RFC3339(datetime(2022, 1, 1, 0, 0, 0)))
-    print(RFC3339_to_date_and_time("2022-01-01T00:00:00.00Z"))
-    print(epoch_to_datetime(1640995200))
-    print(datetime_to_epoch(datetime(2022, 1, 1, 0, 0, 0)))
-    print(epoch_to_date_and_time(1640995200))
-    print(date_and_time_to_epoch(2022, 1, 1, 0, 0, 0))
-    print(date_and_time_to_relative_time(2024, 11, 19, 22, 29, 20, "Africa/Cairo"))
-    print(RFC3339_to_relative_time("2024-11-19T22:29:20.00Z", "Africa/Cairo"))
-    print(datetime_to_relative_time(datetime.now(), "Africa/Cairo"))
-    print(epoch_to_relative_time(1640995200, "Africa/Cairo"))
+    # print(date_and_time_to_RFC3339(2022, 1, 1, 0, 0, 0))
+    # print(RFC3339_to_datetime("2022-01-01T00:00:00.00Z"))
+    # print(datetime_to_RFC3339(datetime(2022, 1, 1, 0, 0, 0)))
+    # print(RFC3339_to_date_and_time("2022-01-01T00:00:00.00Z"))
+    # print(epoch_to_datetime(1732040151000 / 1000))
+    # print(datetime_to_epoch(datetime(2022, 1, 1, 0, 0, 0)))
+    # print(epoch_to_date_and_time(1640995200))
+    # print(date_and_time_to_epoch(2022, 1, 1, 0, 0, 0))
+    # print(date_and_time_to_relative_time(2024, 11, 19, 20, 15, 51, "Africa/Cairo"))
+    # print(RFC3339_to_relative_time("2024-11-19T22:29:20.00Z", "Africa/Cairo"))
+    # print(datetime_to_relative_time(datetime.now(), "Africa/Cairo"))
+    # print(epoch_to_relative_time(1732040151000 / 1000, "Africa/Cairo"))
 
-    print(hex_to_color_name("#FF0000"))
-    print(color_name_to_hex("red"))
+    # print(hex_to_color_name("#FF0000"))
+    # print(color_name_to_hex("red"))
+    pass
