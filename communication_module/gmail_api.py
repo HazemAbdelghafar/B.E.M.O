@@ -1,5 +1,4 @@
 from pprint import pprint
-from datetime import datetime
 import re
 import base64
 from bs4 import BeautifulSoup
