@@ -933,6 +933,7 @@ class GmailAPI:
         cc: list = [],
         bcc: list = [],
         content: str = DEFAULT_NOTE,
+        labels: list = [],
     ) -> str:
         """
         Create a draft
@@ -945,6 +946,7 @@ class GmailAPI:
             cc (list): The cc
             bcc (list): The bcc
             content (str): The content
+            labels (list): The labels
 
         Returns:
             str: The draft ID or None if an error occurred
@@ -971,6 +973,8 @@ class GmailAPI:
             message["Cc"] = ", ".join(cc)
         if bcc != []:
             message["Bcc"] = ", ".join(bcc)
+        if labels != []:
+            labels = [label.lower().strip() for label in labels]
 
         message.set_content(content)
 
@@ -979,13 +983,28 @@ class GmailAPI:
         draft = {"message": {"raw": encoded_message}}
 
         try:
-            id = (
-                self._service.users()
-                .drafts()
-                .create(userId="me", body=draft)
-                .execute()["id"]
+            message = (
+                self._service.users().drafts().create(userId="me", body=draft).execute()
             )
-            return id
+
+            draft_id = message["id"]
+            message_id = message["message"]["id"]
+
+            label_ids = []
+
+            for label in labels:
+                label = self._get_label_by_name_raw(label)
+                try:
+                    label_id = label["id"]
+                except:
+                    continue
+
+                label_ids.append(label_id)
+
+            self._update_message_by_id(message_id, add_label_ids=label_ids)
+
+            return draft_id
+
         except HttpError as e:
             print(f"An error occurred: {e}")
             return None
@@ -998,6 +1017,7 @@ class GmailAPI:
         cc: list = [[]],
         bcc: list = [[]],
         contents: list = [DEFAULT_NOTE],
+        labels: list = [[]],
     ) -> list:
         """
         Create drafts
@@ -1023,11 +1043,12 @@ class GmailAPI:
             != len(cc)
             != len(bcc)
             != len(contents)
+            != len(labels)
         ):
             return None
 
-        for subject, sender, recipient, c, bcc, content in zip(
-            subjects, senders, recipients, cc, bcc, contents
+        for subject, sender, recipient, c, bcc, content, label in zip(
+            subjects, senders, recipients, cc, bcc, contents, labels
         ):
             draft_id = self.create_draft(
                 subject=subject,
@@ -1036,6 +1057,7 @@ class GmailAPI:
                 cc=c,
                 bcc=bcc,
                 content=content,
+                labels=label,
             )
 
             if draft_id is not None:
@@ -1054,6 +1076,7 @@ class GmailAPI:
         cc: list = [],
         bcc: list = [],
         content: str = DEFAULT_NOTE,
+        labels: list = [],
     ) -> bool:
         """
         Create and send a draft
@@ -1065,6 +1088,7 @@ class GmailAPI:
             cc (list): The cc
             bcc (list): The bcc
             content (str): The content
+            labels (list): The labels
 
         Returns:
             bool: True if the draft was sent successfully, False otherwise
@@ -1077,6 +1101,7 @@ class GmailAPI:
             cc=cc,
             bcc=bcc,
             content=content,
+            labels=labels,
         )
 
         if draft_id is None:
@@ -1092,6 +1117,7 @@ class GmailAPI:
         cc: list = [[]],
         bcc: list = [[]],
         contents: list = [DEFAULT_NOTE],
+        labels: list = [[]],
     ) -> bool:
         """
         Create and send drafts
@@ -1103,6 +1129,7 @@ class GmailAPI:
             cc (list): The cc
             bcc (list): The bcc
             contents (list): The contents
+            labels (list): The labels
 
         Returns:
             bool: True if the drafts were sent successfully, False otherwise
@@ -1117,11 +1144,12 @@ class GmailAPI:
             != len(cc)
             != len(bcc)
             != len(contents)
+            != len(labels)
         ):
             return False
 
-        for subject, sender, recipient, c, bcc, content in zip(
-            subjects, senders, recipients, cc, bcc, contents
+        for subject, sender, recipient, c, bcc, content, label in zip(
+            subjects, senders, recipients, cc, bcc, contents, labels
         ):
             draft_id = self.create_draft(
                 subject=subject,
@@ -1130,6 +1158,7 @@ class GmailAPI:
                 cc=c,
                 bcc=bcc,
                 content=content,
+                labels=label,
             )
 
             if draft_id is not None:
@@ -1152,6 +1181,8 @@ class GmailAPI:
         cc: list = [],
         bcc: list = [],
         content: str = None,
+        add_labels: list = [],
+        remove_labels: list = [],
     ) -> str:
         """
         Update a draft
@@ -1164,6 +1195,8 @@ class GmailAPI:
             cc (list): The cc
             bcc (list): The bcc
             content (str): The content
+            add_labels (list): The labels to add
+            remove_labels (list): The labels to remove
 
         Returns:
             str: The draft ID or None if an error occurred
@@ -1208,6 +1241,16 @@ class GmailAPI:
             # Todo: Try HTML Content
             content = draft["content"] + DEFAULT_NOTE
 
+        if add_labels == []:
+            add_labels = draft["label_names"]
+        else:
+            add_labels = [label.lower().strip() for label in add_labels]
+
+        if remove_labels == []:
+            remove_labels = []
+        else:
+            remove_labels = [label.lower().strip() for label in remove_labels]
+
         message = EmailMessage()
 
         if subject is not None:
@@ -1228,13 +1271,45 @@ class GmailAPI:
         draft = {"message": {"raw": encoded_message}}
 
         try:
-            id = (
+            message = (
                 self._service.users()
                 .drafts()
                 .update(userId="me", id=draft_id, body=draft)
-                .execute()["id"]
+                .execute()
             )
-            return id
+
+            draft_id = message["id"]
+            message_id = message["message"]["id"]
+
+            add_label_ids = []
+
+            for label in add_labels:
+                label = self._get_label_by_name_raw(label)
+                try:
+                    label_id = label["id"]
+                except:
+                    continue
+
+                add_label_ids.append(label_id)
+
+            remove_label_ids = []
+
+            for label in remove_labels:
+                label = self._get_label_by_name_raw(label)
+                try:
+                    label_id = label["id"]
+                except:
+                    continue
+
+                remove_label_ids.append(label_id)
+
+            self._update_message_by_id(
+                message_id,
+                add_label_ids=add_label_ids,
+                remove_label_ids=remove_label_ids,
+            )
+
+            return draft_id
         except HttpError as e:
             print(f"An error occurred: {e}")
             return None
@@ -1248,6 +1323,8 @@ class GmailAPI:
         new_cc: list = [],
         new_bcc: list = [],
         new_content: str = None,
+        add_labels: list = [],
+        remove_labels: list = [],
     ) -> list:
         """
         Update the drafts by ID
@@ -1260,6 +1337,8 @@ class GmailAPI:
             new_recipients (list): The new recipients
             new_cc (list): The new cc
             new_bcc (list): The new bcc
+            add_labels (list): The labels to add
+            remove_labels (list): The labels to remove
 
         Returns:
             list: The draft IDs or None if an error occurred
@@ -1276,6 +1355,8 @@ class GmailAPI:
                 cc=new_cc,
                 bcc=new_bcc,
                 content=new_content,
+                add_labels=add_labels,
+                remove_labels=remove_labels,
             )
 
             if new_draft_id is not None:
@@ -1295,6 +1376,8 @@ class GmailAPI:
         new_cc: list = [],
         new_bcc: list = [],
         new_content: str = None,
+        add_labels: list = [],
+        remove_labels: list = [],
     ) -> list:
         """
         Update the drafts by subject
@@ -1307,6 +1390,8 @@ class GmailAPI:
             new_recipients (list): The new recipients
             new_cc (list): The new cc
             new_bcc (list): The new bcc
+            add_labels (list): The labels to add
+            remove_labels (list): The labels to remove
 
         Returns:
             list: The draft IDs or None if an error occurred
@@ -1325,6 +1410,8 @@ class GmailAPI:
             new_cc=new_cc,
             new_bcc=new_bcc,
             new_content=new_content,
+            add_labels=add_labels,
+            remove_labels=remove_labels,
         )
 
     def update_drafts_by_recipients(
@@ -1336,6 +1423,8 @@ class GmailAPI:
         new_cc: list = [],
         new_bcc: list = [],
         new_content: str = None,
+        add_labels: list = [],
+        remove_labels: list = [],
     ) -> list:
         """
         Update the drafts by recipients
@@ -1348,6 +1437,8 @@ class GmailAPI:
             new_recipients (list): The new recipients
             new_cc (list): The new cc
             new_bcc (list): The new bcc
+            add_labels (list): The labels to add
+            remove_labels (list): The labels to remove
 
         Returns:
             list: The draft IDs or None if an error occurred
@@ -1366,6 +1457,8 @@ class GmailAPI:
             new_cc=new_cc,
             new_bcc=new_bcc,
             new_content=new_content,
+            add_labels=add_labels,
+            remove_labels=remove_labels,
         )
 
     # Label
@@ -3390,8 +3483,10 @@ if __name__ == "__main__":
 
     # print("Create Draft:")
     # print(
-    #     gmail_api.create_draft(
-    #         subject="Test 33", content="Hello"
+    #     gmail_api.create_drafts(
+    #         subjects=["Test 1"],
+    #         contents=["Hello"],
+    #         labels=[["Test LABEL 1"]],
     #     )
     # )
 
@@ -3405,6 +3500,8 @@ if __name__ == "__main__":
     #         new_recipients=["begadtAmim.a@gmail.coM"],
     #         new_cc=["begadtAmim.a@gmail.coM"],
     #         new_bcc=["begadtAmim.a@gmail.coM"],
+    #         add_labels=["Test LABEL 2"],
+    #         remove_labels=["Test LABEL 1"],
     #     )
     # )
 
@@ -3484,7 +3581,7 @@ if __name__ == "__main__":
         json.dump(messages, f, indent=4)
     print(f"Messages saved to {DEFAULT_PATH + '/test/messages.json'}")
 
-    print("Get Message by:")
+    # print("Get Message by:")
     # print("Subject:")
     # messages = gmail_api.get_message_content_by_subjects(["WeLcome to Airtm!"])
     # if messages:
@@ -3537,18 +3634,18 @@ if __name__ == "__main__":
     # else:
     #     print("No messages found")
 
-    print("Messages by Multiple:")
-    messages = gmail_api.get_messages_by_multiple(
-        subjects=["WeLcome to Airtm!"],
-        labels=["Test LABEL 1"],
-    )
-    if messages:
-        for message in messages:
-            print(message["id"])
-    else:
-        print("No messages found")
+    # print("Messages by Multiple:")
+    # messages = gmail_api.get_messages_by_multiple(
+    #     subjects=["WeLcome to Airtm!"],
+    #     labels=["Test LABEL 1"],
+    # )
+    # if messages:
+    #     for message in messages:
+    #         print(message["id"])
+    # else:
+    #     print("No messages found")
 
-    print("Delete Messages by:")
+    # print("Delete Messages by:")
     # print("Subject:")
     # print(gmail_api.delete_messages_by_subjects(["WeLcome to Airtm!"]))
     # print("Recipients:")
@@ -3561,15 +3658,15 @@ if __name__ == "__main__":
     # print(gmail_api.delete_messages_by_has_attachment())
     # print("Labels:")
     # print(gmail_api.delete_messages_by_labels(["Test LABEL 1"]))
-    print("Messages by Multiple:")
-    print(
-        gmail_api.delete_messages_by_multiple(
-            subjects=["WeLcome to Airtm!"],
-            labels=["Test LABEL 1"],
-        )
-    )
+    # print("Messages by Multiple:")
+    # print(
+    #     gmail_api.delete_messages_by_multiple(
+    #         subjects=["WeLcome to Airtm!"],
+    #         labels=["Test LABEL 1"],
+    #     )
+    # )
 
-    print("Update Messages by:")
+    # print("Update Messages by:")
     # print("Subject:")
     # print(
     #     gmail_api.update_messages_by_subjects(
@@ -3617,14 +3714,14 @@ if __name__ == "__main__":
     #         remove_label_names=[],
     #     )
     # )
-    print("Messages by Multiple:")
-    print(
-        gmail_api.update_messages_by_multiple(
-            subjects=["WeLcome to Airtm!"],
-            senders=["no-reply@accounts.google.com"],
-            add_label_names=["Test LABEL 2"],
-            remove_label_names=[],
-        )
-    )
+    # print("Messages by Multiple:")
+    # print(
+    #     gmail_api.update_messages_by_multiple(
+    #         subjects=["WeLcome to Airtm!"],
+    #         senders=["no-reply@accounts.google.com"],
+    #         add_label_names=["Test LABEL 2"],
+    #         remove_label_names=[],
+    #     )
+    # )
 
-    print("-" * 100)
+    # print("-" * 100)
