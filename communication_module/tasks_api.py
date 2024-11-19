@@ -12,16 +12,14 @@ from utils import (
     datetime_to_RFC3339,
     RFC3339_to_relative_time,
     RFC3339_change_timezones,
+    date_and_time_to_datetime,
+    get_current_time,
 )
 
 
-# Todo: Fix default note appearing twice
-DEFAULT_NOTE = "CREATED BY BEMO"
+DEFAULT_NOTE = "\n\nB.E.M.O"
 DEFAULT_PATH = os.path.dirname(__file__)
 DEFAULT_TIMEZONE = "Africa/Cairo"
-
-# Todo: Add strip and lower to all strings
-# Todo: Add capitilize title
 
 
 class TasksApi:
@@ -122,9 +120,11 @@ class TasksApi:
 
         return_list = []
 
+        name = name.lower().strip()
+
         if task_lists:
             for item in task_lists:
-                if item["name"] == name:
+                if item["name"].lower().strip() == name:
                     return_list.append(
                         {
                             "id": item["id"],
@@ -194,7 +194,7 @@ class TasksApi:
             dict: The task list id, title, and updated time or None if the task list was not inserted
         """
 
-        body = {"title": title}
+        body = {"title": title.strip().title()}
 
         try:
             task_list = self._service.tasklists().insert(body=body).execute()
@@ -217,7 +217,7 @@ class TasksApi:
 
     # Task Lists (Update)
     ####################################################################################################
-    def _update_task_list_id(self, task_list_id: str, task_list_name: str) -> dict:
+    def _update_task_list_id(self, task_list_id: str, new_task_list_name: str) -> dict:
         """
         This method renames a task list by id
 
@@ -229,7 +229,7 @@ class TasksApi:
             dict: The task list id, title, and updated time or None if the task list was not updated
         """
 
-        body = {"title": task_list_name}
+        body = {"title": new_task_list_name.strip().title()}
 
         try:
             task_list = (
@@ -508,9 +508,11 @@ class TasksApi:
 
         tasks = self.list_tasks_all()
 
+        task_name = task_name.lower().strip()
+
         if tasks:
             for item in tasks:
-                if item["name"] == task_name:
+                if item["name"].lower().strip() == task_name:
                     return_list.append(item)
             return return_list
         else:
@@ -587,13 +589,13 @@ class TasksApi:
 
         move_task = False
 
-        body = {"title": name}
+        body = {"title": name.strip().title()}
 
         if due_date:
             body["due"] = datetime_to_RFC3339(due_date)
 
         if notes:
-            body["notes"] = notes + ", " + DEFAULT_NOTE
+            body["notes"] = notes + DEFAULT_NOTE
         else:
             body["notes"] = DEFAULT_NOTE
 
@@ -629,7 +631,12 @@ class TasksApi:
         self,
         list_name: str,
         name: str,
-        due_date: str = None,
+        due_date_year: int = 0,
+        due_date_month: int = 0,
+        due_date_day: int = 0,
+        due_date_hour: int = 0,
+        due_date_minute: int = 0,
+        due_date_second: int = 0,
         notes: str = None,
         parent_name: str = None,
     ) -> dict:
@@ -639,7 +646,12 @@ class TasksApi:
         Args:
             list_name (str): The task list title
             name (str): The task title
-            due_date (str): The task due date (default is None)
+            due_date_year (int): The task due date year (default is 0)
+            due_date_month (int): The task due date month (default is 0)
+            due_date_day (int): The task due date day (default is 0)
+            due_date_hour (int): The task due date hour (default is 0)
+            due_date_minute (int): The task due date minute (default is 0)
+            due_date_second (int): The task due date second (default is 0)
             notes (str): The task notes (default is None)
             parent_name (str): The task parent title (default is None)
 
@@ -663,8 +675,18 @@ class TasksApi:
         else:
             parent_id = None
 
-        if due_date:
-            due_date = datetime.fromisoformat(due_date)
+        if due_date_year != 0 and due_date_month != 0 and due_date_day != 0:
+            due_date = date_and_time_to_datetime(
+                due_date_year,
+                due_date_month,
+                due_date_day,
+                due_date_hour,
+                due_date_minute,
+                due_date_second,
+            )
+
+        else:
+            due_date = None
 
         if task_lists:
             response = self._insert_task_by_list_id_parent_id(
@@ -799,18 +821,31 @@ class TasksApi:
             dict: The task id, title, and updated time or None if the task was not updated
         """
 
+        task = self._get_task_by_id(list_id, task_id)
+
         body = {}
 
         if new_task_name:
-            body["title"] = new_task_name
+            body["title"] = new_task_name.strip().title()
+        else:
+            body["title"] = task["title"]
 
         if due_date:
             body["due"] = datetime_to_RFC3339(due_date)
+        else:
+            body["due"] = task.get("due", None)
 
         if notes:
-            body["notes"] = notes + ", " + DEFAULT_NOTE
+            body["notes"] = notes + DEFAULT_NOTE
         else:
-            body["notes"] = DEFAULT_NOTE
+            notes = task.get("notes", None)
+            if notes:
+                if DEFAULT_NOTE not in notes:
+                    body["notes"] = notes + DEFAULT_NOTE
+                else:
+                    body["notes"] = notes
+            else:
+                body["notes"] = DEFAULT_NOTE
 
         if parent_id:
             self._move_task_by_list_id_task_id_parent_id(list_id, task_id, parent_id)
@@ -818,10 +853,15 @@ class TasksApi:
         if is_done != None:
             if is_done:
                 body["status"] = "completed"
-                body["completed"] = datetime_to_RFC3339(datetime.now())
+                body["completed"] = datetime_to_RFC3339(
+                    get_current_time(self._timezone)
+                )
             else:
                 body["status"] = "needsAction"
                 body["completed"] = None
+        else:
+            body["status"] = task.get("status", None)
+            body["completed"] = task.get("completed", None)
 
         try:
             task = (
@@ -851,7 +891,12 @@ class TasksApi:
         list_name: str,
         task_name: str,
         new_task_name: str = None,
-        due_date: str = None,
+        due_date_year: int = 0,
+        due_date_month: int = 0,
+        due_date_day: int = 0,
+        due_date_hour: int = 0,
+        due_date_minute: int = 0,
+        due_date_second: int = 0,
         notes: str = None,
         parent_name: str = None,
         is_done: bool = None,
@@ -892,8 +937,17 @@ class TasksApi:
         else:
             parent_id = None
 
-        if due_date:
-            due_date = datetime.fromisoformat(due_date)
+        if due_date_year != 0 and due_date_month != 0 and due_date_day != 0:
+            due_date = date_and_time_to_datetime(
+                due_date_year,
+                due_date_month,
+                due_date_day,
+                due_date_hour,
+                due_date_minute,
+                due_date_second,
+            )
+        else:
+            due_date = None
 
         response = self._update_task_by_list_id_task_id(
             task_list_id, task_id, new_task_name, due_date, notes, parent_id, is_done
@@ -907,8 +961,8 @@ class TasksApi:
 
 if __name__ == "__main__":
 
-    new_list_name = "Test List"
-    uptaded_list_name = "New Test List"
+    new_list_name = "TEST lisT"
+    updated_list_name = "NEW TEST LIST"
 
     # Initialize the tasks API
     tasks_api = TasksApi("1")
@@ -987,14 +1041,18 @@ if __name__ == "__main__":
     # else:
     #     print(f"Task (Test) was not deleted.")
 
-    # print("Insert Task (Test 3)...")
-    # tasks = tasks_api.insert_task_by_list_name_parent_name(
-    #     "New Test List",
-    #     "Test 3",
-    #     "2024-11-01T00:00:00",
-    #     "Test 3 Notes",
-    #     "Test 0",
-    # )
+    print("Insert Task (Test 1)...")
+    tasks = tasks_api.insert_task_by_list_name_parent_name(
+        new_list_name,
+        "Test 1",
+        2024,
+        11,
+        30,
+        0,
+        0,
+        0,
+        "Test 1 Notes",
+    )
 
     # if tasks:
     #     print(f"{tasks['name']} ({tasks['id']}) {tasks['last_updated']}")
@@ -1023,15 +1081,13 @@ if __name__ == "__main__":
     # else:
     #     print(f"Task (Test 3) was not moved.")
 
-    # print("Update Task (Test 3)...")
-    # task = tasks_api.update_task_by_list_name_task_name(
-    #     "New Test List",
-    #     "Test 3",
-    #     new_task_name="Test 3 Updated",
-    #     due_date="2024-11-01T00:00:00",
-    #     notes="Test 3 Updated Notes",
-    #     is_done=True,
-    # )
+    print("Update Task (Test 1)...")
+    task = tasks_api.update_task_by_list_name_task_name(
+        new_list_name,
+        "Test 1",
+        new_task_name="Test 1 Updated",
+        notes="Test 1 Updated Notes",
+    )
     # if task:
     #     print(f"{task['name']} ({task['id']}) {task['last_updated']}")
     # else:
