@@ -184,10 +184,46 @@ def RFC3339_to_relative_time(date: str, timezone: str = "UTC") -> str:
     """
     try:
         date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
+        epoch = int(date.timestamp())
     except:
         return "Invalid Date"
 
-    return epoch_to_relative_time(date.timestamp(), timezone)
+    return epoch_to_relative_time(epoch, timezone)
+
+
+def RFC3339_change_timezones(
+    date: str, from_timezone: str = "UTC", to_timezone: str = "UTC"
+) -> str:
+    """
+    Converts an RFC3339 formatted date string from one timezone to another.
+
+    Args:
+        date (str): The RFC3339 formatted date string.
+        from_timezone (str): The timezone of the input date string.
+        to_timezone (str): The timezone to convert the input date string to.
+
+    Returns:
+        str: The date string in the new timezone if the conversion is successful, otherwise "Invalid Date" or "Invalid Timezone".
+    """
+    try:
+        date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%fZ")
+    except:
+        return "Invalid Date"
+
+    if from_timezone not in allowed_timezones:
+        print("Invalid timezone, Defaulting to UTC")
+        from_timezone = "UTC"
+
+    if to_timezone not in allowed_timezones:
+        print("Invalid timezone, Defaulting to UTC")
+        to_timezone = "UTC"
+
+    try:
+        date = pytz.timezone(from_timezone).localize(date)
+        date = date.astimezone(pytz.timezone(to_timezone))
+        return date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    except:
+        return "Invalid Timezone"
 
 
 ## Datetime
@@ -451,69 +487,131 @@ def epoch_to_relative_time(epoch: int, timezone: str = "UTC") -> str:
     current_time = datetime.now(pytz.timezone(timezone))
 
     if epoch > current_time.timestamp():
-        return "Future Date"
+        time_difference = current_time - datetime.fromtimestamp(
+            epoch, tz=pytz.timezone(timezone)
+        )
 
-    time_difference = current_time - datetime.fromtimestamp(
-        epoch, tz=pytz.timezone(timezone)
-    )
+        diff_years = time_difference.days // 365
+        diff_months = time_difference.days // 30
+        diff_weeks = time_difference.days // 7
+        diff_days = time_difference.days
+        diff_hours = time_difference.seconds // 3600 % 24
+        diff_minutes = time_difference.seconds // 60 % 60
+        diff_seconds = time_difference.seconds % 60
 
-    diff_years = time_difference.days // 365
-    diff_months = time_difference.days // 30
-    diff_weeks = time_difference.days // 7
-    diff_days = time_difference.days
-    diff_hours = time_difference.seconds // 3600 % 24
-    diff_minutes = time_difference.seconds // 60 % 60
-    diff_seconds = time_difference.seconds % 60
+        if diff_years > 0:
+            if diff_years == 1:
+                return "1 year from now"
+            return f"{diff_years} years from now"
 
-    if diff_years > 0:
-        if diff_years == 1:
-            return "1 year ago"
-        return f"{diff_years} years ago"
+        if diff_months > 0:
+            if diff_months == 1:
+                return "1 month from now"
+            return f"{diff_months} months from now"
 
-    if diff_months > 0:
-        if diff_months == 1:
-            return "1 month ago"
-        return f"{diff_months} months ago"
+        if diff_weeks > 0:
+            if diff_weeks == 1:
+                return "1 week from now"
+            return f"{diff_weeks} weeks from now"
 
-    if diff_weeks > 0:
-        if diff_weeks == 1:
-            return "1 week ago"
-        return f"{diff_weeks} weeks ago"
+        if diff_days > 0:
+            if diff_days == 1:
+                return "1 day from now"
+            return f"{diff_days} days from now"
 
-    if diff_days > 0:
-        if diff_days == 1:
-            return "1 day ago"
-        return f"{diff_days} days ago"
+        moved_diff_minutes = diff_minutes
 
-    moved_diff_minutes = diff_minutes
+        if diff_hours > 0:
+            if diff_hours == 1:
+                if moved_diff_minutes == 0:
+                    return f"{diff_hours} hours from now"
+                return f"1 hour from now, {moved_diff_minutes} minutes from now"
+            if moved_diff_minutes == 0:
+                return f"{diff_hours} hours from now"
+            return f"{diff_hours} hours from now, {moved_diff_minutes} minutes from now"
 
-    if diff_hours > 0:
-        if diff_hours == 1:
+        moved_diff_minutes = diff_minutes - 5
+
+        if moved_diff_minutes > 0:
+            if moved_diff_minutes == 1:
+                if diff_seconds == 0:
+                    return "1 minute from now"
+                return f"1 minute from now, {diff_seconds} seconds from now"
+            if diff_seconds == 0:
+                return f"{moved_diff_minutes} minutes from now"
+            return f"{moved_diff_minutes} minutes from now, {diff_seconds} seconds from now"
+
+        if diff_seconds == 0:
+            return "Just Now"
+
+        if diff_seconds > 0:
+            if diff_seconds == 1:
+                return "1 second from now"
+            return f"{diff_seconds} seconds from now"
+    elif epoch == current_time.timestamp():
+        return "Just Now"
+    else:
+        time_difference = current_time - datetime.fromtimestamp(
+            epoch, tz=pytz.timezone(timezone)
+        )
+
+        diff_years = time_difference.days // 365
+        diff_months = time_difference.days // 30
+        diff_weeks = time_difference.days // 7
+        diff_days = time_difference.days
+        diff_hours = time_difference.seconds // 3600 % 24
+        diff_minutes = time_difference.seconds // 60 % 60
+        diff_seconds = time_difference.seconds % 60
+
+        if diff_years > 0:
+            if diff_years == 1:
+                return "1 year ago"
+            return f"{diff_years} years ago"
+
+        if diff_months > 0:
+            if diff_months == 1:
+                return "1 month ago"
+            return f"{diff_months} months ago"
+
+        if diff_weeks > 0:
+            if diff_weeks == 1:
+                return "1 week ago"
+            return f"{diff_weeks} weeks ago"
+
+        if diff_days > 0:
+            if diff_days == 1:
+                return "1 day ago"
+            return f"{diff_days} days ago"
+
+        moved_diff_minutes = diff_minutes
+
+        if diff_hours > 0:
+            if diff_hours == 1:
+                if moved_diff_minutes == 0:
+                    return f"{diff_hours} hours ago"
+                return f"1 hour ago, {moved_diff_minutes} minutes ago"
             if moved_diff_minutes == 0:
                 return f"{diff_hours} hours ago"
-            return f"1 hour ago, {moved_diff_minutes} minutes ago"
-        if moved_diff_minutes == 0:
-            return f"{diff_hours} hours ago"
-        return f"{diff_hours} hours ago, {moved_diff_minutes} minutes ago"
+            return f"{diff_hours} hours ago, {moved_diff_minutes} minutes ago"
 
-    moved_diff_minutes = diff_minutes - 5
+        moved_diff_minutes = diff_minutes - 5
 
-    if moved_diff_minutes > 0:
-        if moved_diff_minutes == 1:
+        if moved_diff_minutes > 0:
+            if moved_diff_minutes == 1:
+                if diff_seconds == 0:
+                    return "1 minute ago"
+                return f"1 minute ago, {diff_seconds} seconds ago"
             if diff_seconds == 0:
-                return "1 minute ago"
-            return f"1 minute ago, {diff_seconds} seconds ago"
+                return f"{moved_diff_minutes} minutes ago"
+            return f"{moved_diff_minutes} minutes ago, {diff_seconds} seconds ago"
+
         if diff_seconds == 0:
-            return f"{moved_diff_minutes} minutes ago"
-        return f"{moved_diff_minutes} minutes ago, {diff_seconds} seconds ago"
+            return "Just Now"
 
-    if diff_seconds == 0:
-        return "Just Now"
-
-    if diff_seconds > 0:
-        if diff_seconds == 1:
-            return "1 second ago"
-        return f"{diff_seconds} seconds ago"
+        if diff_seconds > 0:
+            if diff_seconds == 1:
+                return "1 second ago"
+            return f"{diff_seconds} seconds ago"
 
 
 # Color Conversion Functions
