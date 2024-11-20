@@ -1,4 +1,3 @@
-from pprint import pprint
 from datetime import datetime
 import os
 import json
@@ -15,6 +14,8 @@ from utils import (
     date_and_time_to_datetime,
     get_current_time,
 )
+
+from pprint import pprint
 
 
 DEFAULT_NOTE = "\n\nB.E.M.O"
