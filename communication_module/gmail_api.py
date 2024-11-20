@@ -1,9 +1,14 @@
-from pprint import pprint
 import re
+import json
 import base64
-from bs4 import BeautifulSoup
-from email.message import EmailMessage
+import os
 
+from bs4 import BeautifulSoup
+
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -12,15 +17,12 @@ from init_user import init_user
 from utils import epoch_to_date_and_time, epoch_to_relative_time
 from utils import hex_to_color_name, color_name_to_hex
 
-import os
-import json
+from pprint import pprint
 
-# Todo: Fix default note appearing twice
-DEFAULT_NOTE = "\n\n<Sent from BEMO>\n"
+
+DEFAULT_NOTE = "\n\nSent or Modified by B.E.M.O"
 DEFAULT_PATH = os.path.dirname(__file__)
 DEFAULT_TIMEZONE = "Africa/Cairo"
-
-# Todo: Add capitilize title
 
 
 class GmailAPI:
@@ -957,13 +959,13 @@ class GmailAPI:
         cc = [recipient.lower().strip() for recipient in cc]
         bcc = [recipient.lower().strip() for recipient in bcc]
 
-        subject = subject.lower().strip()
+        subject = subject.lower().strip().title()
         sender = sender.lower().strip()
 
         if content != DEFAULT_NOTE:
             content += DEFAULT_NOTE
 
-        message = EmailMessage()
+        message = MIMEMultipart("alternative")
 
         message["Subject"] = subject
         message["From"] = sender
@@ -977,7 +979,7 @@ class GmailAPI:
         if labels != []:
             labels = [label.lower().strip() for label in labels]
 
-        message.set_content(content)
+        message.attach(MIMEText(content, "plain"))
 
         encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
 
@@ -1204,9 +1206,21 @@ class GmailAPI:
         """
 
         draft = self._get_draft_content(draft_id)[0]
+        message_id = draft["id"]
+        attachment_ids = draft["attachment_id"]
+        attachment_names = [
+            name + "." + type
+            for name, type in zip(draft["attachment_name"], draft["attachment_type"])
+        ]
+
+        attachments = []
+
+        for attachment_id in attachment_ids:
+            attachment = self._get_attachment_by_id(message_id, attachment_id)
+            attachments.append(attachment)
 
         if subject is not None:
-            subject = subject.lower().strip()
+            subject = subject.lower().strip().title()
         else:
             subject = draft["subject"]
 
@@ -1230,17 +1244,32 @@ class GmailAPI:
         else:
             bcc = draft["Bcc"]
 
+        is_default_note = False
+
         if content is not None:
             content += DEFAULT_NOTE
         else:
-            # matches = re.findall(r"<(.*?)>", draft["content"])
-            # print("Matches:")
-            # print(matches)
-            # default_note_cleaned = DEFAULT_NOTE.split("<")[0][:-1]
-            # print("Default Note Cleaned:")
-            # print(default_note_cleaned)
-            # Todo: Try HTML Content
-            content = draft["content"] + DEFAULT_NOTE
+            content = draft["html_content"]
+
+            cleaned_content = re.sub(r"\n", "", content)
+            cleaned_default_note = re.sub(r"\n", "", DEFAULT_NOTE)
+
+            p_tags = re.findall(r"<p>(.*?)</p>", cleaned_content)
+            div_tags = re.findall(r"<div>(.*?)</div>", cleaned_content)
+
+            for tag in p_tags + div_tags:
+                if tag.lower().strip() == cleaned_default_note.lower().strip():
+                    is_default_note = True
+                    break
+
+            if not is_default_note and not content.endswith(DEFAULT_NOTE):
+                try:
+                    content = content.replace(
+                        "</body>", f"<p>{DEFAULT_NOTE}</p></body>"
+                    )
+                except:
+                    print("No HTML content found. Using plain text content.")
+                    content = draft["content"] + DEFAULT_NOTE
 
         if add_labels == []:
             add_labels = draft["label_names"]
@@ -1252,7 +1281,7 @@ class GmailAPI:
         else:
             remove_labels = [label.lower().strip() for label in remove_labels]
 
-        message = EmailMessage()
+        message = MIMEMultipart("alternative")
 
         if subject is not None:
             message["Subject"] = subject
@@ -1265,7 +1294,18 @@ class GmailAPI:
         if bcc is not [] or bcc is not None:
             message["Bcc"] = ", ".join(bcc)
         if content is not None:
-            message.set_content(content)
+            message.attach(MIMEText(content, "html"))
+
+        # Add attachments
+        for i, attachment in enumerate(attachments):
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment["data"])
+            encoders.encode_base64(part)
+            part.add_header(
+                "Content-Disposition",
+                f'attachment; filename="{attachment_names[i]}"',
+            )
+            message.attach(part)
 
         encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
 
@@ -1748,7 +1788,7 @@ class GmailAPI:
         Returns:
             str: The label ID or None if an error occurred
         """
-        label_name = label_name.lower().strip()
+        label_name = label_name.lower().strip().title()
 
         if parent_label_name is not None:
             parent_label_name = parent_label_name.lower().strip()
@@ -1850,7 +1890,7 @@ class GmailAPI:
         label = self._get_label_by_id(label_id)
 
         if new_label_name is not None:
-            new_label_name = new_label_name.lower().strip()
+            new_label_name = new_label_name.lower().strip().title()
         else:
             new_label_name = label["name"]
 
@@ -2195,6 +2235,34 @@ class GmailAPI:
 
         return self._count_by_label_id(label["id"])
 
+    # Attachment
+    ##############################################################################################################
+
+    # Attachment (Get)
+    ##############################################################################################################
+    def _get_attachment_by_id(self, message_id: str, attachment_id: str) -> dict:
+        """
+        Get the attachment by ID
+
+        Args:
+            message_id (str): The message ID
+            attachment_id (str): The attachment ID
+
+        Returns:
+            dict: The attachment or None if an error occurred
+        """
+        try:
+            return (
+                self._service.users()
+                .messages()
+                .attachments()
+                .get(userId="me", messageId=message_id, id=attachment_id)
+                .execute()
+            )
+        except HttpError as e:
+            print(f"An error occurred: {e}")
+            return None
+
     # Thread
     ##############################################################################################################
 
@@ -2401,8 +2469,6 @@ class GmailAPI:
 
                 text = text.encode("ascii", "ignore").decode("ascii")
 
-                text = " ".join(text.split())
-
                 return_dict["html_content"] = content
                 return_dict["content"] = text
 
@@ -2489,13 +2555,7 @@ class GmailAPI:
                     text = soup.get_text()
                     content = soup.prettify()
 
-                    text = (
-                        text.replace("\n", " ")
-                        .replace("\r", " ")
-                        .replace("\t", " ")
-                        .replace("\xa0", " ")
-                        .strip()
-                    )
+                    text = text.encode("ascii", "ignore").decode("ascii").strip()
 
                     return_dict["html_content"] = content
                     return_dict["content"] = text
@@ -2506,6 +2566,7 @@ class GmailAPI:
             return_dict["attachment_name"] = []
             return_dict["attachment_type"] = []
             return_dict["attachment_size"] = []
+            return_dict["attachment_id"] = []
 
             for attachment in attachments:
                 return_dict["attachment_name"].append(
@@ -2514,6 +2575,7 @@ class GmailAPI:
                 return_dict["attachment_type"].append(
                     attachment["filename"].split(".")[-1]
                 )
+                return_dict["attachment_id"].append(attachment["body"]["attachmentId"])
                 size_in_kb = int(attachment["body"]["size"]) / 1024
 
                 return_dict["attachment_size"].append(f"{size_in_kb:.2f} KB")
@@ -3515,17 +3577,12 @@ if __name__ == "__main__":
     # )
 
     # print("Update Draft:")
-    # print("By Subject:")
+    # print("By Subjects:")
     # print(
     #     gmail_api.update_drafts_by_subjects(
-    #         ["tEst 1"],
+    #         ["Test 1"],
     #         new_subject="Test 2",
-    #         new_content="Hello",
-    #         new_recipients=["begadtAmim.a@gmail.coM"],
-    #         new_cc=["begadtAmim.a@gmail.coM"],
-    #         new_bcc=["begadtAmim.a@gmail.coM"],
-    #         add_labels=["Test LABEL 2"],
-    #         remove_labels=["Test LABEL 1"],
+    #         new_content="Hello 2",
     #     )
     # )
 
@@ -3748,4 +3805,4 @@ if __name__ == "__main__":
     #     )
     # )
 
-    # print("-" * 100)
+    print("-" * 100)
