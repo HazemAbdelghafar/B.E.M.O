@@ -22,7 +22,7 @@ class FindLearningResources:
         use_llm: bool = True,
         max_results_per_type: int = 5,
         check_status_code: bool = False,
-        clean_resources: bool = True,
+        clean_resources: bool = False,
     ):
         """
         Initialize the Tavily API and Google Chat API
@@ -88,8 +88,22 @@ class FindLearningResources:
         # Initialize the prompt or resources
         if self.use_llm:
             self.prompt = self._init_prompt()
+            self.llm_resources = [
+                "Roadmaps",
+                "Blogs/Articles",
+                "YouTube Videos",
+                "Scientific Papers",
+                "Courses",
+                "Images",
+                "Communities/Forums",
+                "Code Repositories",
+                "Slides/Presentations",
+                "Books",
+                "Webinars",
+                "Case Studies",
+            ]
         else:
-            self.resources = [
+            self.tavily_resources = [
                 "Learning Roadmaps",
                 "Learning Blogs",
                 "Learning Articles",
@@ -107,7 +121,6 @@ class FindLearningResources:
                 "Learning Slides",
                 "Learning Presentations",
                 "Learning Books",
-                "Learning eBooks",
                 "Learning Webinars",
                 "Case Studies",
                 "Real-world Applications",
@@ -134,47 +147,43 @@ class FindLearningResources:
                 (
                     "system",
                     """
-                    You are an intelligent assistant specialized in finding high-quality learning resources on the web.
-                    Your task is to gather diverse and comprehensive resources for the topic provided in the human input. Include the following resource types:
-                    
-                    - **Roadmaps**: Step-by-step guides or structured learning paths.
-                    - **Blogs/Articles**: Informative written content explaining concepts, ideas, or updates related to the topic.
-                    - **YouTube Videos**: Video tutorials, lectures, or explainers.
-                    - **Scientific Papers**: Research papers or articles published in journals or conferences.
-                    - **Courses**: Online courses, tutorials, or workshops (free or paid).
-                    - **Images**: Visual resources such as diagrams, charts, or infographics related to the topic.
-                    - **Podcasts**: Audio discussions or interviews related to the topic.
-                    - **Communities/Forums**: Online platforms where the topic is actively discussed.
-                    - **Code Repositories**: Open-source repositories with implementations or datasets.
-                    - **Slides/Presentations**: Educational slide decks or conference presentations.
-                    - **Books**: Textbooks, guides, or eBooks on the topic.
-                    - **Datasets**: Public datasets relevant to the topic.
-                    - **Interactive Tutorials**: Platforms offering hands-on learning experiences.
-                    - **Webinars**: Live or recorded online events.
-                    - **Case Studies**: Real-world applications and examples.
-                    - **Newsletters**: Regular updates and insights about the topic.
-                    
-                    Rules:
-                    - Include resources from as many different types as possible. Avoid focusing on only a few types.
-                    - The total number of results must not exceed 20 and must not be less than 12.
-                    - The more the number of results, the better, as long as quality is maintained.
-                    - The total number of results for each resource type must not exceed 3.
-                    - Select only the most relevant and high-quality resources for each type.
-                    - Ensure a diverse selection to cater to different learning preferences and levels.
-                    - Do not return duplicate resources or similar content.
-                    - THE TOTAL NUMBER OF RESOURCES MUST BE BETWEEN 12 AND 20.
+Gather high-quality learning resources based on the specified topic and specific resource types.
 
-                    Provide the results in the following JSON format:
-                    {{
-                        "resources": [
-                            {{"title": "Title of resource 1", "url": "URL of the resource 1", "type": "Type of the resource 1"}},
-                            {{"title": "Title of resource 2", "url": "URL of the resource 2", "type": "Type of the resource 2"}},
-                            {{"title": "Title of resource 3", "url": "URL of the resource 3", "type": "Type of the resource 3"}},
-                            ...
-                        ],
-                        "model_output": "A short sentence describing all of the results for the user and telling them that the results have been sent to their phone on Telegram and to their machine on the B.E.M.O app."
-                    }}
-                    """,
+Parameters:
+    input_data (str): A string input with the following format:
+    "Topic: <topic> - Specific Resources: <resource1>, <resource2>, ..."
+
+Resource Types:
+    - Roadmaps: Step-by-step guides or structured learning paths.
+    - Blogs/Articles: Informative written content explaining concepts or updates.
+    - YouTube Videos: Video tutorials, lectures, or explainers.
+    - Scientific Papers: Research papers or articles published in journals or conferences.
+    - Courses: Online courses, tutorials, or workshops (free or paid).
+    - Images: Visual resources like diagrams, charts, or infographics.
+    - Communities/Forums: Online platforms discussing the topic.
+    - Code Repositories: Open-source repositories with implementations or datasets.
+    - Slides/Presentations: Educational slide decks or conference presentations.
+    - Books: Textbooks, guides, or eBooks on the topic.
+    - Webinars: Live or recorded online events.
+    - Case Studies: Real-world applications and examples.
+
+Rules:
+    - Include resources from multiple types, not just a few.
+    - Provide 12-20 results, prioritizing quality and variety.
+    - The output should be in JSON format.
+    - Do not include the number of results in the "model_output".
+
+Returns:
+    dict: A JSON-compatible dictionary in the following format:
+    {{
+        "resources": [
+            {{"title": "Title of resource 1", "url": "URL of the resource 1", "type": "Type of the resource 1"}},
+            {{"title": "Title of resource 2", "url": "URL of the resource 2", "type": "Type of the resource 2"}},
+            ...
+        ],
+        "model_output": "Summary of results sent to Telegram and B.E.M.O app."
+    }}
+""",
                 ),
                 ("human", "{user_input}"),
                 ("placeholder", "{messages}"),
@@ -197,18 +206,38 @@ class FindLearningResources:
 
         return self.prompt | llm_with_tavily
 
-    def find_resources(self, topic: str) -> dict:
+    def find_resources(self, topic: str, specific_resources: list = None) -> dict:
         """
         Find learning resources for the given topic
 
         Args:
             topic (str): The topic for which to find learning resources
+            specific_resources (list): The specific types of resources to include. Default is None which includes all resources.
 
         Returns:
             dict: The learning resources found for the given topic
         """
 
         if self.use_llm:
+
+            # Check if specific resources are provided
+            llm_resources = [resource.lower() for resource in self.llm_resources]
+            specific_resources = [
+                resource.lower()
+                for resource in specific_resources
+                if resource.lower() in llm_resources
+            ]
+
+            # Remove duplicates
+            specific_resources = list(set(specific_resources))
+
+            # Generate the input for the LLM
+            if len(specific_resources) == 0 or specific_resources is None:
+                specific_resources = llm_resources
+
+            input = (
+                f"Topic: {topic} - Specific Resources: {', '.join(specific_resources)}"
+            )
 
             # Define the tool chain
             @chain
@@ -232,13 +261,18 @@ class FindLearningResources:
 
             # Run the tool chain
             start_time = time.time()
-            result = tool_chain.invoke(topic)
+            result = tool_chain.invoke(input)
+
+            try:
+                total_resources = len(result["resources"])
+            except:
+                return {"error": "LLM failed to generate resources."}
 
             # Add the time taken and topic to the result
             result["time_taken"] = round(time.time() - start_time, 2)
             result["topic"] = topic
-            result["total_resources"] = len(result["resources"])
-
+            result["total_resources"] = total_resources
+            result["specific_resources"] = specific_resources
             if self.clean_resources:
                 return self.clean_llm_resources(result)
             else:
@@ -249,24 +283,35 @@ class FindLearningResources:
             # Todo: Implement the logic to find resources without the LLM
             pass
 
-    def find_multiple_resources(self, topics: list) -> dict:
+    def find_multiple_resources(
+        self, topics: list, specific_resources: list = [[]]
+    ) -> list:
         """
         Find learning resources for the given topics
 
         Args:
             topics (list): The topics for which to find learning resources
+            specific_resources (list): The specific types of resources to include for each topic. Default is [[]].
 
         Returns:
             dict: The learning resources found for the given topics
         """
 
+        if len(specific_resources) != len(topics):
+            return {
+                "error": "The number of specific resources must match the number of topics."
+            }
+
         results = []
-        for topic in topics:
-            results.append(self.find_resources(topic))
-            print(f"Learning resources found for the topic '{topic}'")
+        for topic, specific_resource in zip(topics, specific_resources):
+            results.append(self.find_resources(topic, specific_resource))
+            print(
+                f"Learning resources found for the topic '{topic}', specific resources: {specific_resource}"
+            )  #! Remove
 
         return results
 
+    # Todo: Fix the function to clean the resources
     def clean_llm_resources(self, resources: dict) -> dict:
         """
         Clean the learning resources generated by the LLM
@@ -311,6 +356,8 @@ class FindLearningResources:
                 unique_urls.add(url)
                 unique_resources.append(resource)
 
+        print(f"Unique resources: {len(unique_resources)}")  #! Remove
+
         # Remove resources with empty titles or URLs
         unique_resources = [
             resource
@@ -321,20 +368,39 @@ class FindLearningResources:
             and resource["url"] is not None
         ]
 
+        print(f"Resources with titles and URLs: {len(unique_resources)}")  #! Remove
+
+        # Remove resource types that are not in the specific resources
+        specific_resources = resources["specific_resources"]
+        unique_resources = [
+            resource
+            for resource in unique_resources
+            if resource["type"].lower() in specific_resources
+        ]
+
+        print(f"Resources with specific types: {len(unique_resources)}")  #! Remove
+
         # Limit the number of resources for each type to the maximum allowed
-        resource_count = {}
-        cleaned_resources = []
-        for resource in unique_resources:
-            resource_type = resource["type"]
-            if resource_type not in resource_count:
-                resource_count[resource_type] = 0
-            if resource_count[resource_type] < self.max_results_per_type:
-                cleaned_resources.append(resource)
-                resource_count[resource_type] += 1
+        if len(specific_resources) > 2:
+            resource_count = {}
+            cleaned_resources = []
+            for resource in unique_resources:
+                resource_type = resource["type"]
+                if resource_type not in resource_count:
+                    resource_count[resource_type] = 0
+                if resource_count[resource_type] < self.max_results_per_type:
+                    cleaned_resources.append(resource)
+                    resource_count[resource_type] += 1
+        else:
+            cleaned_resources = unique_resources
+
+        print(f"Resources after limiting: {len(cleaned_resources)}")  #! Remove
 
         # Limit the number of resources to 20
         if len(cleaned_resources) > 20:
             cleaned_resources = cleaned_resources[:20]
+
+        print(f"Resources after limiting to 20: {len(cleaned_resources)}")  #! Remove
 
         # Remove the resources that give a status code other than 200
         if self.check_status_code:
@@ -348,13 +414,18 @@ class FindLearningResources:
         else:
             non_error_resources = cleaned_resources
 
+        print(
+            f"Resources after checking status code: {len(non_error_resources)}"
+        )  #! Remove
+
         return {
             "resources": non_error_resources,
             "topic": resources["topic"],
-            "total_resources": resources["total_resources"],
+            "total_resources": len(non_error_resources),
             "model_output": resources["model_output"],
             "generation_time": resources["time_taken"],
             "cleaning_time": round(time.time() - start_time, 2),
+            "specific_resources": resources["specific_resources"],
         }
 
 
@@ -368,7 +439,14 @@ if __name__ == "__main__":
         "Human Brain",
     ]
 
-    results = flr_llm.find_multiple_resources(topics)
+    specific_resources = [
+        ["Roadmaps", "Blogs/Articles", "YouTube Videos"],
+        ["Roadmaps"],
+        ["Blogs/Articles", "YouTube Videos"],
+        [],
+    ]
+
+    results = flr_llm.find_multiple_resources(topics, specific_resources)
 
     with open(DEFAULT_PATH + "/test/resources.json", "w") as f:
         json.dump(results, f, indent=4)
