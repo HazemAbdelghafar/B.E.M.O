@@ -12,6 +12,8 @@ import os
 import time
 import requests
 import json
+import random
+from pprint import pprint
 
 DEFAULT_PATH = os.path.dirname(__file__)
 
@@ -86,6 +88,8 @@ class FindLearningResources:
             self.output_parser = JsonOutputParser()
 
         # Initialize the prompt or resources
+        # Todo: llm resources and tavily resources
+        # Todo: Add default resources
         if self.use_llm:
             self.prompt = self._init_prompt()
             self.llm_resources = [
@@ -280,8 +284,101 @@ Returns:
                 return result
 
         else:
-            # Todo: Implement the logic to find resources without the LLM
-            pass
+            # Check if specific resources are provided
+            tavily_resources = [resource.lower() for resource in self.tavily_resources]
+            specific_resources = [
+                resource.lower()
+                for resource in specific_resources
+                if resource.lower() in tavily_resources
+            ]
+
+            # Remove duplicates
+            specific_resources = list(set(specific_resources))
+
+            # Get the resources for the topic if specific resources are provided
+            if len(specific_resources) == 0 or specific_resources is None:
+                specific_resources = tavily_resources
+
+            resources = []
+
+            # Find resources using the Tavily API
+            start_time = time.time()
+            for resource in specific_resources:
+
+                is_image = False
+
+                if (
+                    resource == "learning figures"
+                    or resource == "learning diagrams"
+                    or resource == "learning charts"
+                    or resource == "learning infographics"
+                    or resource == "learning images"
+                ):
+                    try:
+                        results = self.tavily.search(
+                            query=f"{topic} {resource}",
+                            search_depth="advanced",
+                            max_results=random.randint(1, 3),
+                            include_images=True,
+                            include_answer=False,
+                            include_image_descriptions=True,
+                            include_raw_content=False,
+                            exclude_domains=[],
+                        )
+                        is_image = True
+                    except Exception as e:
+                        results = {"error": str(e)}
+                else:
+                    try:
+                        results = self.tavily.search(
+                            query=f"{topic} {resource}",
+                            search_depth="advanced",
+                            max_results=random.randint(1, 3),
+                            include_images=False,
+                            include_answer=False,
+                            include_image_descriptions=False,
+                            include_raw_content=False,
+                            exclude_domains=[],
+                        )  # Todo: Add domains to exclude
+                        is_image = False
+                    except Exception as e:
+                        results = {"error": str(e)}
+
+                if not is_image:
+                    for result in results["results"]:
+                        resources.append(
+                            {
+                                "title": result["title"],
+                                "url": result["url"],
+                                "type": resource,
+                                "score": result["score"],
+                            }
+                        )
+                else:
+                    for result in results["images"]:
+                        resources.append(
+                            {
+                                "title": result["description"],
+                                "url": result["url"],
+                                "type": resource,
+                                "score": 100,
+                            }
+                        )
+
+            results_dict = {
+                "resources": resources,
+                "topic": topic,
+                "total_resources": len(results["results"]),
+                "model_output": f"Learning resources found for the topic '{topic}', results have been sent to Telegram and B.E.M.O app.",
+                "generation_time": round(time.time() - start_time, 2),
+                "cleaning_time": 0,
+                "specific_resources": specific_resources,
+            }
+
+            if self.clean_resources:
+                return self.clean_non_llm_resources(results_dict)
+            else:
+                return results_dict
 
     def find_multiple_resources(
         self, topics: list, specific_resources: list = [[]]
@@ -294,7 +391,7 @@ Returns:
             specific_resources (list): The specific types of resources to include for each topic. Default is [[]].
 
         Returns:
-            dict: The learning resources found for the given topics
+            list: The learning resources found for the given topics
         """
 
         if len(specific_resources) != len(topics):
@@ -396,6 +493,7 @@ Returns:
             non_error_resources = []
             for resource in cleaned_resources:
                 url = resource["url"]
+                # Todo: Send head request
                 response = requests.request("GET", url)
                 status_code = response.status_code
                 if status_code in allowed_status_codes:
@@ -413,22 +511,49 @@ Returns:
             "specific_resources": resources["specific_resources"],
         }
 
+    def clean_non_llm_resources(self, resources: dict) -> dict:
+        """
+        Clean the learning resources generated by the Tavily API
+
+        Args:
+            resources (dict): The learning resources generated by the Tavily API
+
+        Returns:
+            dict: The cleaned learning resources
+        """
+
+        # Todo: Add cleaning for non-LLM resources
+        return resources
+
 
 if __name__ == "__main__":
-    flr_llm = FindLearningResources(use_llm=True)
+    flr_llm = FindLearningResources(use_llm=False)
 
     topics = [
-        "Deep Learning",
+        # "Deep Learning",
         "Arabic Language",
-        "Stock Market Analysis",
-        "Human Brain",
+        # "Stock Market Analysis",
+        # "Human Brain",
     ]
 
+    # specific_resources = [
+    #     ["Roadmaps", "Blogs/Articles", "YouTube Videos"],
+    #     ["Roadmaps"],
+    #     ["Blogs/Articles", "YouTube Videos"],
+    #     [],
+    # ]
+
     specific_resources = [
-        ["Roadmaps", "Blogs/Articles", "YouTube Videos"],
-        ["Roadmaps"],
-        ["Blogs/Articles", "YouTube Videos"],
-        [],
+        # ["Learning Roadmaps", "Learning Blogs", "Learning YouTube Videos"],
+        # ["Learning Roadmaps"],
+        [
+            "Learning Figures",
+            "Learning Diagrams",
+            "Learning Charts",
+            "Learning Infographics",
+            "Learning Images",
+        ],
+        # [],
     ]
 
     results = flr_llm.find_multiple_resources(topics, specific_resources)
@@ -440,7 +565,7 @@ if __name__ == "__main__":
         f"Learning resources for the topics '{topics}' using LLM saved to {DEFAULT_PATH}/test/resources.json"
     )
 
-    for result in results:
-        print(
-            f"Topic: {result['topic']}, Number of Resources: {len(result['resources'])}"
-        )
+    # for result in results:
+    #     print(
+    #         f"Topic: {result['topic']}, Number of Resources: {len(result['resources'])}"
+    #     )
