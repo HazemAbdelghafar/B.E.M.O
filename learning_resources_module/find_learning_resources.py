@@ -51,14 +51,10 @@ class FindLearningResources:
         self.confidence_threshold = confidence_threshold / 100
 
         # Load API keys from .env file
-        self.tavily_api_key = dotenv_values(find_dotenv())[
-            "TAVILY_API_KEY_TEST"
-        ]  #! Remove _TEST
+        self.tavily_api_key = dotenv_values(find_dotenv())["TAVILY_API_KEY"]
 
         if self.use_llm:
-            self.gemini_api_key = dotenv_values(find_dotenv())[
-                "GEMINI_API_KEY_TEST"
-            ]  #! Remove _TEST
+            self.gemini_api_key = dotenv_values(find_dotenv())["GEMINI_API_KEY_TEST"]
 
         # Set the API keys as environment variables
         if self.use_llm:
@@ -74,7 +70,7 @@ class FindLearningResources:
                 verbose=False,
                 include_raw_content=False,
                 include_images=True,
-                exclude_domains=[],  # Todo: Add domains to exclude
+                exclude_domains=[],
             )
         else:
             self.tavily = TavilyClient(api_key=self.tavily_api_key)
@@ -496,7 +492,7 @@ Returns:
                             include_image_descriptions=False,
                             include_raw_content=False,
                             exclude_domains=[],
-                        )  # Todo: Add domains to exclude
+                        )
                     except Exception as e:
                         results = {"error": str(e)}
 
@@ -558,9 +554,6 @@ Returns:
         results = []
         for topic, specific_resource in zip(topics, specific_resources):
             results.append(self.find_resources(topic, specific_resource))
-            print(
-                f"Learning resources found for the topic '{topic}', specific resources: {specific_resource}"
-            )  #! Remove
 
         return results
 
@@ -639,8 +632,7 @@ Returns:
             non_error_resources = []
             for resource in cleaned_resources:
                 url = resource["url"]
-                # Todo: Send head request
-                response = requests.request("GET", url)
+                response = requests.head("GET", url)
                 status_code = response.status_code
                 if status_code in allowed_status_codes:
                     non_error_resources.append(resource)
@@ -753,8 +745,7 @@ Returns:
             non_error_resources = []
             for resource in confidence_resources:
                 url = resource["url"]
-                # Todo: Send head request
-                response = requests.request("GET", url)
+                response = requests.head("GET", url)
                 status_code = response.status_code
                 if status_code in allowed_status_codes:
                     non_error_resources.append(resource)
@@ -784,6 +775,11 @@ Returns:
 
 if __name__ == "__main__":
     flr_llm = FindLearningResources(use_llm=True)
+
+    # Show the learning resources names
+    names = [resource["name"] for resource in flr_llm.all_resources]
+    print("Default Learning Resources: ")
+    print(names)
 
     topics = [
         "Arabic Language",
