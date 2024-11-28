@@ -54,7 +54,7 @@ class FindLearningResources:
         self.tavily_api_key = dotenv_values(find_dotenv())["TAVILY_API_KEY"]
 
         if self.use_llm:
-            self.gemini_api_key = dotenv_values(find_dotenv())["GEMINI_API_KEY_TEST"]
+            self.gemini_api_key = dotenv_values(find_dotenv())["GEMINI_API_KEY"]
 
         # Set the API keys as environment variables
         if self.use_llm:
@@ -632,7 +632,10 @@ Returns:
             non_error_resources = []
             for resource in cleaned_resources:
                 url = resource["url"]
-                response = requests.head("GET", url)
+                try:
+                    response = requests.request("HEAD", url)
+                except:
+                    status_code = 200
                 status_code = response.status_code
                 if status_code in allowed_status_codes:
                     non_error_resources.append(resource)
@@ -745,7 +748,10 @@ Returns:
             non_error_resources = []
             for resource in confidence_resources:
                 url = resource["url"]
-                response = requests.head("GET", url)
+                try:
+                    response = requests.request("HEAD", url)
+                except:
+                    status_code = 200
                 status_code = response.status_code
                 if status_code in allowed_status_codes:
                     non_error_resources.append(resource)
@@ -774,7 +780,7 @@ Returns:
 
 
 if __name__ == "__main__":
-    flr_llm = FindLearningResources(use_llm=True)
+    flr_llm = FindLearningResources(use_llm=False)
 
     # Show the learning resources names
     names = [resource["name"] for resource in flr_llm.all_resources]
