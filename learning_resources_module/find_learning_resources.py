@@ -641,6 +641,7 @@ Returns:
                     non_error_resources.append(resource)
         else:
             non_error_resources = cleaned_resources
+
         # Limit the number of resources to 20
         if len(non_error_resources) > 20:
             non_error_resources = non_error_resources[:20]
@@ -649,6 +650,12 @@ Returns:
         non_error_resources = random.sample(
             non_error_resources, len(non_error_resources)
         )
+
+        # Remove all charachters that are not ASCII from the title
+        for resource in non_error_resources:
+            resource["title"] = "".join(
+                char for char in resource["title"] if ord(char) < 128
+            )
 
         return {
             "resources": non_error_resources,
@@ -767,6 +774,12 @@ Returns:
         # Limit the number of resources to 20
         if len(non_error_resources) > 20:
             non_error_resources = non_error_resources[:20]
+
+        # Remove all charachters that are not ASCII from the title
+        for resource in non_error_resources:
+            resource["title"] = "".join(
+                char for char in resource["title"] if ord(char) < 128
+            )
 
         return {
             "resources": non_error_resources,
