@@ -17,6 +17,8 @@ from pprint import pprint
 
 DEFAULT_PATH = os.path.dirname(__file__)
 
+random.seed(time.time())
+
 
 class FindLearningResources:
     def __init__(
@@ -25,6 +27,7 @@ class FindLearningResources:
         max_results_per_type: int = 5,
         check_status_code: bool = False,
         clean_resources: bool = True,
+        confidence_threshold: int = 80,
     ):
         """
         Initialize the Tavily API and Google Chat API
@@ -34,6 +37,7 @@ class FindLearningResources:
             max_results_per_type (int): The maximum number of results to return for each resource type. Default is 5.
             check_status_code (bool): Whether to check the status code of the resources. Default is False.
             clean_resources (bool): Whether to clean the resources. Default is True.
+            confidence_threshold (int): The confidence threshold for the resources. Default is 80.
 
         Returns:
             None
@@ -44,6 +48,7 @@ class FindLearningResources:
         self.max_results_per_type = max_results_per_type
         self.check_status_code = check_status_code
         self.clean_resources = clean_resources
+        self.confidence_threshold = confidence_threshold / 100
 
         # Load API keys from .env file
         self.tavily_api_key = dotenv_values(find_dotenv())[
@@ -88,7 +93,6 @@ class FindLearningResources:
             self.output_parser = JsonOutputParser()
 
         # Initialize the prompt or resources
-        # Todo: llm resources and tavily resources
         # Todo: Add default resources
         if self.use_llm:
             self.prompt = self._init_prompt()
@@ -484,10 +488,6 @@ Returns:
         else:
             cleaned_resources = unique_resources
 
-        # Limit the number of resources to 20
-        if len(cleaned_resources) > 20:
-            cleaned_resources = cleaned_resources[:20]
-
         # Remove the resources that give a status code other than 200
         if self.check_status_code:
             non_error_resources = []
@@ -500,6 +500,15 @@ Returns:
                     non_error_resources.append(resource)
         else:
             non_error_resources = cleaned_resources
+
+        # Limit the number of resources to 20
+        if len(non_error_resources) > 20:
+            non_error_resources = non_error_resources[:20]
+
+        # Shuffle the list of resources
+        non_error_resources = random.sample(
+            non_error_resources, len(non_error_resources)
+        )
 
         return {
             "resources": non_error_resources,
@@ -522,18 +531,150 @@ Returns:
             dict: The cleaned learning resources
         """
 
-        # Todo: Add cleaning for non-LLM resources
-        return resources
+        start_time = time.time()
+
+        allowed_status_codes = [
+            200,
+            201,
+            202,
+            203,
+            204,
+            205,
+            206,
+            207,
+            208,
+            226,
+            300,
+            301,
+            302,
+            303,
+            304,
+            305,
+            306,
+            307,
+            308,
+        ]
+
+        print(f"Befor cleaning: {len(resources['resources'])}")
+
+        # Remove duplicates based on the URL
+        unique_resources = []
+        unique_urls = set()
+        for resource in resources["resources"]:
+            url = resource["url"]
+            if url not in unique_urls:
+                unique_urls.add(url)
+                unique_resources.append(resource)
+
+        print(f"After removing duplicates: {len(unique_resources)}")
+
+        # Remove resources with empty titles or URLs
+        unique_resources = [
+            resource
+            for resource in unique_resources
+            if resource["title"] != ""
+            and resource["url"] != ""
+            and resource["type"] != ""
+            and resource["url"] is not None
+        ]
+
+        print(f"After removing empty titles or URLs: {len(unique_resources)}")
+
+        # Remove resource types that are not in the specific resources
+        specific_resources = resources["specific_resources"]
+        unique_resources = [
+            resource
+            for resource in unique_resources
+            if resource["type"].lower() in specific_resources
+        ]
+
+        print(
+            f"After removing resource types not in specific resources: {len(unique_resources)}"
+        )
+
+        # Limit the number of resources for each type to the maximum allowed
+        if len(specific_resources) > 2:
+            resource_count = {}
+            cleaned_resources = []
+            for resource in unique_resources:
+                resource_type = resource["type"]
+                if resource_type not in resource_count:
+                    resource_count[resource_type] = 0
+                if resource_count[resource_type] < self.max_results_per_type:
+                    cleaned_resources.append(resource)
+                    resource_count[resource_type] += 1
+
+        else:
+            cleaned_resources = unique_resources
+
+        print(f"After limiting the number of resources: {len(cleaned_resources)}")
+
+        # Remove the resources that give have a score less than 80
+        confidence_resources = []
+        for resource in cleaned_resources:
+            if resource["score"] >= self.confidence_threshold:
+                confidence_resources.append(
+                    {
+                        "title": resource["title"],
+                        "url": resource["url"],
+                        "type": resource["type"],
+                    }
+                )
+
+        print(
+            f"After removing resources with score less than 80: {len(confidence_resources)}"
+        )
+
+        # Remove the resources that give a status code other than 200
+        if self.check_status_code:
+            non_error_resources = []
+            for resource in confidence_resources:
+                url = resource["url"]
+                # Todo: Send head request
+                response = requests.request("GET", url)
+                status_code = response.status_code
+                if status_code in allowed_status_codes:
+                    non_error_resources.append(resource)
+
+        else:
+            non_error_resources = confidence_resources
+
+        print(
+            f"After removing resources with status code other than 200: {len(non_error_resources)}"
+        )
+
+        # Shuffle the list of resources
+        non_error_resources = random.sample(
+            non_error_resources, len(non_error_resources)
+        )
+
+        # Limit the number of resources to 20
+        if len(non_error_resources) > 20:
+            non_error_resources = non_error_resources[:20]
+
+        print(
+            f"After limiting the number of resources to 20: {len(non_error_resources)}"
+        )
+
+        return {
+            "resources": non_error_resources,
+            "topic": resources["topic"],
+            "total_resources": len(non_error_resources),
+            "model_output": resources["model_output"],
+            "generation_time": resources["generation_time"],
+            "cleaning_time": round(time.time() - start_time, 2),
+            "specific_resources": resources["specific_resources"],
+        }
 
 
 if __name__ == "__main__":
     flr_llm = FindLearningResources(use_llm=False)
 
     topics = [
-        # "Deep Learning",
         "Arabic Language",
         # "Stock Market Analysis",
         # "Human Brain",
+        # "Deep Learning",
     ]
 
     # specific_resources = [
@@ -546,14 +687,14 @@ if __name__ == "__main__":
     specific_resources = [
         # ["Learning Roadmaps", "Learning Blogs", "Learning YouTube Videos"],
         # ["Learning Roadmaps"],
-        [
-            "Learning Figures",
-            "Learning Diagrams",
-            "Learning Charts",
-            "Learning Infographics",
-            "Learning Images",
-        ],
-        # [],
+        # [
+        #     "Learning Figures",
+        #     "Learning Diagrams",
+        #     "Learning Charts",
+        #     "Learning Infographics",
+        #     "Learning Images",
+        # ],
+        [],
     ]
 
     results = flr_llm.find_multiple_resources(topics, specific_resources)
