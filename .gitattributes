@@ -2,3 +2,4 @@
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.dat filter=lfs diff=lfs merge=lfs -text
 SR(Speech_Recognition)/* filter=lfs diff=lfs merge=lfs -text
+SR(Speech_Recognition)/whisper_cpp/* filter=lfs diff=lfs merge=lfs -text
