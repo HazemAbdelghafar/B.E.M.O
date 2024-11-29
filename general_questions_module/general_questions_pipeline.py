@@ -1,9 +1,10 @@
 import os
-import re
 import json
 import time
 from dotenv import load_dotenv
 from tavily import TavilyClient
+
+# Todo: Add Gemini usage to the pipeline to ensure that the answer is correct
 
 load_dotenv()
 DEFAULT_PATH = os.path.dirname(__file__)
