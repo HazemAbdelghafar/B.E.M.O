@@ -17,6 +17,8 @@ from pprint import pprint
 
 DEFAULT_PATH = os.path.dirname(__file__)
 
+random.seed(time.time())
+
 
 class FindLearningResources:
     def __init__(
@@ -25,6 +27,7 @@ class FindLearningResources:
         max_results_per_type: int = 5,
         check_status_code: bool = False,
         clean_resources: bool = True,
+        confidence_threshold: int = 80,
     ):
         """
         Initialize the Tavily API and Google Chat API
@@ -34,6 +37,7 @@ class FindLearningResources:
             max_results_per_type (int): The maximum number of results to return for each resource type. Default is 5.
             check_status_code (bool): Whether to check the status code of the resources. Default is False.
             clean_resources (bool): Whether to clean the resources. Default is True.
+            confidence_threshold (int): The confidence threshold for the resources. Default is 80.
 
         Returns:
             None
@@ -44,16 +48,13 @@ class FindLearningResources:
         self.max_results_per_type = max_results_per_type
         self.check_status_code = check_status_code
         self.clean_resources = clean_resources
+        self.confidence_threshold = confidence_threshold / 100
 
         # Load API keys from .env file
-        self.tavily_api_key = dotenv_values(find_dotenv())[
-            "TAVILY_API_KEY_TEST"
-        ]  #! Remove _TEST
+        self.tavily_api_key = dotenv_values(find_dotenv())["TAVILY_API_KEY"]
 
         if self.use_llm:
-            self.gemini_api_key = dotenv_values(find_dotenv())[
-                "GEMINI_API_KEY_TEST"
-            ]  #! Remove _TEST
+            self.gemini_api_key = dotenv_values(find_dotenv())["GEMINI_API_KEY"]
 
         # Set the API keys as environment variables
         if self.use_llm:
@@ -69,7 +70,7 @@ class FindLearningResources:
                 verbose=False,
                 include_raw_content=False,
                 include_images=True,
-                exclude_domains=[],  # Todo: Add domains to exclude
+                exclude_domains=[],
             )
         else:
             self.tavily = TavilyClient(api_key=self.tavily_api_key)
@@ -87,49 +88,159 @@ class FindLearningResources:
         if self.use_llm:
             self.output_parser = JsonOutputParser()
 
+        self.all_resources = [
+            {
+                "name": "Roadmaps",
+                "llm_name": "Roadmaps",
+                "tavily_name": "Learning Roadmaps",
+                "is_default": False,
+                "is_image": False,
+            },
+            {
+                "name": "Blogs",
+                "llm_name": "Blogs/Articles",
+                "tavily_name": "Learning Blogs",
+                "is_default": True,
+                "is_image": False,
+            },
+            {
+                "name": "Articles",
+                "llm_name": "Blogs/Articles",
+                "tavily_name": "Learning Articles",
+                "is_default": True,
+                "is_image": False,
+            },
+            {
+                "name": "YouTube Videos",
+                "llm_name": "YouTube Videos",
+                "tavily_name": "Learning YouTube Videos",
+                "is_default": True,
+                "is_image": False,
+            },
+            {
+                "name": "Scientific Papers",
+                "llm_name": "Scientific Papers",
+                "tavily_name": "Scientific Papers",
+                "is_default": False,
+                "is_image": False,
+            },
+            {
+                "name": "Courses",
+                "llm_name": "Courses",
+                "tavily_name": "Learning Courses",
+                "is_default": True,
+                "is_image": False,
+            },
+            {
+                "name": "Figures",
+                "llm_name": "Images",
+                "tavily_name": "Learning Figures",
+                "is_default": True,
+                "is_image": True,
+            },
+            {
+                "name": "Diagrams",
+                "llm_name": "Images",
+                "tavily_name": "Learning Diagrams",
+                "is_default": True,
+                "is_image": True,
+            },
+            {
+                "name": "Charts",
+                "llm_name": "Images",
+                "tavily_name": "Learning Charts",
+                "is_default": False,
+                "is_image": True,
+            },
+            {
+                "name": "Infographics",
+                "llm_name": "Images",
+                "tavily_name": "Learning Infographics",
+                "is_default": False,
+                "is_image": True,
+            },
+            {
+                "name": "Images",
+                "llm_name": "Images",
+                "tavily_name": "Learning Images",
+                "is_default": True,
+                "is_image": True,
+            },
+            {
+                "name": "Communities",
+                "llm_name": "Communities/Forums",
+                "tavily_name": "Communities",
+                "is_default": True,
+                "is_image": False,
+            },
+            {
+                "name": "Forums",
+                "llm_name": "Communities/Forums",
+                "tavily_name": "Forums",
+                "is_default": False,
+                "is_image": False,
+            },
+            {
+                "name": "Code Repositories",
+                "llm_name": "Code Repositories",
+                "tavily_name": "Code Repositories",
+                "is_default": False,
+                "is_image": False,
+            },
+            {
+                "name": "Slides",
+                "llm_name": "Slides/Presentations",
+                "tavily_name": "Learning Slides",
+                "is_default": False,
+                "is_image": False,
+            },
+            {
+                "name": "Presentations",
+                "llm_name": "Slides/Presentations",
+                "tavily_name": "Learning Presentations",
+                "is_default": True,
+                "is_image": False,
+            },
+            {
+                "name": "Books",
+                "llm_name": "Books",
+                "tavily_name": "Learning Books",
+                "is_default": True,
+                "is_image": False,
+            },
+            {
+                "name": "Webinars",
+                "llm_name": "Webinars",
+                "tavily_name": "Learning Webinars",
+                "is_default": False,
+                "is_image": False,
+            },
+            {
+                "name": "Case Studies",
+                "llm_name": "Case Studies",
+                "tavily_name": "Case Studies",
+                "is_default": False,
+                "is_image": False,
+            },
+            {
+                "name": "Real-world Applications",
+                "llm_name": "Real-world Applications",
+                "tavily_name": "Real-world Applications",
+                "is_default": False,
+                "is_image": False,
+            },
+            {
+                "name": "Examples",
+                "llm_name": "Examples",
+                "tavily_name": "Examples",
+                "is_default": True,
+                "is_image": False,
+            },
+        ]
+
         # Initialize the prompt or resources
-        # Todo: llm resources and tavily resources
-        # Todo: Add default resources
         if self.use_llm:
             self.prompt = self._init_prompt()
-            self.llm_resources = [
-                "Roadmaps",
-                "Blogs/Articles",
-                "YouTube Videos",
-                "Scientific Papers",
-                "Courses",
-                "Images",
-                "Communities/Forums",
-                "Code Repositories",
-                "Slides/Presentations",
-                "Books",
-                "Webinars",
-                "Case Studies",
-            ]
-        else:
-            self.tavily_resources = [
-                "Learning Roadmaps",
-                "Learning Blogs",
-                "Learning Articles",
-                "Learning YouTube Videos",
-                "Scientific Papers",
-                "Learning Courses",
-                "Learning Figures",
-                "Learning Diagrams",
-                "Learning Charts",
-                "Learning Infographics",
-                "Learning Images",
-                "Communities",
-                "Forums",
-                "Code Repositories",
-                "Learning Slides",
-                "Learning Presentations",
-                "Learning Books",
-                "Learning Webinars",
-                "Case Studies",
-                "Real-world Applications",
-                "Examples",
-            ]
 
         # Initialize the chain
         if self.use_llm:
@@ -170,6 +281,8 @@ Resource Types:
     - Books: Textbooks, guides, or eBooks on the topic.
     - Webinars: Live or recorded online events.
     - Case Studies: Real-world applications and examples.
+    - Real-world Applications: Practical use cases or industry applications.
+    - Examples: Sample code, projects, or exercises.
 
 Rules:
     - Include resources from multiple types, not just a few.
@@ -222,23 +335,43 @@ Returns:
             dict: The learning resources found for the given topic
         """
 
+        # Lowercase the specific resources
+        if specific_resources is not None or specific_resources != []:
+            specific_resources = [resource.lower() for resource in specific_resources]
+
         if self.use_llm:
+            # If specific resources are not provided, use the default resources
+            if specific_resources is None or specific_resources == []:
+                specific_resources = [
+                    resource["llm_name"].lower()
+                    for resource in self.all_resources
+                    if resource["is_default"]
+                ]
+
+                specific_resources_names = [
+                    resource["name"]
+                    for resource in self.all_resources
+                    if resource["is_default"]
+                ]
 
             # Check if specific resources are provided
-            llm_resources = [resource.lower() for resource in self.llm_resources]
-            specific_resources = [
-                resource.lower()
-                for resource in specific_resources
-                if resource.lower() in llm_resources
-            ]
+            else:
+                specific_resources = [
+                    resource["llm_name"].lower()
+                    for resource in self.all_resources
+                    if resource["name"].lower() in specific_resources
+                ]
+
+                specific_resources_names = [
+                    resource["name"]
+                    for resource in self.all_resources
+                    if resource["name"].lower() in specific_resources
+                ]
 
             # Remove duplicates
             specific_resources = list(set(specific_resources))
 
             # Generate the input for the LLM
-            if len(specific_resources) == 0 or specific_resources is None:
-                specific_resources = llm_resources
-
             input = (
                 f"Topic: {topic} - Specific Resources: {', '.join(specific_resources)}"
             )
@@ -276,6 +409,7 @@ Returns:
             result["time_taken"] = round(time.time() - start_time, 2)
             result["topic"] = topic
             result["total_resources"] = total_resources
+            result["specific_resources_names"] = specific_resources_names
             result["specific_resources"] = specific_resources
             if self.clean_resources:
                 return self.clean_llm_resources(result)
@@ -284,36 +418,56 @@ Returns:
                 return result
 
         else:
+            # If specific resources are not provided, use the default resources
+            if specific_resources is None or specific_resources == []:
+                specific_resources_dict = [
+                    {
+                        "tavily_name": resource["tavily_name"],
+                        "is_image": resource["is_image"],
+                    }
+                    for resource in self.all_resources
+                    if resource["is_default"]
+                ]
+                specific_resources_names = [
+                    resource["name"]
+                    for resource in self.all_resources
+                    if resource["is_default"]
+                ]
+
             # Check if specific resources are provided
-            tavily_resources = [resource.lower() for resource in self.tavily_resources]
-            specific_resources = [
-                resource.lower()
-                for resource in specific_resources
-                if resource.lower() in tavily_resources
+            else:
+                specific_resources_dict = [
+                    {
+                        "tavily_name": resource["tavily_name"],
+                        "is_image": resource["is_image"],
+                    }
+                    for resource in self.all_resources
+                    if resource["name"].lower() in specific_resources
+                ]
+
+                specific_resources_names = [
+                    resource["name"]
+                    for resource in self.all_resources
+                    if resource["name"] in specific_resources
+                ]
+
+            # Remove duplicates from the dictionary
+            specific_resources_dict = [
+                dict(t) for t in {tuple(d.items()) for d in specific_resources_dict}
             ]
 
-            # Remove duplicates
-            specific_resources = list(set(specific_resources))
+            is_image = [resource["is_image"] for resource in specific_resources_dict]
+            specific_resources = [
+                resource["tavily_name"] for resource in specific_resources_dict
+            ]
 
-            # Get the resources for the topic if specific resources are provided
-            if len(specific_resources) == 0 or specific_resources is None:
-                specific_resources = tavily_resources
-
+            # Initialize the list of resources
             resources = []
 
             # Find resources using the Tavily API
             start_time = time.time()
-            for resource in specific_resources:
-
-                is_image = False
-
-                if (
-                    resource == "learning figures"
-                    or resource == "learning diagrams"
-                    or resource == "learning charts"
-                    or resource == "learning infographics"
-                    or resource == "learning images"
-                ):
+            for is_image, resource in zip(is_image, specific_resources):
+                if is_image:
                     try:
                         results = self.tavily.search(
                             query=f"{topic} {resource}",
@@ -325,7 +479,6 @@ Returns:
                             include_raw_content=False,
                             exclude_domains=[],
                         )
-                        is_image = True
                     except Exception as e:
                         results = {"error": str(e)}
                 else:
@@ -339,8 +492,7 @@ Returns:
                             include_image_descriptions=False,
                             include_raw_content=False,
                             exclude_domains=[],
-                        )  # Todo: Add domains to exclude
-                        is_image = False
+                        )
                     except Exception as e:
                         results = {"error": str(e)}
 
@@ -368,11 +520,11 @@ Returns:
             results_dict = {
                 "resources": resources,
                 "topic": topic,
-                "total_resources": len(results["results"]),
+                "total_resources": len(resources),
                 "model_output": f"Learning resources found for the topic '{topic}', results have been sent to Telegram and B.E.M.O app.",
                 "generation_time": round(time.time() - start_time, 2),
                 "cleaning_time": 0,
-                "specific_resources": specific_resources,
+                "specific_resources": specific_resources_names,
             }
 
             if self.clean_resources:
@@ -402,9 +554,6 @@ Returns:
         results = []
         for topic, specific_resource in zip(topics, specific_resources):
             results.append(self.find_resources(topic, specific_resource))
-            print(
-                f"Learning resources found for the topic '{topic}', specific resources: {specific_resource}"
-            )  #! Remove
 
         return results
 
@@ -459,19 +608,13 @@ Returns:
             if resource["title"] != ""
             and resource["url"] != ""
             and resource["type"] != ""
+            and resource["title"] is not None
             and resource["url"] is not None
-        ]
-
-        # Remove resource types that are not in the specific resources
-        specific_resources = resources["specific_resources"]
-        unique_resources = [
-            resource
-            for resource in unique_resources
-            if resource["type"].lower() in specific_resources
+            and resource["type"] is not None
         ]
 
         # Limit the number of resources for each type to the maximum allowed
-        if len(specific_resources) > 2:
+        if len(resources["specific_resources"]) > 2:
             resource_count = {}
             cleaned_resources = []
             for resource in unique_resources:
@@ -484,22 +627,35 @@ Returns:
         else:
             cleaned_resources = unique_resources
 
-        # Limit the number of resources to 20
-        if len(cleaned_resources) > 20:
-            cleaned_resources = cleaned_resources[:20]
-
         # Remove the resources that give a status code other than 200
         if self.check_status_code:
             non_error_resources = []
             for resource in cleaned_resources:
                 url = resource["url"]
-                # Todo: Send head request
-                response = requests.request("GET", url)
+                try:
+                    response = requests.request("HEAD", url)
+                except:
+                    status_code = 200
                 status_code = response.status_code
                 if status_code in allowed_status_codes:
                     non_error_resources.append(resource)
         else:
             non_error_resources = cleaned_resources
+
+        # Limit the number of resources to 20
+        if len(non_error_resources) > 20:
+            non_error_resources = non_error_resources[:20]
+
+        # Shuffle the list of resources
+        non_error_resources = random.sample(
+            non_error_resources, len(non_error_resources)
+        )
+
+        # Remove all charachters that are not ASCII from the title
+        for resource in non_error_resources:
+            resource["title"] = "".join(
+                char for char in resource["title"] if ord(char) < 128
+            )
 
         return {
             "resources": non_error_resources,
@@ -508,7 +664,7 @@ Returns:
             "model_output": resources["model_output"],
             "generation_time": resources["time_taken"],
             "cleaning_time": round(time.time() - start_time, 2),
-            "specific_resources": resources["specific_resources"],
+            "specific_resources": resources["specific_resources_names"],
         }
 
     def clean_non_llm_resources(self, resources: dict) -> dict:
@@ -522,38 +678,140 @@ Returns:
             dict: The cleaned learning resources
         """
 
-        # Todo: Add cleaning for non-LLM resources
-        return resources
+        start_time = time.time()
+
+        allowed_status_codes = [
+            200,
+            201,
+            202,
+            203,
+            204,
+            205,
+            206,
+            207,
+            208,
+            226,
+            300,
+            301,
+            302,
+            303,
+            304,
+            305,
+            306,
+            307,
+            308,
+        ]
+
+        # Remove duplicates based on the URL
+        unique_resources = []
+        unique_urls = set()
+        for resource in resources["resources"]:
+            url = resource["url"]
+            if url not in unique_urls:
+                unique_urls.add(url)
+                unique_resources.append(resource)
+
+        # Remove resources with empty titles or URLs
+        unique_resources = [
+            resource
+            for resource in unique_resources
+            if resource["title"] != ""
+            and resource["url"] != ""
+            and resource["type"] != ""
+            and resource["title"] is not None
+            and resource["url"] is not None
+            and resource["type"] is not None
+        ]
+
+        # Limit the number of resources for each type to the maximum allowed
+        if len(resources["specific_resources"]) > 2:
+            resource_count = {}
+            cleaned_resources = []
+            for resource in unique_resources:
+                resource_type = resource["type"]
+                if resource_type not in resource_count:
+                    resource_count[resource_type] = 0
+                if resource_count[resource_type] < self.max_results_per_type:
+                    cleaned_resources.append(resource)
+                    resource_count[resource_type] += 1
+
+        else:
+            cleaned_resources = unique_resources
+
+        # Remove the resources that give have a score less than 80
+        confidence_resources = []
+        for resource in cleaned_resources:
+            if resource["score"] >= self.confidence_threshold:
+                confidence_resources.append(
+                    {
+                        "title": resource["title"],
+                        "url": resource["url"],
+                        "type": resource["type"],
+                    }
+                )
+
+        # Remove the resources that give a status code other than 200
+        if self.check_status_code:
+            non_error_resources = []
+            for resource in confidence_resources:
+                url = resource["url"]
+                try:
+                    response = requests.request("HEAD", url)
+                except:
+                    status_code = 200
+                status_code = response.status_code
+                if status_code in allowed_status_codes:
+                    non_error_resources.append(resource)
+
+        else:
+            non_error_resources = confidence_resources
+
+        # Shuffle the list of resources
+        non_error_resources = random.sample(
+            non_error_resources, len(non_error_resources)
+        )
+
+        # Limit the number of resources to 20
+        if len(non_error_resources) > 20:
+            non_error_resources = non_error_resources[:20]
+
+        # Remove all charachters that are not ASCII from the title
+        for resource in non_error_resources:
+            resource["title"] = "".join(
+                char for char in resource["title"] if ord(char) < 128
+            )
+
+        return {
+            "resources": non_error_resources,
+            "topic": resources["topic"],
+            "total_resources": len(non_error_resources),
+            "model_output": resources["model_output"],
+            "generation_time": resources["generation_time"],
+            "cleaning_time": round(time.time() - start_time, 2),
+            "specific_resources": resources["specific_resources"],
+        }
 
 
 if __name__ == "__main__":
     flr_llm = FindLearningResources(use_llm=False)
 
+    # Show the learning resources names
+    names = [resource["name"] for resource in flr_llm.all_resources]
+    print("Default Learning Resources: ")
+    print(names)
+
     topics = [
-        # "Deep Learning",
         "Arabic Language",
-        # "Stock Market Analysis",
-        # "Human Brain",
+        "Stock Market Analysis",
+        "Human Brain",
+        "Deep Learning",
     ]
 
-    # specific_resources = [
-    #     ["Roadmaps", "Blogs/Articles", "YouTube Videos"],
-    #     ["Roadmaps"],
-    #     ["Blogs/Articles", "YouTube Videos"],
-    #     [],
-    # ]
-
     specific_resources = [
-        # ["Learning Roadmaps", "Learning Blogs", "Learning YouTube Videos"],
-        # ["Learning Roadmaps"],
-        [
-            "Learning Figures",
-            "Learning Diagrams",
-            "Learning Charts",
-            "Learning Infographics",
-            "Learning Images",
-        ],
-        # [],
+        ["Roadmaps", "YouTube Videos", "Courses"],
+        ["Images", "Infographics", "Diagrams", "Charts", "Figures"],
+        ["Scientific Papers", "Books", "Webinars", "Real-world Applications"],
+        [],
     ]
 
     results = flr_llm.find_multiple_resources(topics, specific_resources)
@@ -565,7 +823,10 @@ if __name__ == "__main__":
         f"Learning resources for the topics '{topics}' using LLM saved to {DEFAULT_PATH}/test/resources.json"
     )
 
-    # for result in results:
-    #     print(
-    #         f"Topic: {result['topic']}, Number of Resources: {len(result['resources'])}"
-    #     )
+    for result in results:
+        try:
+            print(
+                f"Topic: {result['topic']}, Number of Resources: {len(result['resources'])}"
+            )
+        except:
+            print("Error")
