@@ -1,0 +1,191 @@
+[{
+    "classification": "other",
+    "cleaned_text": "hey, view.",
+    "end_time": 30.0,
+    "start_time": 0.0
+},{
+    "classification": "other",
+    "cleaned_text": "hey, you, are you?",
+    "end_time": 60.0,
+    "start_time": 30.0
+},{
+    "classification": "other",
+    "cleaned_text": "are you okay?",
+    "end_time": 90.0,
+    "start_time": 60.0
+},{
+    "classification": "other",
+    "cleaned_text": "are you okay?",
+    "end_time": 120.0,
+    "start_time": 90.0
+},{
+    "classification": "other",
+    "cleaned_text": "what is the wizard outside?",
+    "end_time": 150.0,
+    "start_time": 120.0
+},{
+    "classification": "other",
+    "cleaned_text": "what is the wizard outside?",
+    "end_time": 180.0,
+    "start_time": 150.0
+},{
+    "classification": "other",
+    "cleaned_text": "hey you party!",
+    "end_time": 210.0,
+    "start_time": 180.0
+},{
+    "classification": "other",
+    "cleaned_text": "hey you party, what is there is an outside?",
+    "end_time": 240.0,
+    "start_time": 210.0
+},{
+    "classification": "other",
+    "cleaned_text": "please stop.",
+    "end_time": 270.0,
+    "start_time": 240.0
+},{
+    "classification": "other",
+    "cleaned_text": "[inaudible]",
+    "end_time": 300.0,
+    "start_time": 270.0
+},{
+    "classification": "other",
+    "cleaned_text": "hello, all are you with the zosers outside.",
+    "end_time": 330.0,
+    "start_time": 300.0
+},{
+    "classification": "other",
+    "cleaned_text": "hello, how are you with the hazards outside?",
+    "end_time": 360.0,
+    "start_time": 330.0
+},{
+    "classification": "other",
+    "cleaned_text": "hey, beautiful.",
+    "end_time": 390.0,
+    "start_time": 360.0
+},{
+    "classification": "other",
+    "cleaned_text": "hey people. hey people.",
+    "end_time": 420.0,
+    "start_time": 390.0
+},{
+    "classification": "other",
+    "cleaned_text": "hey, baby.",
+    "end_time": 450.0,
+    "start_time": 420.0
+},{
+    "classification": "other",
+    "cleaned_text": "hey, people. hey.",
+    "end_time": 480.0,
+    "start_time": 450.0
+},{
+    "classification": "other",
+    "cleaned_text": "i'm not a female.",
+    "end_time": 510.0,
+    "start_time": 480.0
+},{
+    "classification": "other",
+    "cleaned_text": "*unintelligible*",
+    "end_time": 540.0,
+    "start_time": 510.0
+},{
+    "classification": "other",
+    "cleaned_text": "(muffled talking)",
+    "end_time": 570.0,
+    "start_time": 540.0
+},{
+    "classification": "other",
+    "cleaned_text": "hey, are you out there? hey, no?",
+    "end_time": 600.0,
+    "start_time": 570.0
+},{
+    "classification": "other",
+    "cleaned_text": "(speaking in foreign language)",
+    "end_time": 630.0,
+    "start_time": 600.0
+},{
+    "classification": "other",
+    "cleaned_text": "(speaking in foreign language)",
+    "end_time": 660.0,
+    "start_time": 630.0
+},{
+    "classification": "other",
+    "cleaned_text": "[blank_audio]",
+    "end_time": 690.0,
+    "start_time": 660.0
+},{
+    "classification": "other",
+    "cleaned_text": "(indistinct chatter)",
+    "end_time": 720.0,
+    "start_time": 690.0
+},{
+    "classification": "other",
+    "cleaned_text": "hey people.",
+    "end_time": 750.0,
+    "start_time": 720.0
+},{
+    "classification": "other",
+    "cleaned_text": "hey people.",
+    "end_time": 780.0,
+    "start_time": 750.0
+},{
+    "classification": "other",
+    "cleaned_text": "oh",
+    "end_time": 810.0,
+    "start_time": 780.0
+},{
+    "classification": "other",
+    "cleaned_text": "oh",
+    "end_time": 840.0,
+    "start_time": 810.0
+},{
+    "classification": "other",
+    "cleaned_text": "pmo? pmo?",
+    "end_time": 870.0,
+    "start_time": 840.0
+},{
+    "classification": "other",
+    "cleaned_text": "pmo pmo pmo",
+    "end_time": 900.0,
+    "start_time": 870.0
+},{
+    "classification": "bemo",
+    "cleaned_text": "bmo, bmo, bmo, bmo, bmo",
+    "end_time": 930.0,
+    "start_time": 900.0
+},{
+    "classification": "other",
+    "cleaned_text": "bm o bm o bm o bm o bm o bm o hey bm",
+    "end_time": 960.0,
+    "start_time": 930.0
+},{
+    "classification": "other",
+    "cleaned_text": "be a bit better.",
+    "end_time": 990.0,
+    "start_time": 960.0
+},{
+    "classification": "other",
+    "cleaned_text": "be a bit more effective.",
+    "end_time": 1020.0,
+    "start_time": 990.0
+},{
+    "classification": "other",
+    "cleaned_text": "what is the way?",
+    "end_time": 1050.0,
+    "start_time": 1020.0
+},{
+    "classification": "other",
+    "cleaned_text": "what is the other's outside?",
+    "end_time": 1080.0,
+    "start_time": 1050.0
+},{
+    "classification": "other",
+    "cleaned_text": "(muffled speaking)",
+    "end_time": 1110.0,
+    "start_time": 1080.0
+},{
+    "classification": "other",
+    "cleaned_text": "(muffled speaking)",
+    "end_time": 1140.0,
+    "start_time": 1110.0
+}]
