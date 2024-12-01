@@ -1,4 +1,0 @@
-numpy==1.24.4
-pyaudio==0.2.13
-transformers==4.33.3
-tf-keras
