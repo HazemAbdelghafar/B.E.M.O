@@ -960,6 +960,15 @@ class TasksApi:
         }
 
     def __call__(self, input_dict: dict):
+        """
+        Executes the specified action based on the input dictionary.
+
+        Args:
+            input_dict (dict): A dictionary containing the input parameters.
+
+        Returns:
+            The result of the specified action, or None if the action is invalid or incomplete.
+        """
         object_type = input_dict.get("list_or_task", None)
         list_name = input_dict.get("list_name", None)
         task_name = input_dict.get("task_name", None)
@@ -1053,6 +1062,7 @@ class TasksApi:
                     return None
                 return self.get_tasks_by_name(task_name)
 
+        return None
 
 if __name__ == "__main__":
     
