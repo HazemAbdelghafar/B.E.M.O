@@ -1,8 +1,8 @@
 import os
 import json
-from datetime import datetime as dt 
 from dotenv import load_dotenv
 import google.generativeai as gai
+from datetime import datetime as dt 
 
 load_dotenv()
 
@@ -120,7 +120,7 @@ Process queries accurately, ensuring strict adherence to these rules and formats
 """
 
 
-class GAI:
+class Preprocessing:
     def __init__(self,model_name, SYSTEM_INSTRUCTION):
         self.SYSTEM_INSTRUCTION = SYSTEM_INSTRUCTION
         gai.configure(api_key=os.getenv('GEMINI_API'))
@@ -137,7 +137,7 @@ class GAI:
         
 if __name__ == "__main__":
     MODEL_NAME = 'gemini-1.5-flash-8b'
-    llm = GAI(MODEL_NAME, SYSTEM_INSTRUCTION)
+    llm = Preprocessing(MODEL_NAME, SYSTEM_INSTRUCTION)
     test_request = input("Enter your prompt: ")
     response = llm.generate_response(test_request)
     
