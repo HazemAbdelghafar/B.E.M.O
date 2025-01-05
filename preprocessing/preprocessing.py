@@ -1,10 +1,10 @@
 import os
 import json
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import google.generativeai as gai
 from datetime import datetime as dt 
 
-load_dotenv()
+load_dotenv(find_dotenv())
 
 SYSTEM_INSTRUCTION= """
 System Instructions for Preprocessing LLM:
@@ -123,7 +123,7 @@ Process queries accurately, ensuring strict adherence to these rules and formats
 class Preprocessing:
     def __init__(self, SYSTEM_INSTRUCTION=SYSTEM_INSTRUCTION, model_name = 'gemini-1.5-flash-8b'):
         self.SYSTEM_INSTRUCTION = SYSTEM_INSTRUCTION
-        gai.configure(api_key=os.getenv('GEMINI_API'))
+        gai.configure(api_key=os.getenv('GEMINI_API_KEY'))
         self.model = gai.GenerativeModel(model_name, system_instruction=SYSTEM_INSTRUCTION)
         
     def generate_response(self, request: str):
@@ -136,8 +136,7 @@ class Preprocessing:
             
         
 if __name__ == "__main__":
-    MODEL_NAME = 'gemini-1.5-flash-8b'
-    llm = Preprocessing(MODEL_NAME, SYSTEM_INSTRUCTION)
+    llm = Preprocessing()
     test_request = input("Enter your prompt: ")
     response = llm.generate_response(test_request)
     
