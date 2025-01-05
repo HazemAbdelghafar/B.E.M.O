@@ -295,8 +295,8 @@ class TasksApi:
         task_list_id: str,
         max_results: int = 10,
         show_completed: bool = True,
-        show_deleted: bool = True,
-        show_hidden: bool = True,
+        show_deleted: bool = False,
+        show_hidden: bool = False,
     ) -> dict:
         """
         This method gets all the tasks
@@ -333,8 +333,8 @@ class TasksApi:
         name: str,
         max_results: int = 10,
         show_completed: bool = True,
-        show_deleted: bool = True,
-        show_hidden: bool = True,
+        show_deleted: bool = False,
+        show_hidden: bool = False,
     ) -> list:
         """
         This method gets all the tasks
@@ -370,8 +370,8 @@ class TasksApi:
         self,
         max_results: int = 10,
         show_completed: bool = True,
-        show_deleted: bool = True,
-        show_hidden: bool = True,
+        show_deleted: bool = False,
+        show_hidden: bool = False,
     ) -> list:
         """
         This method gets all the tasks
@@ -959,137 +959,284 @@ class TasksApi:
             "last_updated": response["last_updated"],
         }
 
+    def __call__(self, input_dict: dict):
+        object_type = input_dict.get("list_or_task", None)
+        list_name = input_dict.get("list_name", None)
+        task_name = input_dict.get("task_name", None)
+        action = input_dict.get("action", None)
+        max_results = input_dict.get("max_output", 10)
+        list_all = input_dict.get("list_all_tasks", False)
+        new_list_name = input_dict.get("new_list_name", None)
+        new_task_name = input_dict.get("new_task_name", None)
+        due_date = input_dict.get("due_date", None)
+        notes = input_dict.get("notes", None)
+        parent_task_name = input_dict.get("parent_task", None)
+        mark_done = input_dict.get("mark_as_done", False)
+
+        if list_all and not object_type and not list_name and not action:
+            return self.list_tasks_all(max_results)
+
+        if not object_type or not list_name or not action:
+            return None
+
+        if object_type == "list":
+            if action == "list":
+                if list_all:
+                    return self.list_task_lists_all(max_results)
+                else:
+                    return self.get_task_lists_by_name(list_name)
+            elif action == "insert":
+                return self.insert_task_list(list_name)
+            elif action == "update":
+                if not new_list_name:
+                    return None
+                return self.update_task_lists_by_name(list_name, new_list_name)
+            elif action == "remove":
+                return self.delete_task_lists_by_name(list_name)
+            elif action == "get":
+                return self.get_task_lists_by_name(list_name)
+
+        elif object_type == "task":
+            if due_date:
+                year = int(due_date[0:4])
+                month = int(due_date[5:7])
+                day = int(due_date[8:10])
+                hour = int(due_date[11:13])
+                minute = int(due_date[14:16])
+                second = int(due_date[17:19])
+            if not due_date:
+                year = month = day = hour = minute = second = 0
+            if action == "list":
+                if list_all:
+                    return self.list_tasks_all(max_results)
+                else:
+                    return self.list_tasks_by_task_list_name(list_name, max_results)
+            elif action == "insert":
+                if not task_name:
+                    return None
+                return self.insert_task_by_list_name_parent_name(
+                    list_name,
+                    task_name,
+                    year,
+                    month,
+                    day,
+                    hour,
+                    minute,
+                    second,
+                    notes,
+                    parent_task_name,
+                )
+            elif action == "update":
+                if not task_name:
+                    return None
+                return self.update_task_by_list_name_task_name(
+                    list_name,
+                    task_name,
+                    new_task_name,
+                    year,
+                    month,
+                    day,
+                    hour,
+                    minute,
+                    second,
+                    notes,
+                    parent_task_name,
+                    mark_done,
+                )
+            elif action == "remove":
+                if not task_name:
+                    print("No task name provided.")
+                    return None
+                return self.delete_tasks_by_name(task_name)
+            elif action == "get":
+                if not task_name:
+                    return None
+                return self.get_tasks_by_name(task_name)
+
 
 if __name__ == "__main__":
-
-    new_list_name = "TEST lisT"
-    updated_list_name = "NEW TEST LIST"
-
     # Initialize the tasks API
     tasks_api = TasksApi("1")
 
-    print("Task Lists:")
-    task_lists = tasks_api.list_task_lists_all()
+    input_dict_list = [
+        {
+            "method": "todo",
+            "list_or_task": "task",
+            "list_name": "my tasks",
+            "action": "list",
+            "list_all_tasks": False,
+        },
+        {
+            "method": "todo",
+            "list_all_tasks": True,
+        },
+        {
+            "method": "todo",
+            "list_or_task": "task",
+            "list_name": "my tasks",
+            "task_name": "DEPI",
+            "action": "insert",
+            "due_date": "2025-01-05T21:49:36",
+        },
+        {
+            "method": "todo",
+            "list_or_task": "task",
+            "list_name": "my tasks",
+            "task_name": "DEPI",
+            "action": "remove",
+        },
+        {
+            "method": "todo",
+            "list_or_task": "task",
+            "list_name": "my tasks",
+            "task_name": "Hi",
+            "action": "update",
+            "new_task_name": "meeting",
+        },
+        {
+            "method": "todo",
+            "list_or_task": "list",
+            "list_name": "test list",
+            "action": "update",
+            "new_list_name": "iSchool",
+        },
+    ]
 
-    with open(DEFAULT_PATH + "/test/task_lists.json", "w") as f:
-        json.dump(task_lists, f, indent=4)
-    print(f"Task Lists saved to {DEFAULT_PATH + '/test/task_lists.json'}")
+    for input_dict in input_dict_list:
+        pprint(tasks_api(input_dict))
+        print("\n")
 
-    # if task_lists:
-    #     for item in task_lists:
-    #         print(f"{item['name']} ({item['id']}) {item['last_updated']}")
 
-    # else:
-    #     print("No task lists found.")
+# if __name__ == "__main__":
 
-    # print("Task List by Title (My Tasks):")
-    # task_lists = tasks_api.get_task_lists_by_name("My Tasks")
-    # for item in task_lists:
-    #     print(f"{item['name']} ({item['id']}) {item['last_updated']}")
+#     new_list_name = "TEST lisT"
+#     updated_list_name = "NEW TEST LIST"
 
-    # print(f"Inserting Task List ({new_list_name})...")
-    # task_list = tasks_api.insert_task_list(new_list_name)
-    # print(f"{task_list['name']} ({task_list['id']}) {task_list['last_updated']}")
+#     # Initialize the tasks API
+#     tasks_api = TasksApi("1")
 
-    # print(f"Update Task List ({updated_list_name})...")
-    # task_lists = tasks_api.update_task_lists_by_name(new_list_name, updated_list_name)
-    # for item in task_lists:
-    #     print(f"{item['name']} ({item['id']}) {item['last_updated']}")
+#     print("Task Lists:")
+#     task_lists = tasks_api.list_task_lists_all()
 
-    # print(f"Delete Task List ({updated_list_name})...")
-    # result = tasks_api.delete_task_lists_by_name(updated_list_name)
-    # if result:
-    #     print(f"Task List ({updated_list_name}) was deleted.")
-    # else:
-    #     print(f"Task List ({updated_list_name}) was not deleted.")
+#     with open(DEFAULT_PATH + "/test/task_lists.json", "w") as f:
+#         json.dump(task_lists, f, indent=4)
+#     print(f"Task Lists saved to {DEFAULT_PATH + '/test/task_lists.json'}")
 
-    # print("Task Lists after deletion:")
-    # task_lists = tasks_api.list_task_lists_all()
+#     # if task_lists:
+#     #     for item in task_lists:
+#     #         print(f"{item['name']} ({item['id']}) {item['last_updated']}")
 
-    # if task_lists:
-    #     for item in task_lists:
-    #         print(f"{item['name']} ({item['id']}) {item['last_updated']}")
+#     # else:
+#     #     print("No task lists found.")
 
-    # else:
-    #     print("No task lists found.")
+#     # print("Task List by Title (My Tasks):")
+#     # task_lists = tasks_api.get_task_lists_by_name("My Tasks")
+#     # for item in task_lists:
+#     #     print(f"{item['name']} ({item['id']}) {item['last_updated']}")
 
-    print("Tasks")
-    tasks = tasks_api.list_tasks_all()
+#     # print(f"Inserting Task List ({new_list_name})...")
+#     # task_list = tasks_api.insert_task_list(new_list_name)
+#     # print(f"{task_list['name']} ({task_list['id']}) {task_list['last_updated']}")
 
-    with open(DEFAULT_PATH + "/test/tasks.json", "w") as f:
-        json.dump(tasks, f, indent=4)
-    print(f"Tasks saved to {DEFAULT_PATH + '/test/tasks.json'}")
+#     # print(f"Update Task List ({updated_list_name})...")
+#     # task_lists = tasks_api.update_task_lists_by_name(new_list_name, updated_list_name)
+#     # for item in task_lists:
+#     #     print(f"{item['name']} ({item['id']}) {item['last_updated']}")
 
-    # if tasks:
-    #     print("Tasks:")
-    #     pprint(tasks)
-    # else:
-    #     print("No tasks found.")
+#     # print(f"Delete Task List ({updated_list_name})...")
+#     # result = tasks_api.delete_task_lists_by_name(updated_list_name)
+#     # if result:
+#     #     print(f"Task List ({updated_list_name}) was deleted.")
+#     # else:
+#     #     print(f"Task List ({updated_list_name}) was not deleted.")
 
-    # print("Task by Name (Test 1):")
-    # task = tasks_api.get_tasks_by_name("Test 1")
+#     # print("Task Lists after deletion:")
+#     # task_lists = tasks_api.list_task_lists_all()
 
-    # if task:
-    #     pprint(task)
-    # else:
-    #     print("No task found.")
+#     # if task_lists:
+#     #     for item in task_lists:
+#     #         print(f"{item['name']} ({item['id']}) {item['last_updated']}")
 
-    # print(f"Delete Task (Test)...")
-    # result = tasks_api.delete_tasks_by_name("Test")
+#     # else:
+#     #     print("No task lists found.")
 
-    # if result:
-    #     print(f"Task (Test) was deleted.")
-    # else:
-    #     print(f"Task (Test) was not deleted.")
+#     print("Tasks")
+#     tasks = tasks_api.list_tasks_all()
 
-    print("Insert Task (Test 1)...")
-    tasks = tasks_api.insert_task_by_list_name_parent_name(
-        new_list_name,
-        "Test 1",
-        2024,
-        11,
-        30,
-        0,
-        0,
-        0,
-        "Test 1 Notes",
-    )
+#     with open(DEFAULT_PATH + "/test/tasks.json", "w") as f:
+#         json.dump(tasks, f, indent=4)
+#     print(f"Tasks saved to {DEFAULT_PATH + '/test/tasks.json'}")
 
-    # if tasks:
-    #     print(f"{tasks['name']} ({tasks['id']}) {tasks['last_updated']}")
-    # else:
-    #     print("Task (Test 3) was not inserted.")
+#     # if tasks:
+#     #     print("Tasks:")
+#     #     pprint(tasks)
+#     # else:
+#     #     print("No tasks found.")
 
-    # print("Move Task (Test 3) under Test 1...")
-    # result = tasks_api.move_task_by_list_name_task_name_parent_name(
-    #     "New Test List",
-    #     "Test 3",
-    #     parent_name="Test 1",
-    # )
-    # if result:
-    #     print(f"Task (Test 3) was moved.")
-    # else:
-    #     print(f"Task (Test 3) was not moved.")
+#     # print("Task by Name (Test 1):")
+#     # task = tasks_api.get_tasks_by_name("Test 1")
 
-    # print("Move Task (Test 3) from New Test List to Test List...")
-    # result = tasks_api.move_task_by_list_name_task_name_parent_name(
-    #     "New Test List",
-    #     "Test 3",
-    #     new_list_name="My Tasks",
-    # )
-    # if result:
-    #     print(f"Task (Test 3) was moved.")
-    # else:
-    #     print(f"Task (Test 3) was not moved.")
+#     # if task:
+#     #     pprint(task)
+#     # else:
+#     #     print("No task found.")
 
-    print("Update Task (Test 1)...")
-    task = tasks_api.update_task_by_list_name_task_name(
-        new_list_name,
-        "Test 1",
-        new_task_name="Test 1 Updated",
-        notes="Test 1 Updated Notes",
-    )
-    # if task:
-    #     print(f"{task['name']} ({task['id']}) {task['last_updated']}")
-    # else:
-    #     print("Task (Test 3) was not updated.")
+#     # print(f"Delete Task (Test)...")
+#     # result = tasks_api.delete_tasks_by_name("Test")
+
+#     # if result:
+#     #     print(f"Task (Test) was deleted.")
+#     # else:
+#     #     print(f"Task (Test) was not deleted.")
+
+#     print("Insert Task (Test 1)...")
+#     tasks = tasks_api.insert_task_by_list_name_parent_name(
+#         new_list_name,
+#         "Test 1",
+#         2024,
+#         11,
+#         30,
+#         0,
+#         0,
+#         0,
+#         "Test 1 Notes",
+#     )
+
+#     # if tasks:
+#     #     print(f"{tasks['name']} ({tasks['id']}) {tasks['last_updated']}")
+#     # else:
+#     #     print("Task (Test 3) was not inserted.")
+
+#     # print("Move Task (Test 3) under Test 1...")
+#     # result = tasks_api.move_task_by_list_name_task_name_parent_name(
+#     #     "New Test List",
+#     #     "Test 3",
+#     #     parent_name="Test 1",
+#     # )
+#     # if result:
+#     #     print(f"Task (Test 3) was moved.")
+#     # else:
+#     #     print(f"Task (Test 3) was not moved.")
+
+#     # print("Move Task (Test 3) from New Test List to Test List...")
+#     # result = tasks_api.move_task_by_list_name_task_name_parent_name(
+#     #     "New Test List",
+#     #     "Test 3",
+#     #     new_list_name="My Tasks",
+#     # )
+#     # if result:
+#     #     print(f"Task (Test 3) was moved.")
+#     # else:
+#     #     print(f"Task (Test 3) was not moved.")
+
+#     print("Update Task (Test 1)...")
+#     task = tasks_api.update_task_by_list_name_task_name(
+#         new_list_name,
+#         "Test 1",
+#         new_task_name="Test 1 Updated",
+#         notes="Test 1 Updated Notes",
+#     )
+#     # if task:
+#     #     print(f"{task['name']} ({task['id']}) {task['last_updated']}")
+#     # else:
+#     #     print("Task (Test 3) was not updated.")
