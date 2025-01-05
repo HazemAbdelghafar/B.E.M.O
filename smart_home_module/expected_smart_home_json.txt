@@ -1,0 +1,8 @@
+# This file contains the expected JSON format for the tasks that are to be performed by the smart home module
+
+{
+    "other_data": "other_data", # other data that will not be used by the smart home module (optional)
+    
+    "switch_number": 1, # number of the switch (required) (1, 2, 3, 4, ...)
+    "action": "on" # action to be performed (required) (on, off)
+}
