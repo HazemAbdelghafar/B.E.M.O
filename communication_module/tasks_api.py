@@ -5,8 +5,8 @@ import json
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from init_user import init_user
-from utils import (
+from .init_user import init_user
+from .utils import (
     RFC3339_to_date_and_time,
     datetime_to_RFC3339,
     RFC3339_to_relative_time,
