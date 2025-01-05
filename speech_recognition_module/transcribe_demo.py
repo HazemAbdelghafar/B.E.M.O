@@ -192,7 +192,7 @@ class SpeechRecognitionDemo:
             phrase_timeout=args.phrase_timeout,
             default_microphone=args.default_microphone if 'linux' in platform else None
         )
-        demo.run()
+        return demo.run()
 
 if __name__ == "__main__":
     SpeechRecognitionDemo.main()
