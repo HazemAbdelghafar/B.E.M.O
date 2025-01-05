@@ -4,7 +4,7 @@ import pickle
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from scopes import SCOPES
+from .scopes import SCOPES
 
 DEFAULT_PATH = os.path.dirname(__file__)
 USER_DATA_PATH = os.path.join(DEFAULT_PATH, "user_data")
