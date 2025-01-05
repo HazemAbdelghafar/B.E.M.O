@@ -13,9 +13,9 @@ from email import encoders
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from init_user import init_user
-from utils import epoch_to_date_and_time, epoch_to_relative_time
-from utils import hex_to_color_name, color_name_to_hex
+from .init_user import init_user
+from .utils import epoch_to_date_and_time, epoch_to_relative_time
+from .utils import hex_to_color_name, color_name_to_hex
 
 from pprint import pprint
 
