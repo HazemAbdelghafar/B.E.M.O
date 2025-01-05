@@ -3431,7 +3431,201 @@ class GmailAPI:
             ],
         )
 
+    # Todo: Test
+    def __call__(self, input_dict: dict):
+        """
+        Executes the specified action based on the input dictionary.
 
+        Args:
+            input_dict (dict): A dictionary containing the input parameters.
+
+        Returns:
+            The result of the specified action, or None if the action is invalid or incomplete.
+        """
+        object_type = input_dict.get("object_type", None)
+        action = input_dict.get("action", None)
+        get_by = input_dict.get("get_by", [])
+        get_by_values = input_dict.get("get_by_values", [[]])
+        max_results = input_dict.get("max_output", 100)
+        include_spam_trash = input_dict.get("include_spam_trash", True)
+        query = input_dict.get("query", "")
+        delete_send_all = input_dict.get("all", False)
+        create_send = input_dict.get("create_and_send", False)
+        count_by = input_dict.get("count_by", None)
+        new_label_names = input_dict.get("new_label_names", [])
+        new_parent_label_names = input_dict.get("new_parent_label_names", [])
+        new_background_colors = input_dict.get("new_background_colors", [])
+        new_color_texts = input_dict.get("new_color_texts", [])
+        new_draft_subjects = input_dict.get("new_draft_subjects", [])
+        new_draft_recipients = input_dict.get("new_draft_recipients", [[]])
+        new_draft_contents = input_dict.get("new_draft_body", [[]])
+        new_draft_cc = input_dict.get("new_draft_cc", [[]])
+        new_draft_bcc = input_dict.get("new_draft_bcc", [[]])
+        add_labels = input_dict.get("add_labels", [[]])
+        remove_labels = input_dict.get("remove_labels", [[]])
+        
+        if not object_type or not action:
+            return None
+        
+        if not get_by:
+            is_get_by = False
+        else:
+            is_get_by = True
+            
+        if not get_by_values:
+            is_get_by_values = False
+        else:
+            is_get_by_values = True
+            
+        is_both = ~ is_get_by ^ is_get_by_values
+        
+        if is_both == -2:
+            return None
+        
+        get_by_dict = {}
+        
+        if is_get_by:
+            if is_get_by_values:
+                if len(get_by) != len(get_by_values):
+                    return None
+                
+                for i, get in enumerate(get_by):
+                    get_by_dict[get] = get_by_values[i]
+                    
+            else:
+                return None
+            
+        
+        if object_type == "user":
+            if action == "get":
+                return self.get_user_email_address()
+
+        if object_type == "label":
+            if action == "list":
+                return self.list_labels_content()
+            if action == "get":
+                try:
+                    name = get_by_values[0][0]
+                except:
+                    return None
+                return self.get_labels_by_name(name)
+            if action == "delete":
+                if delete_send_all:
+                    return self.delete_all_labels()
+                try:
+                    names = get_by_values[0]
+                except:
+                    return None
+                return self.delete_labels_by_name(names)
+            if action == "create":
+                return self.create_labels(new_label_names, new_parent_label_names, new_background_colors, new_color_texts)
+            if action == "update":
+                try:
+                    names = get_by_values[0]
+                except:
+                    return None
+                return self.update_labels_by_name(name, new_label_names, new_parent_label_names, new_background_colors, new_color_texts)
+            if action == "count":
+                if count_by == "name":
+                    return self.count_by_label_name(count_by)
+                if count_by == "chat":
+                    return self.count_by_label_chat()
+                if count_by == "sent":
+                    return self.count_by_label_sent()
+                if count_by == "inbox":
+                    return self.count_by_label_inbox()
+                if count_by == "important":
+                    return self.count_by_label_important()
+                if count_by == "starred":
+                    return self.count_by_label_starred()
+                if count_by == "draft":
+                    return self.count_by_label_draft()
+                if count_by == "spam":
+                    return self.count_by_label_spam()
+                if count_by == "trash":
+                    return self.count_by_label_trash()
+                if count_by == "unread":
+                    return self.count_by_label_unread()
+                
+        if object_type == "draft":
+            if action == "list":
+                return self.list_drafts_content(max_results, include_spam_trash, query)
+            
+            if action == "get":
+                subjects = get_by_dict.get("subjects", None)
+                recipients = get_by_dict.get("recipients", None)
+                attachment_names = get_by_dict.get("attachment_names", None)
+                has_attachment = get_by_dict.get("has_attachment", False)
+                labels = get_by_dict.get("labels", None)
+                return self.get_drafts_by_multiple(subjects, recipients, attachment_names, has_attachment, labels)
+            
+            if action == "delete":
+                if delete_send_all:
+                    return self.delete_all_drafts()
+                subjects = get_by_dict.get("subject", None)
+                recipients = get_by_dict.get("recipient", None)
+                attachment_names = get_by_dict.get("attachment", None)
+                has_attachment = get_by_dict.get("has_attachment", False)
+                labels = get_by_dict.get("label", None)
+                return self.delete_drafts_by_multiple(subjects, recipients, attachment_names, has_attachment, labels)
+            
+            if action == "send":
+                if delete_send_all:
+                    return self.send_all_drafts()
+                subjects = get_by_dict.get("subject", None)
+                recipients = get_by_dict.get("recipient", None)
+                attachment_names = get_by_dict.get("attachment", None)
+                has_attachment = get_by_dict.get("has_attachment", False)
+                labels = get_by_dict.get("label", None)
+                return self.send_drafts_by_multiple(subjects, recipients, attachment_names, has_attachment, labels)
+            
+            if action == "create":
+                if create_send:
+                    return self.create_send_drafts(subjects=new_draft_subjects, contents=new_draft_contents, recipients=new_draft_recipients, cc=new_draft_cc, bcc=new_draft_bcc, labels=add_labels)
+                return self.create_drafts(subjects=new_draft_subjects, contents=new_draft_contents, recipients=new_draft_recipients, cc=new_draft_cc, bcc=new_draft_bcc, labels=add_labels)
+            
+            if action == "update":
+                subjects = get_by_dict.get("subject", None)
+                recipients = get_by_dict.get("recipient", None)
+                if subjects:
+                    return self.update_drafts_by_subjects(subjects=subjects, new_subject=new_draft_subjects, new_recipients=new_draft_recipients, new_cc=new_draft_cc, new_bcc=new_draft_bcc, new_labels=add_labels, remove_labels=remove_labels, new_content=new_draft_contents)
+                elif recipients:
+                    return self.update_drafts_by_recipients(recipients=recipients, new_subject=new_draft_subjects, new_recipients=new_draft_recipients, new_cc=new_draft_cc, new_bcc=new_draft_bcc, new_labels=add_labels, remove_labels=remove_labels, new_content=new_draft_contents)
+                
+        if object_type == "message":
+            if action == "list":
+                labels = get_by_dict.get("labels", None)
+                return self.list_messages_content(max_results, include_spam_trash, labels, query)
+            
+            if action == "get":
+                subjects = get_by_dict.get("subjects", None)
+                recipients = get_by_dict.get("recipients", None)
+                senders = get_by_dict.get("senders", None)
+                attachment_names = get_by_dict.get("attachment_names", None)
+                has_attachment = get_by_dict.get("has_attachment", False)
+                labels = get_by_dict.get("labels", None)
+                return self.get_messages_by_multiple(subjects, recipients, senders, attachment_names, has_attachment, labels)
+            
+            if action == "delete":
+                if delete_send_all:
+                    return self.delete_all_messages()
+                subjects = get_by_dict.get("subject", None)
+                recipients = get_by_dict.get("recipient", None)
+                senders = get_by_dict.get("sender", None)
+                attachment_names = get_by_dict.get("attachment", None)
+                has_attachment = get_by_dict.get("has_attachment", False)
+                labels = get_by_dict.get("label", None)
+                return self.delete_messages_by_multiple(subjects, recipients, senders, attachment_names, has_attachment, labels)
+            
+            if action == "update":
+                subjects = get_by_dict.get("subject", None)
+                recipients = get_by_dict.get("recipient", None)
+                senders = get_by_dict.get("sender", None)
+                attachment_names = get_by_dict.get("attachment", None)
+                has_attachment = get_by_dict.get("has_attachment", False)
+                labels = get_by_dict.get("label", None)
+                return self.update_messages_by_multiple(subjects, recipients, senders, attachment_names, has_attachment, labels, add_labels, remove_labels)
+                
 if __name__ == "__main__":
 
     gmail_api = GmailAPI("1")
