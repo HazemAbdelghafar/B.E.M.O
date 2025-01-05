@@ -123,6 +123,7 @@ pydantic_core==2.27.2
 pyparsing==3.2.0
 python-dotenv==1.0.1
 python-qt-binding==1.1.2
+pytz==2024.2
 PyYAML==6.0.2
 qt-dotgraph==2.2.3
 qt-gui==2.2.3
@@ -230,6 +231,7 @@ urllib3==2.2.3
 vehicle==2023.1.3
 vision-msgs==4.1.1
 visualization-msgs==4.2.4
+webcolors==24.11.1
 webots-ros2==2023.1.3
 webots-ros2-driver==2023.1.3
 webots-ros2-epuck==2023.1.3
