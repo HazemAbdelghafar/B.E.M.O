@@ -1,3 +1,4 @@
+colory==0.2
 tinytuya==1.15.1
 webcolors==24.11.1
 tavily-python==0.5.0
