@@ -1055,51 +1055,52 @@ class TasksApi:
 
 
 if __name__ == "__main__":
+    
     # Initialize the tasks API
-    tasks_api = TasksApi("1")
+    tasks_api = TasksApi("0")
 
     input_dict_list = [
-        {
-            "method": "todo",
-            "list_or_task": "task",
-            "list_name": "my tasks",
-            "action": "list",
-            "list_all_tasks": False,
-        },
+        # {
+        #     "method": "todo",
+        #     "list_or_task": "task",
+        #     "list_name": "my tasks",
+        #     "action": "list",
+        #     "list_all_tasks": False,
+        # },
         {
             "method": "todo",
             "list_all_tasks": True,
         },
-        {
-            "method": "todo",
-            "list_or_task": "task",
-            "list_name": "my tasks",
-            "task_name": "DEPI",
-            "action": "insert",
-            "due_date": "2025-01-05T21:49:36",
-        },
-        {
-            "method": "todo",
-            "list_or_task": "task",
-            "list_name": "my tasks",
-            "task_name": "DEPI",
-            "action": "remove",
-        },
-        {
-            "method": "todo",
-            "list_or_task": "task",
-            "list_name": "my tasks",
-            "task_name": "Hi",
-            "action": "update",
-            "new_task_name": "meeting",
-        },
-        {
-            "method": "todo",
-            "list_or_task": "list",
-            "list_name": "test list",
-            "action": "update",
-            "new_list_name": "iSchool",
-        },
+        # {
+        #     "method": "todo",
+        #     "list_or_task": "task",
+        #     "list_name": "my tasks",
+        #     "task_name": "DEPI",
+        #     "action": "insert",
+        #     "due_date": "2025-01-05T21:49:36",
+        # },
+        # {
+        #     "method": "todo",
+        #     "list_or_task": "task",
+        #     "list_name": "my tasks",
+        #     "task_name": "DEPI",
+        #     "action": "remove",
+        # },
+        # {
+        #     "method": "todo",
+        #     "list_or_task": "task",
+        #     "list_name": "my tasks",
+        #     "task_name": "Hi",
+        #     "action": "update",
+        #     "new_task_name": "meeting",
+        # },
+        # {
+        #     "method": "todo",
+        #     "list_or_task": "list",
+        #     "list_name": "test list",
+        #     "action": "update",
+        #     "new_list_name": "iSchool",
+        # },
     ]
 
     for input_dict in input_dict_list:
