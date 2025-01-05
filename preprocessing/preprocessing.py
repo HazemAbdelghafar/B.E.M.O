@@ -121,7 +121,7 @@ Process queries accurately, ensuring strict adherence to these rules and formats
 
 
 class Preprocessing:
-    def __init__(self,model_name, SYSTEM_INSTRUCTION):
+    def __init__(self, SYSTEM_INSTRUCTION, model_name = 'gemini-1.5-flash-8b'):
         self.SYSTEM_INSTRUCTION = SYSTEM_INSTRUCTION
         gai.configure(api_key=os.getenv('GEMINI_API'))
         self.model = gai.GenerativeModel(model_name, system_instruction=SYSTEM_INSTRUCTION)
