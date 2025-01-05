@@ -5,13 +5,13 @@ import os
 import random
 import time
 
-class PreProcessing:
+class Postprocessing:
     """
-    A class to preprocess the result of a task into a natural, engaging response.
+    A class to postprocess the result of a task into a natural, engaging response.
     """
     def __init__(self) -> None:
         """
-        Initialize the PreProcessing class.
+        Initialize the Postprocessing class.
         
         Args:
             None
@@ -159,7 +159,7 @@ Your output should be a single, concise, and natural string for BEMO's TTS syste
     
     
 if __name__ == "__main__":
-    pp = PreProcessing()
+    pp = Postprocessing()
     # task_result = {
     #     "result": "Paris",
     # }
