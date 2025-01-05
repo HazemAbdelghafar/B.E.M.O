@@ -1,6 +1,6 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
-from dotenv import find_dotenv, dotenv_values
+from dotenv import dotenv_values, find_dotenv
 import os
 import random
 import time
@@ -100,7 +100,7 @@ Guidelines:
     - If you think that the result is wrong, do not correct it. Just reflect the result in the response.
     - Do not attempt to correct blatantly wrong results or perform the task. Simply reflect the given result in the response.
     - Make sure the tone aligns with BEMO's friendly and interactive personality.
-    - Focus on delivering a short and lighthearted message that reflects the result.
+    - Focus on delivering a short and lighthearted message that reflects the result, unless the result is lengthy or complex.
 
 Your output should be a single, concise, and natural string for BEMO's TTS system.
 """
@@ -163,7 +163,7 @@ if __name__ == "__main__":
     # task_result = {
     #     "result": "Paris",
     # }
-    task_result = True
+    # task_result = True
     # task_result = [
     #     {
     #         "id": "QU5ydjN6OEJ2NGZIMklINQ",
@@ -230,7 +230,9 @@ if __name__ == "__main__":
     #         "parent_title": None
     #     }
     # ]
-    user_query = "Send an email to John Doe."
-    task_name = "mail"
+    task_result = {'response': 'The Arab Academy for Science, Technology & Maritime Transport (AAST) has a branch in Alamein. The AAST-MT Alamein Branch offers students the opportunity to join its esteemed 7 colleges. The branch is part of the regional university operated by the Arab League, focusing on programs in marine transportation, business, and engineering. The Alamein branch provides a variety of educational opportunities within these fields.'
+    }
+    user_query = "Tell me about AAST's Alamein branch"
+    task_name = "rapid questions"
     response = pp(str(task_result), str(user_query), str(task_name))
     print(response)
