@@ -28,16 +28,21 @@ class SpeechRecognitionDemo:
 
     def classify_event(self, line):
         line = line.lower()
-        if any(keyword in line for keyword in [
-            "hey bemo", "hey bmo", "hey vemo", "hey vmo", "hey nemo", "hey kemo", 
-            "hey bbmo", "hey moo", "hey bemoo", "hey bemu", 
-            "hey temo", "bey bemo", "bey bmo", "bey vemo", 
-            "bey vmo", "bey nemo", "bey kemo", "bey bbmo", 
-            "bey moo", "bey bemoo", "bey bemu", "bey temo", 
-            "sey bemo", "sey bmo", "sey vemo", "sey vmo", "sey nemo", 
-            "sey kemo", "sey bbmo", "sey moo", "sey bemoo", "sey bemu", 
-            "sey temo", "ey bemo", "ey bmo", "ey vemo", "ey vmo", "ey nemo", 
-            "ey kemo", "ey bbmo", "ey moo", "ey bemoo", "ey bemu", "ey temo"]):
+        
+        # [
+        #     "hey bemo", "hey bmo", "hey vemo", "hey vmo", "hey nemo", "hey kemo", 
+        #     "hey bbmo", "hey moo", "hey bemoo", "hey bemu", 
+        #     "hey temo", "bey bemo", "bey bmo", "bey vemo", 
+        #     "bey vmo", "bey nemo", "bey kemo", "bey bbmo", 
+        #     "bey moo", "bey bemoo", "bey bemu", "bey temo", 
+        #     "sey bemo", "sey bmo", "sey vemo", "sey vmo", "sey nemo", 
+        #     "sey kemo", "sey bbmo", "sey moo", "sey bemoo", "sey bemu", 
+        #     "sey temo", "ey bemo", "ey bmo", "ey vemo", "ey vmo", "ey nemo", 
+        #     "ey kemo", "ey bbmo", "ey moo", "ey bemoo", "ey bemu", "ey temo"]
+        
+        detection_list = ['hey', 'bey', 'sey', 'ey', 'hi']
+        
+        if any(keyword in line for keyword in detection_list):
             return "bemo"
         elif "screaming" in line:
             return "screaming"
