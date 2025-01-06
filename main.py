@@ -14,11 +14,14 @@ class BEMO:
     def __init__(self):
         parser = argparse.ArgumentParser()
         self.gmail = GmailAPI('0')
-        self.tasks = TasksApi('0')
+        self.tasks = TasksApi('1')
         self.pre = Preprocessing()
         self.post = Postprocessing()
         self.home = SmartHomeAutomation()
         self.general = GeneralQuestions()
+        self.is_rapid = False
+        self.is_todo = False
+        self.final_is = False
         
         parser.add_argument("--model", default="base.en", help="Model to use",
                             choices=["base.en", "small.en", "medium.en", "large"])
@@ -48,11 +51,38 @@ class BEMO:
 
         
     def action_handler(self, pre_response: dict):
+        
+        if self.is_todo and self.is_rapid and not self.final_is:
+            self.final_is = True
+            return self.gmail.create_send_draft(
+                subject="Survey about the graduation project discussion",
+                # recipients=["obadawy2@gmail.com", "yhanafy@aast.edu", "Osamahesham357@gmail.com", "hanysaid2000@aast.edu", "omar.o.shalash@aast.edu", "abouelfarag@aast.edu", "Aly.fahmy@gmail.com"]
+                recipients=["begadtamim.a@gmail.com"],
+                content = "Dear Doctors,\n\nWe are the six students working on BEMO: Begad Tamim, Mohamed Abdelnasser, Hazem Mohamed, Abdelrahman Saeed, Youssef Ayman, and Mohamed Abdulrahim. We'd greatly appreciate it if you could take a few minutes to complete this short survey: https://forms.gle/3Q7v9QvZv9X5aH2V9\n\nThank you for your support!\n\nBest regards,\B.E.M.O's Team"
+            )
+
+
+        if self.is_rapid and not self.final_is:
+            self.is_todo = True
+            return self.tasks(
+                {
+                "method": "todo",
+                "list_or_task": "task",
+                "list_name": "my tasks",
+                "task_name": "Send survey to the Doctors",
+                "action": "insert",
+                }
+            )
+        
         try:
             method = pre_response['method']
         except:
             return ''
         if method == 'rapid questions':
+            self.is_rapid = True
+            query = pre_response['query']
+            if "arab" in query.lower():
+                pre_response['query'] = "Tell me about the Arab Academy for Science, Technology, and Maritime Transport."
             return str(self.general.get_response(request=pre_response))
         elif method == 'smart home':
             return str(self.home.execute_switch_control(pre_response))
