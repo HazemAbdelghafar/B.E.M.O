@@ -14,20 +14,18 @@ class BEMO:
         self.post = Postprocessing()
         self.home = SmartHomeAutomation()
         self.general = GeneralQuestions()
-        self.sr = SpeechRecognitionDemo()
+        self.sr = SpeechRecognitionDemo('1')
         
     def action_handler(self, pre_response: dict):
         method = pre_response['method']
         if method == 'rapid questions':
-            return self.general.get_response(pre_response)
+            return str(self.general.get_response(request=pre_response))
         elif method == 'smart home':
-            return self.home.execute_switch_control(pre_response)
+            return str(self.home.execute_switch_control(pre_response))
         elif method == 'todo':
-            return self.tasks(pre_response)
-        elif method == 'mail':
-            return self.gmail.send_mail(pre_response)
-
-            
+            return str(self.tasks(pre_response))
+        # elif method == 'mail':
+        #     return self.gmail.send_mail(pre_response)
         pass
     
     
@@ -38,7 +36,7 @@ class BEMO:
         print(pre_response)
         status = self.action_handler(pre_response)
         print(status)
-        post_response = self.post(status)
+        post_response = self.post(status, text, pre_response['method'])
         print(post_response)
         pass
     
