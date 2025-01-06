@@ -23,7 +23,7 @@ from sys import platform
 #             "ey kemo", "ey bbmo", "ey moo", "ey bemoo", "ey bemu", "ey temo"]
 
 
-class SpeechRecognitionDemo:
+class SpeechRecognition:
     def __init__(self, model="large", non_english=False, energy_threshold=300, record_timeout=4.0, phrase_timeout=5.0, default_microphone=None):
         self.model = model
         self.non_english = non_english
@@ -84,17 +84,15 @@ class SpeechRecognitionDemo:
                 json.dump([event], file, indent=4)
 
     def record_callback(self, _, audio: sr.AudioData) -> None:
-        print("Audio captured.")
         data = audio.get_raw_data()
         self.data_queue.put(data)
-
+    
+    
+    
     def run(self):
         if 'linux' in platform:
             mic_name = self.default_microphone
             if not mic_name or mic_name == 'list':
-                print("Available microphone devices are: ")
-                for index, name in enumerate(sr.Microphone.list_microphone_names()):
-                    print(f"Microphone with name \"{name}\" found")
                 return
             else:
                 for index, name in enumerate(sr.Microphone.list_microphone_names()):
@@ -104,16 +102,12 @@ class SpeechRecognitionDemo:
         else:
             source = sr.Microphone(sample_rate=16000)
 
-        if self.model != "large" and not self.non_english:
-            self.model = self.model + ".en"
         audio_model = whisper.load_model(self.model)
 
         with source:
             self.recorder.adjust_for_ambient_noise(source)
-            print("Adjusting for ambient noise. Please wait...")
 
-        self.recorder.listen_in_background(source, self.record_callback, phrase_time_limit=self.record_timeout)
-        print(f"Model '{self.model}' loaded. Listening...\n")
+        stopper = self.recorder.listen_in_background(source, self.record_callback, phrase_time_limit=self.record_timeout)
 
         while True:
             try:
@@ -143,11 +137,9 @@ class SpeechRecognitionDemo:
                     classification = self.classify_event(text)
                     if classification == "bemo":
                         print("Bemo detected!")
-                        
+                        stopper()
                         return text
 
-                    # Save transcription to JSON
-                    # self.save_to_json(text, text, classification, start_time, end_time)
 
                     if phrase_complete:
                         self.transcription.append(text)
@@ -158,48 +150,13 @@ class SpeechRecognitionDemo:
                             self.transcription.append(text)
 
                     os.system('cls' if os.name == 'nt' else 'clear')
-                    for line in self.transcription:
-                        print(line)
 
-                    print('', end='', flush=True)
                 else:
                     sleep(0.25)
             except KeyboardInterrupt:
-                print("\nStopping transcription...")
                 break
+            
 
-        print("\n\nFinal Transcription:")
-        for line in self.transcription:
-            print(line)
-
-    @staticmethod
-    def main():
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--model", default="base", help="Model to use",
-                            choices=["base", "small", "medium", "large"])
-        parser.add_argument("--non_english", action='store_true',
-                            help="Don't use the English model.")
-        parser.add_argument("--energy_threshold", default=300,
-                            help="Energy level for mic to detect.", type=int)
-        parser.add_argument("--record_timeout", default=4.0,
-                            help="How real-time the recording is in seconds.", type=float)
-        parser.add_argument("--phrase_timeout", default=5.0,
-                            help="How much empty space between recordings before considering it a new line in the transcription.", type=float)
-        if 'linux' in platform:
-            parser.add_argument("--default_microphone", default='pulse',
-                                help="Default microphone name for SpeechRecognition. "
-                                     "Run this with 'list' to view available Microphones.", type=str)
-        args = parser.parse_args()
-
-        demo = SpeechRecognitionDemo(
-            model=args.model,
-            non_english=args.non_english,
-            energy_threshold=args.energy_threshold,
-            record_timeout=args.record_timeout,
-            phrase_timeout=args.phrase_timeout,
-            default_microphone=args.default_microphone if 'linux' in platform else None
-        )
-        return demo.run()
 
 if __name__ == "__main__":
-    SpeechRecognitionDemo.main()
+    SpeechRecognition.main()
