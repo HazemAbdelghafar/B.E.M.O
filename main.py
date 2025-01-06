@@ -38,6 +38,8 @@ class BEMO:
         print(status)
         post_response = self.post(status, text, pre_response['method'])
         print(post_response)
+        with open('./output.txt', 'a+') as f:
+            f.write(f"{text}\n{pre_response}\n {status}\n {post_response}\n\n\n" )
         pass
     
     
