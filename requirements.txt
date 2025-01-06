@@ -17,3 +17,6 @@ openai-whisper==20240930
 PyAudio==0.2.14
 # sudo apt-get install python3-tk
 # sudo apt-get install portaudio19-dev
+# sudo apt install pulseaudio
+# pulseaudio --start
+# sudo usermod -aG audio $USER
