@@ -48,7 +48,7 @@ class GeneralQuestions:
             self.write_response(response_dict)
             return response_dict
         else:
-            return response_dict
+            return cleaned_answer
 
 
 if __name__ == "__main__":
