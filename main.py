@@ -58,7 +58,7 @@ class BEMO:
                 subject="Survey about the graduation project discussion",
                 # recipients=["obadawy2@gmail.com", "yhanafy@aast.edu", "Osamahesham357@gmail.com", "hanysaid2000@aast.edu", "omar.o.shalash@aast.edu", "abouelfarag@aast.edu", "Aly.fahmy@gmail.com"]
                 recipients=["begadtamim.a@gmail.com"],
-                content = "Dear Doctors,\n\nWe are the six students working on BEMO: Begad Tamim, Mohamed Abdelnasser, Hazem Mohamed, Abdelrahman Saeed, Youssef Ayman, and Mohamed Abdulrahim. We'd greatly appreciate it if you could take a few minutes to complete this short survey: https://forms.gle/3Q7v9QvZv9X5aH2V9\n\nThank you for your support!\n\nBest regards,\B.E.M.O's Team"
+                content = "Dear Doctors,\n\nWe are the six students working on BEMO: Begad Tamim, Mohamed Abdelnasser, Hazem Mohamed, Abdelrahman Saeed, Youssef Ayman, and Mohamed Abdulrahim. We'd greatly appreciate it if you could take a few minutes to complete this short survey: https://forms.gle/5Y1JhtdgEbq1gQ1TA\n\nThank you for your support!\n\nBest regards,\B.E.M.O's Team"
             )
 
 
