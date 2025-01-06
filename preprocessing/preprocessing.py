@@ -128,9 +128,15 @@ class Preprocessing:
         
     def generate_response(self, request: str):
         print("Generating response")
-        request = request + ' ' + dt.now().strftime('%Y-%m-%dT%H:%M:%S')
-        response = self.model.generate_content(request)
-        response = json.loads(response.text[8:-4])
+        try:
+            request = request + ' ' + dt.now().strftime('%Y-%m-%dT%H:%M:%S')
+            response = self.model.generate_content(request)
+        except:
+            response = "" 
+        try:
+          response = json.loads(response.text[8:-4])
+        except:
+          response = response.text
         return response
                      
             
