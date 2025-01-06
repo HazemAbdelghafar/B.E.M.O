@@ -11,8 +11,20 @@ from queue import Queue
 from time import sleep
 from sys import platform
 
+# [
+#             "hey bemo", "hey bmo", "hey vemo", "hey vmo", "hey nemo", "hey kemo",
+#             "hey bbmo", "hey moo", "hey bemoo", "hey bemu",
+#             "hey temo", "bey bemo", "bey bmo", "bey vemo",
+#             "bey vmo", "bey nemo", "bey kemo", "bey bbmo",
+#             "bey moo", "bey bemoo", "bey bemu", "bey temo",
+#             "sey bemo", "sey bmo", "sey vemo", "sey vmo", "sey nemo",
+#             "sey kemo", "sey bbmo", "sey moo", "sey bemoo", "sey bemu",
+#             "sey temo", "ey bemo", "ey bmo", "ey vemo", "ey vmo", "ey nemo",
+#             "ey kemo", "ey bbmo", "ey moo", "ey bemoo", "ey bemu", "ey temo"]
+
+
 class SpeechRecognitionDemo:
-    def __init__(self, model="base", non_english=False, energy_threshold=300, record_timeout=2.0, phrase_timeout=3.0, default_microphone=None):
+    def __init__(self, model="large", non_english=False, energy_threshold=300, record_timeout=4.0, phrase_timeout=5.0, default_microphone=None):
         self.model = model
         self.non_english = non_english
         self.energy_threshold = energy_threshold
@@ -29,20 +41,9 @@ class SpeechRecognitionDemo:
     def classify_event(self, line):
         line = line.lower()
         
-        # [
-        #     "hey bemo", "hey bmo", "hey vemo", "hey vmo", "hey nemo", "hey kemo", 
-        #     "hey bbmo", "hey moo", "hey bemoo", "hey bemu", 
-        #     "hey temo", "bey bemo", "bey bmo", "bey vemo", 
-        #     "bey vmo", "bey nemo", "bey kemo", "bey bbmo", 
-        #     "bey moo", "bey bemoo", "bey bemu", "bey temo", 
-        #     "sey bemo", "sey bmo", "sey vemo", "sey vmo", "sey nemo", 
-        #     "sey kemo", "sey bbmo", "sey moo", "sey bemoo", "sey bemu", 
-        #     "sey temo", "ey bemo", "ey bmo", "ey vemo", "ey vmo", "ey nemo", 
-        #     "ey kemo", "ey bbmo", "ey moo", "ey bemoo", "ey bemu", "ey temo"]
-        
         detection_list = ['hey', 'bey', 'sey', 'ey', 'hi']
         
-        if any(keyword in line for keyword in detection_list):
+        if any(keyword in line for keyword in detection_list): 
             return "bemo"
         elif "screaming" in line:
             return "screaming"
@@ -142,6 +143,7 @@ class SpeechRecognitionDemo:
                     classification = self.classify_event(text)
                     if classification == "bemo":
                         print("Bemo detected!")
+                        
                         return text
 
                     # Save transcription to JSON
@@ -179,9 +181,9 @@ class SpeechRecognitionDemo:
                             help="Don't use the English model.")
         parser.add_argument("--energy_threshold", default=300,
                             help="Energy level for mic to detect.", type=int)
-        parser.add_argument("--record_timeout", default=2,
+        parser.add_argument("--record_timeout", default=4.0,
                             help="How real-time the recording is in seconds.", type=float)
-        parser.add_argument("--phrase_timeout", default=3,
+        parser.add_argument("--phrase_timeout", default=5.0,
                             help="How much empty space between recordings before considering it a new line in the transcription.", type=float)
         if 'linux' in platform:
             parser.add_argument("--default_microphone", default='pulse',
