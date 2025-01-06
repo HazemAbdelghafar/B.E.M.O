@@ -43,6 +43,7 @@ class BEMO:
     
 if __name__ == '__main__':
     bemo = BEMO()
-    bemo.pipeline()
-    pass
+    while True:
+        bemo.pipeline()
+        pass
     
