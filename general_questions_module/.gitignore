@@ -217,6 +217,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Custom for APIs/general_questions_module
 overthinking.txt
-
+tempCodeRunnerFile.py
 *.ipynb
