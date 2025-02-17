@@ -1,0 +1,31 @@
+// This file contains the expected JSON format for the tasks that are to be performed by the learning resources module
+
+{
+    "other_data": "other_data", // other data that will not be used by the communication module (optional)
+
+    "topics": ["topic1", "topic2", "topic3"], // list of topics that the user wants to learn about (required)
+    "specific_resources": [
+        "Roadmaps",
+        "Blogs",
+        "Articles",
+        "YouTube Videos",
+        "Scientific Papers",
+        "Courses",
+        "Figures",
+        "Diagrams",
+        "Charts",
+        "Infographics",
+        "Images",
+        "Communities",
+        "Forums",
+        "Code Repositories",
+        "Slides",
+        "Presentations",
+        "Books",
+        "Webinars",
+        "Case Studies",
+        "Real-world Applications",
+        "Examples"
+    ]
+    // Specific resources that the user want to use for learning (required) (if empty, default resources will be used)
+}
