@@ -1,7 +1,7 @@
-// This file contains the expected JSON format for the tasks that are to be performed by the communication module (tasks api)
-// Optional fields are removed if not needed and will be interpreted as their default values
-// Required fields cannot be removed and will result in an empty response if not provided
-// Not providing the specific values for the fields will result in an empty response
+// This file contains the expected JSON format for the tasks that are to be performed by the communication module (tasks api).
+// Optional fields are removed if not needed and will be interpreted as their default values.
+// Required fields cannot be removed and will result in an error response if not provided.
+// Not providing the specific values for the fields will result in an error response.
 // Syntax: "key": "example value" // (type) (optional or required) (possible values) (default value), "description", "notes" ...
 
 {
