@@ -1,44 +1,51 @@
-// This file contains the expected JSON format for the tasks that are to be performed by the communication module (tasks api)
-
 {
-    "other_data": "other_data", // other data that will not be used by the communication module (optional)
+    // This file contains the expected JSON format for the tasks to be performed by the Gmail communication module (Gmail API).
+    // Optional fields are removed if not needed and will be interpreted as their default values.
+    // Required fields cannot be removed and will result in an error response if not provided.
+    // Not providing the specific values for the fields will result in an error response.
+    // Syntax: "key": "example value" // (type) (optional or required) (possible values) (default value), "description", "notes" ...
 
-    "object_type": "draft", // type of object on which the action is to be performed (required) (draft, user, message, label)
-    "action": "insert", // action to be performed (required) (create, delete, update, get, list, send, count) (send, create is only for draft type) (count is only for label type)
+    "other_data": "other_data", // (any) (optional) (any) (default: None), "other data that will not be used by the communication module",
 
-    "get_by": ["subject"], // get the object by (optional) (subjects, recipients, labels, senders, attachment_names, has_attachment, name) (Can be multiple) (only for delete, get, list, count, send, update actions) (label type has only name) (default: subject) (only for draft, message, label type) (subject, recipients only and only for draft update action) (senders only for message type)
+    "object_type": "draft", // (string) (required) (can be draft, user, message, label) (default: None), "type of object on which the action is to be performed",
 
-    "get_by_values": ["subject_value"], // value of the get_by (optional) (only for delete, get, list, count, send, update actions) (default: None)
+    "action": "insert", // (string) (required) (can be create, delete, update, get, list, send, count) (default: None), "action to be performed",
 
-    "max_output": 10, // maximum number of objects to be returned (optional) (default: 10) (only for list action) (only for draft, message)
-    "include_spam_trash": false, // includes spam and trash (optional) (default: false) (true, false) (only for list action) (only for draft, message, label type) (only for draft, message)
-    "query": "query", // query to filter the objects (optional) (only for list action) (only for draft, message) (default: None)
+    "get_by": ["subject"], // (array) (optional) (can be subject, recipients, labels, senders, attachment_names, has_attachment, name) (default: ["subject"]), "filter objects by specific attribute",
 
-    "all": false, // send or delete all objects (optional) (default: false) (true, false) (only for delete, send actions) (only for draft, label, message type) (if true, get_by_value will be ignored) (send only for draft type)
+    "get_by_values": ["subject_value"], // (array) (optional) (any) (default: None), "values for filtering objects by get_by attribute",
 
-    "create_and_send": false, // create and send the draft (optional) (default: false) (true, false) (only for draft type) (only for create action)
+    "max_output": 10, // (int) (optional) (any) (default: 10), "maximum number of objects to be returned",
 
-    "count_by": "custom", // count the objects by (optional) (only for count action) (only for label type) (default: custom) (chat, sent, inbox, draft, spam, trash, important, starred, unread, custom)
+    "include_spam_trash": false, // (bool) (optional) (can be true or false) (default: false), "includes spam and trash in list action",
 
-    "new_label_names": ["new_label_name"], // new name of the label (optional) (only for update and create action) (only for label type)
+    "query": "query", // (string) (optional) (any) (default: None), "query to filter the objects",
 
-    "new_parent_label_names": ["new_parent_label_name"], // new name of the parent label (optional) (only for update and create action) (only for label type)
+    "all": false, // (bool) (optional) (can be true or false) (default: false), "send or delete all objects if true, ignoring get_by_values",
 
-    "new_background_color": "new_background_color", // new background color of the label (optional) (only for update and create action)
+    "create_and_send": false, // (bool) (optional) (can be true or false) (default: false), "create and send the draft immediately after creation",
 
-    "new_color_text": "new_color_text", // new text color of the label (optional) (only for update and create action) (only for label type)
+    "count_by": "custom", // (string) (optional) (can be custom, chat, sent, inbox, draft, spam, trash, important, starred, unread) (default: custom), "count objects by a specific category",
 
-    "new_draft_subjects": ["new_draft_subject"], // new subject of the draft (optional) (only for update and create action) (only for draft type)
+    "new_label_names": ["new_label_name"], // (array) (optional) (any) (default: None), "new names for the label",
 
-    "new_draft_recipients": ["new_draft_recipient"], // new recipient of the draft (optional) (only for update and create action) (only for draft type)
+    "new_parent_label_names": ["new_parent_label_name"], // (array) (optional) (any) (default: None), "new parent label names",
 
-    "new_draft_body": "new_draft_body", // new body of the draft (optional) (only for update and create action) (only for draft type)
+    "new_background_color": "new_background_color", // (string) (optional) (any) (default: None), "new background color for the label",
 
-    "new_draft_cc": ["new_draft_cc"], // new cc of the draft (optional) (only for update and create action) (only for draft type)
+    "new_color_text": "new_color_text", // (string) (optional) (any) (default: None), "new text color for the label",
 
-    "new_draft_bcc": ["new_draft_bcc"], // new bcc of the draft (optional) (only for update and create action) (only for draft type)
+    "new_draft_subjects": ["new_draft_subject"], // (array) (optional) (any) (default: None), "new subject for the draft",
 
-    "add_labels": ["label_name"], // add the label to the object (optional) (only for update and create action) (only for draft, message type)
+    "new_draft_recipients": ["new_draft_recipient"], // (array) (optional) (any) (default: None), "new recipient(s) for the draft",
 
-    "remove_labels": ["label_name"] // remove the label from the object (optional) (only for update action) (only for draft, message type)
+    "new_draft_body": "new_draft_body", // (string) (optional) (any) (default: None), "new body for the draft",
+
+    "new_draft_cc": ["new_draft_cc"], // (array) (optional) (any) (default: None), "new cc recipients for the draft",
+
+    "new_draft_bcc": ["new_draft_bcc"], // (array) (optional) (any) (default: None), "new bcc recipients for the draft",
+
+    "add_labels": ["label_name"], // (array) (optional) (any) (default: None), "labels to be added to the object",
+
+    "remove_labels": ["label_name"] // (array) (optional) (any) (default: None), "labels to be removed from the object"
 }
