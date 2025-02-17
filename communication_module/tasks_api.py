@@ -5,7 +5,7 @@ import jstyleson
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from init_user import init_user
+from init_user import init_user_google
 from utils import (
     RFC3339_to_date_and_time,
     datetime_to_RFC3339,
@@ -36,7 +36,7 @@ class TasksApi:
             None
         """
 
-        self._creds = init_user(user_id)
+        self._creds = init_user_google(user_id)
         self._service = build("tasks", "v1", credentials=self._creds)
         self._timezone = timezone
 
