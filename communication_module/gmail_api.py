@@ -13,7 +13,7 @@ from email import encoders
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-from init_user import init_user
+from init_user import init_user_google
 from utils import epoch_to_date_and_time, epoch_to_relative_time
 from utils import hex_to_color_name, color_name_to_hex
 
@@ -37,7 +37,7 @@ class GmailAPI:
         Returns:
             None
         """
-        self._creds = init_user(user_id)
+        self._creds = init_user_google(user_id)
         self._service = build("gmail", "v1", credentials=self._creds)
         self._time_zone = time_zone
 
