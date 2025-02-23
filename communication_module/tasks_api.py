@@ -218,7 +218,7 @@ class TasksApi:
 
         except HttpError as err:
             print(err)
-            return None, None, None
+            return None
 
     # Task Lists (Update)
     ####################################################################################################
@@ -257,7 +257,7 @@ class TasksApi:
 
         except HttpError as err:
             print(err)
-            return None, None, None
+            return None
 
     def update_task_lists_by_name(self, old_name: str, new_name: str) -> list:
         """
@@ -278,15 +278,19 @@ class TasksApi:
             for item in task_lists:
                 id = item["id"]
                 response = self._update_task_list_id(id, new_name)
-                return_list.append(
-                    {
-                        "id": response["id"],
-                        "name": response["name"],
-                        "last_updated": response["last_updated"],
-                        "last_updated_relative": response["last_updated_relative"],
-                    }
-                )
-            return return_list
+                if response:
+                    return_list.append(
+                        {
+                            "id": response["id"],
+                            "name": response["name"],
+                            "last_updated": response["last_updated"],
+                            "last_updated_relative": response["last_updated_relative"],
+                        }
+                    )
+            if return_list:
+                return return_list
+            else:
+                return None
         else:
             return None
 
@@ -742,7 +746,9 @@ class TasksApi:
         try:
             task_list_id = task_lists[0]["id"]
         except IndexError:
-            return None
+            task_list_id = self.insert_task_list(list_name)["id"]
+            if task_list_id == None:
+                return None
 
         if parent_name:
             parent_tasks = self.get_tasks_by_name(parent_name)
@@ -767,19 +773,16 @@ class TasksApi:
         else:
             due_date = None
 
-        if task_lists:
-            response = self._insert_task_by_list_id_parent_id(
-                task_list_id, name, due_date, notes, parent_id
-            )
-            return {
-                "id": response["id"],
-                "name": response["name"],
-                "last_updated": response["last_updated"],
-                "last_updated_relative": response["last_updated_relative"],
-            }
+        response = self._insert_task_by_list_id_parent_id(
+            task_list_id, name, due_date, notes, parent_id
+        )
+        return {
+            "id": response["id"],
+            "name": response["name"],
+            "last_updated": response["last_updated"],
+            "last_updated_relative": response["last_updated_relative"],
+        }
 
-        else:
-            return None
 
     # Tasks (Move)
     ####################################################################################################
