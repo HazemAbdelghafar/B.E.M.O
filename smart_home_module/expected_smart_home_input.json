@@ -3,6 +3,6 @@
 {
     "other_data": "other_data", // other data that will not be used by the smart home module (optional)
 
-    "switch_number": 1, // number of the switch (required) (1, 2, 3, 4, ...)
-    "action": "on" // action to be performed (required) (on, off)
+    "switch_number": ["switch_1", "switch_2"], // switch number (required) (switch_[all_numbers])
+    "action": ["on", "off"] // action to be performed (required) (on/off)
 }
