@@ -14,10 +14,9 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 MODEL_PATH = f"{CURRENT_DIR}/models/TC_Pipeline_LR_v2.pkl"
 LABELS_PATH = f"{CURRENT_DIR}/models/labels.pkl"
 
-# Define the name of the task classifier and the MQTT topics
+# Define the name of the module and the topics
 NAME = "task_classifier"
 SUB_TOPIC = "task_classifier/prompt"
-PUB_TOPIC = "task_classifier/result"
 
 class TaskClassifier(BaseMQTTHandler):
     """
@@ -30,7 +29,7 @@ class TaskClassifier(BaseMQTTHandler):
         """
         
         # Initialize the BaseMQTTHandler object
-        super().__init__(SUB_TOPIC, PUB_TOPIC, NAME)
+        super().__init__(SUB_TOPIC, NAME)
         
         # Load the model and labels
         self._model = pickle.load(open(MODEL_PATH, "rb"))
@@ -62,7 +61,7 @@ if __name__ == "__main__":
     tc = TaskClassifier()
     
     # Start the MQTT client loop
-    tc.client.loop_forever()
+    tc.start()
 
 
 
