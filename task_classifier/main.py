@@ -1,5 +1,6 @@
 import pickle
 import os
+import string
 
 import sys
 from pathlib import Path
@@ -34,7 +35,13 @@ class TaskClassifier(BaseMQTTHandler):
         # Load the model and labels
         self._model = pickle.load(open(MODEL_PATH, "rb"))
         self._labels = pickle.load(open(LABELS_PATH, "rb"))
-                
+        self._bemo_strings = [
+            "bemo", "bmo", "bimo", "vemo", "vimo", "vmo", 
+            "nemo", "kemo", "bbmo", "moo", "bemoo", "bemu", 
+            "beemo", "temo"
+        ]
+
+        
     def _execute_main(self, input_data: dict) -> dict:
         """
         Executes the main functionality of the class.
@@ -46,17 +53,42 @@ class TaskClassifier(BaseMQTTHandler):
             dict: The result of the classification.
         """
         prompt = input_data["prompt"] # Get the prompt from the input data
+        prompt = self.preprocess_prompt(prompt) # Preprocess the prompt
         prediction = self._model.predict([prompt])[0] # Make a prediction using the model
         
         # Get the predicted labels based on the prediction
         predicted_labels = [self._labels[i] for i, val in enumerate(prediction) if val == 1]
         
         # Return the predicted labels
-        return {"predicted_labels": predicted_labels}
+        return {"predicted_labels": predicted_labels, "preprocessed_prompt": prompt}
         
-
-    
-
+    def preprocess_prompt(self, prompt: str) -> str:
+        """
+        Preprocess the prompt for classification.
+        
+        Args:
+            prompt (str): The prompt to preprocess.
+        
+        Returns:
+            str: The preprocessed prompt.
+        """
+        
+        # Remove punctuation
+        prompt = prompt.translate(str.maketrans('', '', string.punctuation))
+        
+        # Lowercase
+        prompt = prompt.lower()
+        
+        # Remove bemo strings and all preceding words
+        for bemo_string in self._bemo_strings:
+            if bemo_string in prompt:
+                prompt = prompt.split(bemo_string)[1]
+                
+        # Remove extra spaces
+        prompt = " ".join(prompt.split())
+        
+        return prompt
+            
 if __name__ == "__main__":
     tc = TaskClassifier()
     
