@@ -8,35 +8,38 @@ class BaseMQTTHandler:
     BaseMQTTHandler is a base class for handling MQTT communication.
     """
 
-    def __init__(self, sub_topic: str, pub_topic: str, name: str):
+    def __init__(self, sub_topic: str, name: str):
         """
         Initialize the BaseMQTTHandler object.
 
         Args:
             sub_topic (str): MQTT topic to subscribe to.
-            pub_topic (str): MQTT topic to publish the result to.
             name (str): Name for the MQTT client.
         """
         
         # Define the broker address and port
         BROKER = "localhost"
         PORT = 1883
+        SERVER_PUB_TOPIC = "server/main"
+
         
         self._result = {}  # Initialize the result variable
         
         # Set the input and output topics and the name of the MQTT client
-        self._pub_topic = pub_topic
+        self._pub_topic = SERVER_PUB_TOPIC 
         self._sub_topic = sub_topic
         self._name = name
+        self.qos = 1  # Quality of Service level
         
         # Create a new MQTT client instance
         self.client =  mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, self._name)
         
         self.client.on_message = self.__callback  # Set the on_message callback function
-        
+        self.client.on_connect = self.__on_connect  # Set the on_connect callback function
+    
         self.client.connect(BROKER, PORT, 60)  # Connect to the broker
         
-        self.client.subscribe(self._sub_topic) # Subscribe to the input topic
+        self.client.subscribe(self._sub_topic, self.qos) # Subscribe to the input topic
 
         print(f"{self._name} initialized successfully!")
     
@@ -54,8 +57,24 @@ class BaseMQTTHandler:
         print(f"Execution time: {end - start} seconds")
         
         # Publish the result after execution
-        self.publish_result(self._result)
-                
+        self.publish_result_server(self._result)
+        
+    def __on_connect(self, client: mqtt.Client, userdata: any, flags: dict, rc: int):
+        """
+        Callback function for when the client connects to the broker.
+
+        Args:
+            client (mqtt.Client): The MQTT client instance.
+            userdata (Any): User-defined data of any type.
+            flags (dict): Response flags sent by the broker.
+            rc (int): The connection result code.
+        """
+        if rc == 0:
+            print("Connected to broker!")
+        else:
+            print(f"Failed to connect, return code {rc}")
+    
+    #! Overridden in server class only  
     def __callback(self, client: mqtt.Client, userdata: any, msg: mqtt.MQTTMessage):
         """
         Callback function for when a message is received.
@@ -92,7 +111,7 @@ class BaseMQTTHandler:
         """
         return self._result
     
-    def publish_result(self, result: dict):
+    def publish_result_server(self, result: dict):
         """
         Publishes the result to the specified MQTT topic.
 
@@ -102,5 +121,25 @@ class BaseMQTTHandler:
         if result is not {}:
             result["module_name"] = self._name
             str_result = str(result)
-            self.client.publish(self._pub_topic, str_result)
+            self.client.publish(self._pub_topic, str_result, self.qos)
             print(f"Published result to topic '{self._pub_topic}': {str_result}")
+
+    def publish_result_specific(self, result: dict, topic: str):
+        """
+        Publishes the result to the specified MQTT topic.
+
+        Args:
+            result (dict): The result to publish.
+            topic (str): The topic to publish the result to.
+        """
+        if result is not {}:
+            result["module_name"] = self._name
+            str_result = str(result)
+            self.client.publish(topic, str_result, self.qos)
+            print(f"Published result to topic '{topic}': {str_result}")
+    
+    def start(self):
+        """
+        Starts the MQTT client loop.
+        """
+        self.client.loop_forever()
