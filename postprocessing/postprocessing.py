@@ -1,5 +1,6 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables.base import RunnableSerializable
 from dotenv import dotenv_values, find_dotenv
 import os
 import random
@@ -108,7 +109,7 @@ Your output should be a single, concise, and natural string for BEMO's TTS syste
         )
 
             
-    def _init_chain(self):
+    def _init_chain(self) -> RunnableSerializable:
         """
         Initialize the chain for the task.
         
@@ -116,7 +117,7 @@ Your output should be a single, concise, and natural string for BEMO's TTS syste
             None
         
         Returns:
-            Chain: The chain for the task.
+            RunnableSerializable: The chain for the task.
         """
         return self.prompt | self.llm
     
