@@ -19,7 +19,9 @@ test_prompts = [
 switch_mapping = {
     "switch_1": "living room lights",
     "switch_2": "fan",
-    "switch_3": "television"
+    "switch_3": "television",
+    "switch_4": "air conditioner",
+    "switch_5": "speaker"
 }
 
 SYSTEM_PROMPTS = {
@@ -94,18 +96,18 @@ SYSTEM_PROMPTS = {
     "smart_home": (
         "You are an LLM that processes smart home commands. Your task is to extract commands related to smart home device control by identifying the switches mentioned and their corresponding statuses ('on' or 'off').\n"
         "The switches are mapped as follows:\n"
-        f"{switch_mapping}\n"
+        f"{str(switch_mapping)[1:-1]}\n"
         "Use your understanding of common abbreviations (e.g., 'ac' for 'air conditioner') to correctly map the devices.\n"
         "The query might include parts that aren't specific to the task itself, so focus only on relevant details.\n"
         "Return a JSON object with the following structure:\n"
         "{{\n"
-        "    'method': 'smart home',\n"
+        "    'method': 'smart_home',\n"
         "    'switch': [<list of switch identifiers>],\n"
         "    'status': [<'on' or 'off'> for each switch]\n"
         "}}\n"
         "Example: For the query 'send an email to dr ali turn on the living room lights and turn off the fan', output:\n"
         "{{\n"
-        "    'method': 'smart home',\n"
+        "    'method': 'smart_home',\n"
         "    'switch': ['switch_1', 'switch_2'],\n"
         "    'status': ['on', 'off']\n"
         "}}"
@@ -148,18 +150,19 @@ SYSTEM_PROMPTS = {
         "    - The topic can be 'general' or 'news' based on the extracted question.\n"
         "Return a JSON object with the following structure:\n"
         "{{\n"
-        "    'method': 'rapid questions',\n"
+        "    'method': 'general',\n"
         "    'query': <extracted question>,\n"
         "    'topic': '<'general' or 'news'>\n"
         "}}\n"
         "Example: For the query 'turn on the fan and by the way whats the weather today', output:\n"
         "{{\n"
-        "    'method': 'rapid questions',\n"
+        "    'method': 'general',\n"
         "    'query': 'What's the weather on 18th March 2025?',\n"
         "    'topic': 'general'\n"
         "}}"
         "Note in the above example, the date is extracted as part of the question using the current date provided in the prompt."
         f"Please note that the current date and time is {datetime.now()}, only use the current date and time if it is relevant to the query."
+        "Use the current date and time to convert relative time references like 'today' or 'tomorrow' or 'in 3 hours' to specific dates."
         "Your output should be a well-structured JSON object suitable for processing."
         "Here is the query: {prompt}"
         ""
@@ -190,3 +193,61 @@ SYSTEM_PROMPTS = {
         "Here is the query: {prompt}"
     )
 }
+
+
+"""
+TODO: Modify Prompts based on these outputs
+
+preprocessing initialized successfully!
+Prompt: play some relaxing music then schedule a doctor appointment and whats the weather like tomorrow
+Labels: ['smart_home', 'todo', 'general']
+Label: smart_home
+Published result to topic 'server/main': {'method': 'smart home', 'switch': [], 'status': [], 'module_name': 'preprocessing'}
+Label: todo
+Published result to topic 'server/main': {'method': 'todo', 'list_all_tasks': False, 'object_type': 'task', 'action': 'insert', 'new_task_name': 'Schedule doctor appointment', 'module_name': 'preprocessing'}
+Label: general
+Published result to topic 'server/main': {'method': 'rapid questions', 'query': "What's the weather like tomorrow?", 'topic': 'general', 'module_name': 'preprocessing'}
+[{'method': 'smart home',
+  'module_name': 'preprocessing',
+  'status': [],
+  'switch': []},
+ {'action': 'insert',
+  'list_all_tasks': False,
+  'method': 'todo',
+  'module_name': 'preprocessing',
+  'new_task_name': 'Schedule doctor appointment',
+  'object_type': 'task'},
+ {'method': 'rapid questions',
+  'module_name': 'preprocessing',
+  'query': "What's the weather like tomorrow?",
+  'topic': 'general'}]
+
+"""
+
+"""
+Results:
+
+test = {
+    'predicted_labels': ['smart_home', 'todo', 'general'],
+    'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like tomorrow',
+    'module_name': 'task_classifier'
+}
+
+
+[{'method': 'smart_home',
+  'module_name': 'preprocessing',
+  'status': ['on'],
+  'switch': ['switch_1']},
+ {'action': 'insert',
+  'due_date': '2025-02-25T23:00:00',
+  'list_all_tasks': False,
+  'method': 'todo',
+  'module_name': 'preprocessing',
+  'new_task_name': 'Schedule doctor appointment',
+  'object_type': 'task'},
+ {'method': 'general',
+  'module_name': 'preprocessing',
+  'query': "What's the weather like tomorrow?",
+  'topic': 'general'}]
+
+"""
