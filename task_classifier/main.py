@@ -33,8 +33,8 @@ class TaskClassifier(BaseMQTTHandler):
         super().__init__(SUB_TOPIC, NAME)
         
         # Load the model and labels
-        self._model = pickle.load(open(MODEL_PATH, "rb"))
-        self._labels = pickle.load(open(LABELS_PATH, "rb"))
+        self.__model = pickle.load(open(MODEL_PATH, "rb"))
+        self.__labels = pickle.load(open(LABELS_PATH, "rb"))
         self._bemo_strings = [
             "bemo", "bmo", "bimo", "vemo", "vimo", "vmo", 
             "nemo", "kemo", "bbmo", "moo", "bemoo", "bemu", 
@@ -42,7 +42,7 @@ class TaskClassifier(BaseMQTTHandler):
         ]
 
         
-    def _execute_main(self, input_data: dict) -> dict:
+    def execute_main(self, input_data: dict) -> dict:
         """
         Executes the main functionality of the class.
         
@@ -54,10 +54,10 @@ class TaskClassifier(BaseMQTTHandler):
         """
         prompt = input_data["prompt"] # Get the prompt from the input data
         prompt = self.preprocess_prompt(prompt) # Preprocess the prompt
-        prediction = self._model.predict([prompt])[0] # Make a prediction using the model
+        prediction = self.__model.predict([prompt])[0] # Make a prediction using the model
         
         # Get the predicted labels based on the prediction
-        predicted_labels = [self._labels[i] for i, val in enumerate(prediction) if val == 1]
+        predicted_labels = [self.__labels[i] for i, val in enumerate(prediction) if val == 1]
         
         # Return the predicted labels
         return {"predicted_labels": predicted_labels, "preprocessed_prompt": prompt}
