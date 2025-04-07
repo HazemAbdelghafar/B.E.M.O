@@ -7,6 +7,7 @@ from langchain_core.output_parsers import JsonOutputParser
 import json
 from ast import literal_eval
 import os
+from datetime import datetime
 
 import sys
 from pathlib import Path
@@ -120,7 +121,7 @@ class PreProcessing(BaseMQTTHandler):
             print(f"Label: {label}")
             response = None
             try:
-                response = self.__chains[label].invoke({"prompt": prompt})
+                response = self.__chains[label].invoke({"prompt": prompt, "current_time": datetime.now()})
             except Exception as e:
                 print(f"Error: {e}")
                 response = None
