@@ -40,6 +40,8 @@ class SmartHomeAutomation(BaseMQTTHandler):
 
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/smart_home", name="smart_home")
+        super().__pub_topic = "task_handler/global"
+        
 
     def control_device(self, switch_id, status):
         """
