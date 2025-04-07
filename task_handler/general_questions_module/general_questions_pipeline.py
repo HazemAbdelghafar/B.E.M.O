@@ -84,7 +84,10 @@ class GeneralQuestions(BaseMQTTHandler):
             "topic": topic,
             "time": round(time.time() - start_time, 2),
         }
-        return result
+        return {
+            "method": "general_questions",
+            "result": result,
+        }
 
 
 if __name__ == "__main__":
