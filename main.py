@@ -1,9 +1,8 @@
-
 import sys
 from pathlib import Path
 
-# Add the root directory to sys.path
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+# Add the root directory of the project to sys.path at the beginning
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from utils import BaseMQTTHandler
 
