@@ -34,7 +34,7 @@ class BaseMQTTHandler:
         try:
             self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, self.__name)
         except Exception as e:
-            self.client =  mqtt.Client(self.__name)
+            self.client =  mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, self.__name)
         
         self.client.on_message = self.__callback  # Set the on_message callback function
         self.client.on_connect = self.__on_connect  # Set the on_connect callback function
@@ -45,7 +45,7 @@ class BaseMQTTHandler:
 
         print(f"{self.__name} initialized successfully!")
     
-    def __call__(self, input_data: dict | list, topic_name: str = ""):
+    def __run(self, input_data: dict | list):
         """
         Executes the main functionality of the class.
 
@@ -60,11 +60,8 @@ class BaseMQTTHandler:
         
         # Publish the result after execution
         if self._result:
-            if topic_name:
-                self.publish_result_server(self._result)
-            else:
-                self.publish_result_specific(self._result, topic_name)
-            
+            self.publish_result(self._result)
+        
     def __on_connect(self, client: mqtt.Client, userdata: any, flags: dict, rc: int):
         """
         Callback function for when the client connects to the broker.
@@ -93,7 +90,7 @@ class BaseMQTTHandler:
         input_data = msg.payload.decode()
         input_data_eval = literal_eval(input_data)
         print(f"Received message: {input_data_eval}")
-        self(input_data_eval)  # Call the main function with the received input data
+        self.__run(input_data_eval)  # Call the main function with the received input data
 
     def execute_main(self, input_data: dict | list) -> dict | list:
         """
@@ -117,7 +114,7 @@ class BaseMQTTHandler:
         """
         return self._result
     
-    def publish_result_server(self, result: dict | list):
+    def publish_result(self, result: dict | list):
         """
         Publishes the result to the specified MQTT topic.
 
@@ -129,20 +126,6 @@ class BaseMQTTHandler:
             str_result = str(result)
             self.client.publish(self.__pub_topic, str_result, self.__qos)
             print(f"Published result to topic '{self.__pub_topic}': {str_result}")
-
-    def publish_result_specific(self, result: dict | list, topic: str):
-        """
-        Publishes the result to the specified MQTT topic.
-
-        Args:
-            result (dict | list): The result to publish.
-            topic (str): The topic to publish the result to.
-        """
-        if result is not {}:
-            result["module_name"] = self.__name
-            str_result = str(result)
-            self.client.publish(topic, str_result, self.__qos)
-            print(f"Published result to topic '{topic}': {str_result}")
     
     def start(self):
         """
