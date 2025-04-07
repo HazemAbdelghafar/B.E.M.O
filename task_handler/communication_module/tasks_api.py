@@ -43,7 +43,7 @@ class TasksApi(BaseMQTTHandler):
         """
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/tasks_api", name="tasks_api")
-        super().__pub_topic = "task_handler/global"
+        self.__pub_topic = "task_handler/global"
 
         self._creds = init_user_google(user_id)
         self._service = build("tasks", "v1", credentials=self._creds)
