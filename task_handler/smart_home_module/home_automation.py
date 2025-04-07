@@ -83,7 +83,10 @@ class SmartHomeAutomation(BaseMQTTHandler):
             success = self.control_device(switch, status)
             results.append({"switch": switch, "status": status, "success": success})
 
-        return {"results": results}
+        return {
+            "method": "smart_home",
+            "results": results
+        }
 
 if __name__ == "__main__":
     # Example usage
