@@ -54,6 +54,7 @@ class FindLearningResources(BaseMQTTHandler):
         """
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/learning_resources", name="learning_resources")
+        super().__pub_topic = "task_handler/global"
 
         # Set the parameters for the class
         self.use_llm = use_llm
