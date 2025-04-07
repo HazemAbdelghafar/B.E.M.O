@@ -102,7 +102,7 @@ SYSTEM_PROMPTS = {
         "Here is the query: {prompt}"
     ),
 
-    # TODO
+    # TODO Implement the mail module then fix this prompt
     "mail": (
         "You are an LLM that processes email-related queries. Your task is to extract email actions by identifying the type of email object (such as 'draft', 'message', or 'label') and the corresponding action (insert, delete, update, send).\n"
         "Also extract additional details like subjects and recipients when relevant.\n"
