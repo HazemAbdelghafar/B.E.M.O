@@ -268,10 +268,15 @@ class FindLearningResources(BaseMQTTHandler):
         Returns:
             dict: The result of the learning resources search.
         """
-        topic = input_data.get("topic", "default_topic")
+        topic = input_data.get("topic", None)
+        if not topic:
+            return
         specific_resources = input_data.get("specific_resources", [])
         result = self.find_resources(topic, specific_resources)
-        return result
+        return {
+            "method": "learning_resources",
+            "result": result,
+        }
 
     def _init_prompt(self) -> ChatPromptTemplate:
         """
