@@ -19,9 +19,9 @@ test_prompts = [
 
 # Define broker address and topic
 BROKER = "localhost"  # The MQTT broker address (localhost for local testing)
-TOPIC = "task_classifier/prompt"
+# TOPIC = "task_classifier/prompt"
 SUB_TOPIC = "server/main"
-# TOPIC = "preprocessing/prompt"
+TOPIC = "preprocessing/prompt"
 
 # Create a new MQTT client instance
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, "server")
@@ -57,12 +57,12 @@ send = {
         'preprocessed_prompt': 'what about tomorrow',
         'module_name': 'task_classifier'
     }
-# send = {
-#         'predicted_labels': ['smart_home', 'todo', 'general'],
-#         'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
-#         'module_name': 'task_classifier'
-#     }
-send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
+send = {
+        'predicted_labels': ['smart_home', 'todo', 'general'],
+        'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
+        'module_name': 'task_classifier'
+    }
+# send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
 # send = {
 #         'predicted_labels': ['test'],
 #         'preprocessed_prompt': 'My name is Ali and I am a software engineer. I am working on a project that involves using MQTT for communication.',
@@ -82,7 +82,7 @@ print(f"Message published to topic {TOPIC}")
 
 # Optional: Keep running briefly to allow message receipt
 import time
-time.sleep(2)
+time.sleep(10)
 
 # client.disconnect()  # Disconnect the client
 # print("Disconnected from the broker")
