@@ -1,9 +1,0 @@
-Pros and Cons
-
-Pros:
-    - Tavily is very simple and reliable to use. 
-    - Provides accurate data and answers
-    - Responses are generated in a fairly fast time
-
-Cons:
-    - Free tier is not generous enough giving only 1000 requests per month. This will probably lead to upgrading to the next tier for $30 giving 4000 requests per month
