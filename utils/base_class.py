@@ -22,7 +22,6 @@ class BaseMQTTHandler:
         PORT = 1883
         SERVER_PUB_TOPIC = "server/main"
 
-        
         self._result = {}  # Initialize the result variable
         
         # Set the input and output topics and the name of the MQTT client
