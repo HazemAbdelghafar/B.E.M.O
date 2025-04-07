@@ -103,7 +103,7 @@ def lime_explanation(prompt: str, prediction: np.ndarray) -> tuple[dict[str, tup
     
     return label_word_map, end-start
 
-# Todo: Fix the split_prompt function
+#! Not Working and i will Not fix it
 def split_prompt(prompt: str, label_word_map: dict[str, tuple[str, float]]) -> list[str]:
     """
     Split the input prompt into multiple prompts, based on the label words map.
@@ -282,17 +282,17 @@ def preprocess_prompt(prompt: str) -> str:
 if __name__ == "__main__":    
     test_prompts = [
         "Hey Bemo, play some relaxing music, then schedule a doctor appointment and email my client.", # smart home, todo, mail
-        "Hey Bemo, remind me that I have a meeting at 5 pm and send an email to Dr Ali.",  # todo, mail
-        "Hey Bemo, remind me to water the plants at 7 am and email my assistant about today's schedule.",  # todo, mail
+        "Hey Bemo, remind me that I have a meeting at 5 pm and send an email to Dr Ali.",  #todo, mail
+        "Hey Bemo, remind me to water the plants at 7 am and email my assistant about today's schedule.",  #todo, mail
         "Hey Bemo, turn off the kitchen lights and remind me to pay the electricity bill at 5 pm.",  # smart home, todo
         "Hey Bemo, send an email to my professor regarding my thesis and turn on the study room lamp.",  # mail, smart home
         "Hey Bemo, what's the news today and open the living room blinds?",  # general questions, smart home
-        "Hey Bemo, remind me to take my medication at 9 pm and send an email to my doctor.",  # todo, mail
+        "Hey Bemo, remind me to take my medication at 9 pm and send an email to my doctor.",  #todo, mail
         "Hey Bemo, what time is my next meeting and lock the front door.",  # general questions, smart home
         "Hey Bemo, email my manager about the deadline extension and remind me to submit the report by noon.",  # mail, todo
         "Hey Bemo, turn off the heater and what's today's temperature?",  # smart home, general questions
-        "Hey Bemo, remind me to call Dad at 6 pm, email him about the family gathering, and check what day it is today.",  # todo, mail, general questions
-        "Hey Bemo, set a reminder for my flight at 10 am, email my assistant the itinerary, check the weather, and turn on the porch light.",  # todo, mail, general questions, smart home
+        "Hey Bemo, remind me to call Dad at 6 pm, email him about the family gathering, and check what day it is today.",  #todo, mail, general questions
+        "Hey Bemo, set a reminder for my flight at 10 am, email my assistant the itinerary, check the weather, and turn on the porch light.",  #todo, mail, general questions, smart home
     ]
     
     
