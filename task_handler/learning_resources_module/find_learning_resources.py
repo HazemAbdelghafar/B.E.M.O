@@ -17,9 +17,7 @@ from dotenv import find_dotenv, dotenv_values
 import os
 import time
 import requests
-import json
 import random
-from pprint import pprint
 
 from utils import BaseMQTTHandler
 
