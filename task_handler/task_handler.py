@@ -7,7 +7,6 @@ from utils import BaseMQTTHandler
 
 NAME = "task_handler"
 SUB_TOPIC = "task_handler/global"
-
 class TaskHandler(BaseMQTTHandler):
     def __init__(self):
         """
@@ -15,6 +14,7 @@ class TaskHandler(BaseMQTTHandler):
         """
         super().__init__(sub_topic=SUB_TOPIC, name=NAME)
         self.results = []
+        self.number_of_tasks = 0
         
     def execute_main(self, input_data):
         """
@@ -28,6 +28,9 @@ class TaskHandler(BaseMQTTHandler):
         """
         # Check if input_data is a list
         if isinstance(input_data, list):
+            self.number_of_tasks = len(input_data)
+            
+            # Iterate through each item in the list
             for item in input_data:
                 method = item.get("method")
                 if not method:
@@ -44,14 +47,19 @@ class TaskHandler(BaseMQTTHandler):
                     return {"status": "error", "message": f"Unknown method: {method}"}
                 # Publish the input data to the appropriate topic
                 self.publish_result(item)
+                print(f"Published to {self.__pub_topic}: {item}")
         else:
             # if input data is not a list, process it as dictionary
             self.results.append(input_data)
              
-                
-                    
-        # Return the results
-        return {"status": "success", "results": self.results}
+            # If all tasks are completed, publish the results
+            if self.number_of_tasks == len(self.results):
+                self.__pub_topic = "server/main"
+                self.publish_result({"method": NAME, "results": self.results})
+                print(f"Published to {self.__pub_topic}: {self.results}")
+                self.results = []
+                self.number_of_tasks = 0                    
+        return None
 
 #  [
 #     {
