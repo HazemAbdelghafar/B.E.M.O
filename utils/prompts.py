@@ -1,19 +1,3 @@
-from datetime import datetime
-
-test_prompts = [
-    "Hey Bemo, play some relaxing music, then schedule a doctor appointment and email my client.", # smart home, todo, mail
-    "Hey Bemo, remind me that I have a meeting at 5 pm and send an email to Dr Ali.",  # todo, mail
-    "Hey Bemo, remind me to water the plants at 7 am and email my assistant about today's schedule.",  # todo, mail
-    "Hey Bemo, turn off the kitchen lights and remind me to pay the electricity bill at 5 pm.",  # smart home, todo
-    "Hey Bemo, send an email to my professor regarding my thesis and turn on the study room lamp.",  # mail, smart home
-    "Hey Bemo, what's the news today and open the living room blinds?",  # general questions, smart home
-    "Hey Bemo, remind me to take my medication at 9 pm and send an email to my doctor.",  # todo, mail
-    "Hey Bemo, what time is my next meeting and lock the front door.",  # general questions, smart home
-    "Hey Bemo, email my manager about the deadline extension and remind me to submit the report by noon.",  # mail, todo
-    "Hey Bemo, turn off the heater and what's today's temperature?",  # smart home, general questions
-    "Hey Bemo, remind me to call Dad at 6 pm, email him about the family gathering, and check what day it is today.",  # todo, mail, general questions
-    "Hey Bemo, set a reminder for my flight at 10 am, email my assistant the itinerary, check the weather, and turn on the porch light.",  # todo, mail, general questions, smart home
-]
 
 # TODO: This is a placeholder mapping, update with actual mappings
 switch_mapping = {
@@ -88,7 +72,9 @@ SYSTEM_PROMPTS = {
         "    - Make sure to accurately reflect the user's intent while maintaining the JSON structure.\n"
         "    - Maintain consistency with the examples and the specified JSON schema.\n"
         "    - Avoid including any unrelated or irrelevant details.\n"
-        f"    - Please note that the current date and time is {datetime.now()}\n"
+        "    - Please note that the current date and time is {current_time}\n"
+        "    - Use the current date and time to convert relative time references like 'today' or 'tomorrow' or 'in 3 hours' to specific dates.\n"
+        "    - If a day is not provided but the time is, use the current date to set the day.\n"
         "Your output should be a well-structured JSON object suitable for processing."
         "Here is the query: {prompt}"
     ),
@@ -161,8 +147,9 @@ SYSTEM_PROMPTS = {
         "    'topic': 'general'\n"
         "}}"
         "Note in the above example, the date is extracted as part of the question using the current date provided in the prompt."
-        f"Please note that the current date and time is {datetime.now()}, only use the current date and time if it is relevant to the query."
-        "Use the current date and time to convert relative time references like 'today' or 'tomorrow' or 'in 3 hours' to specific dates."
+        "Please note that the current date and time is {current_time}\n"
+        "If today is used in the query, replace it with the current date.\n"
+        "Use the current date and time to convert relative time references like 'today' or 'tomorrow' or 'in 3 hours' to specific dates.\n"
         "Your output should be a well-structured JSON object suitable for processing."
         "Here is the query: {prompt}"
         ""
