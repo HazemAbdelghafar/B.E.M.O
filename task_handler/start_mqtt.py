@@ -64,7 +64,7 @@ def on_message(client, userdata, msg):
 # Main function to start MQTT and process responses
 def main():
     # Generate a unique client ID
-    unique_client_id = f"start_mqtt_{uuid.uuid4().hex[:8]}"
+    unique_client_id = 'server'
     try:
         client = mqtt.Client(unique_client_id)  # Use the unique client ID
     except Exception as e:
