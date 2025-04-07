@@ -28,7 +28,7 @@ class GeneralQuestions(BaseMQTTHandler):
         """
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/general_questions", name="general_questions")
-        super().pub_topic = "task_handler/global"
+        super().__pub_topic = "task_handler/global"
         
         self.tavily = TavilyClient(os.getenv("TAVILY_API"))
 

@@ -25,7 +25,7 @@ class BaseMQTTHandler:
         self._result = {}  # Initialize the result variable
         
         # Set the input and output topics and the name of the MQTT client
-        self.pub_topic = SERVER_PUB_TOPIC 
+        self.__pub_topic = SERVER_PUB_TOPIC 
         self.__sub_topic = sub_topic
         self.__name = name
         self.__qos = 1  # Quality of Service level
@@ -124,8 +124,8 @@ class BaseMQTTHandler:
         if result is not {}:
             result["module_name"] = self.__name
             str_result = str(result)
-            self.client.publish(self.pub_topic, str_result, self.__qos)
-            print(f"Published result to topic '{self.pub_topic}': {str_result}")
+            self.client.publish(self.__pub_topic, str_result, self.__qos)
+            print(f"Published result to topic '{self.__pub_topic}': {str_result}")
     
     def start(self):
         """
