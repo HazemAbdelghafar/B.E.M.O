@@ -34,4 +34,11 @@ class Server(BaseMQTTHandler):
         Returns:
             dict: The result of the classification.
         """
+    
+    def authenticatiom(self, input_data: dict) -> dict:
+        """
+        # TODO
+        Authenticate the input data.
+        
+        """
         return input_data
