@@ -61,47 +61,31 @@ class TaskHandler(BaseMQTTHandler):
                 self.number_of_tasks = 0                    
         return None
 
-#  [
+# payloads = [
 #     {
-#         "topic": "task_handler/smart_home",
-#         "payload": {
-#             "method": "smart_home",
-#             "switch": ["switch_1"],
-#             "status": ["on"],
-#             "module_name": "preprocessing"
-#         },
-#         "description": "Test turning on switch_1 in smart home module"
+#         "method": "smart_home",
+#         "switch": ["switch_1"],
+#         "status": ["on"],
+#         "module_name": "preprocessing"
 #     },
 #     {
-#         "topic": "task_handler/tasks_api",
-#         "payload": {
-#             "method": "todo",
-#             "list_all_tasks": False,
-#             "object_type": "task",
-#             "action": "insert",
-#             "new_task_name": "Schedule doctor appointment",
-#             "due_date": "2025-04-07T23:00:00",
-#             "module_name": "preprocessing"
-#         },
-#         "description": "Test inserting a new task in the todo module"
+#         "method": "todo",
+#         "list_all_tasks": False,
+#         "object_type": "task",
+#         "action": "insert",
+#         "new_task_name": "Schedule doctor appointment",
+#         "due_date": "2025-04-07T23:00:00",
+#         "module_name": "preprocessing"
 #     },
 #     {
-#         "topic": "task_handler/general_questions",
-#         "payload": {
-#             "method": "general",
-#             "query": "What's the weather like on 2025-04-07?",
-#             "topic": "general",
-#             "module_name": "preprocessing"
-#         },
-#         "description": "Test querying general questions module"
+#         "method": "general",
+#         "query": "What's the weather like on 2025-04-07?",
+#         "topic": "general",
+#         "module_name": "preprocessing"
 #     },
 #     {
-#         "topic": "task_handler/learning_resources",
-#         "payload": {
-#             "topic": "Deep Learning",
-#             "specific_resources": ["Courses", "Books"],
-#         },
-#         "description": "Test learning resources module with a topic and specific resources"
+#         "topic": "Deep Learning",
+#         "specific_resources": ["Courses", "Books"]
 #     }
 # ]
 
