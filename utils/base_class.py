@@ -42,12 +42,12 @@ class BaseMQTTHandler:
 
         print(f"{self.__name} initialized successfully!")
     
-    def __call__(self, input_data: dict):
+    def __call__(self, input_data: dict | list):
         """
         Executes the main functionality of the class.
 
         Args:
-            input_data (dict): The input data to process.
+            input_data (dict | list): The input data to process.
         """
         start = time.time()  # Start the timer
         self._result = self.execute_main(input_data)
@@ -85,38 +85,38 @@ class BaseMQTTHandler:
             msg (mqtt.MQTTMessage): The message received from the broker.
         """
         input_data = msg.payload.decode()
-        input_data_dict = literal_eval(input_data)
-        print(f"Received message: {input_data_dict}")
-        self(input_data_dict)  # Call the main function with the received input data
+        input_data_eval = literal_eval(input_data)
+        print(f"Received message: {input_data_eval}")
+        self(input_data_eval)  # Call the main function with the received input data
 
-    def execute_main(self, input_data: dict) -> dict:
+    def execute_main(self, input_data: dict | list) -> dict | list:
         """
         Executes the main function of the class.
         This method should be overridden by child classes.
 
         Args:
-            input_data (dict): The input data to process.
+            input_data (dict | list): The input data to process.
 
         Returns:
-            dict: The result of the main function.
+            dict | list: The result of the main function.
         """
         raise NotImplementedError("This method should be overridden by child classes.")
     
-    def get_result(self) -> dict:
+    def get_result(self) -> dict | list:
         """
         Returns the result of the last executed main function.
 
         Returns:
-            dict: The result of the last executed main function.
+            dict | list: The result of the last executed main function.
         """
         return self._result
     
-    def publish_result_server(self, result: dict):
+    def publish_result_server(self, result: dict | list):
         """
         Publishes the result to the specified MQTT topic.
 
         Args:
-            result (dict): The result to publish.
+            result (dict | list): The result to publish.
         """
         if result is not {}:
             result["module_name"] = self.__name
@@ -124,12 +124,12 @@ class BaseMQTTHandler:
             self.client.publish(self.__pub_topic, str_result, self.__qos)
             print(f"Published result to topic '{self.__pub_topic}': {str_result}")
 
-    def publish_result_specific(self, result: dict, topic: str):
+    def publish_result_specific(self, result: dict | list, topic: str):
         """
         Publishes the result to the specified MQTT topic.
 
         Args:
-            result (dict): The result to publish.
+            result (dict | list): The result to publish.
             topic (str): The topic to publish the result to.
         """
         if result is not {}:
