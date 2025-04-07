@@ -34,7 +34,7 @@ class BaseMQTTHandler:
         try:
             self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, self.__name)
         except Exception as e:
-            self.client =  mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, self.__name)
+            self.client =  mqtt.Client(self.__name)
         
         self.client.on_message = self.__callback  # Set the on_message callback function
         self.client.on_connect = self.__on_connect  # Set the on_connect callback function
