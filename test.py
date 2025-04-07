@@ -27,16 +27,31 @@ client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, "python_publisher")
 client.connect(BROKER, 1883, 60)  # Default MQTT port is 1883, timeout is 60 seconds
 
 send = {
-        'predicted_labels': ['smart_home', 'todo', 'general'],
-        'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
+        'predicted_labels': ['general'],
+        'preprocessed_prompt': 'what is the weather like today',
         'module_name': 'task_classifier'
     }
-# send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
 send = {
-        'predicted_labels': ['others'],
-        'preprocessed_prompt': 'I Love you Bemo',
+        'predicted_labels': ['general'],
+        'preprocessed_prompt': 'what about tomorrow',
         'module_name': 'task_classifier'
     }
+# send = {
+#         'predicted_labels': ['smart_home', 'todo', 'general'],
+#         'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
+#         'module_name': 'task_classifier'
+#     }
+# send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
+# send = {
+#         'predicted_labels': ['test'],
+#         'preprocessed_prompt': 'My name is Ali and I am a software engineer. I am working on a project that involves using MQTT for communication.',
+#         'module_name': 'task_classifier'
+#     }
+# send = {
+#         'predicted_labels': ['test'],
+#         'preprocessed_prompt': 'What is my job title and what is my name?',
+#         'module_name': 'task_classifier'
+#     }
 
 client.publish(TOPIC, str(send))  # Publish the message to the defined topic
 print(f"Message published to topic {TOPIC}")
