@@ -59,7 +59,11 @@ class TasksApi(BaseMQTTHandler):
         Returns:
             dict: The result of the task operation.
         """
-        return self(input_data)
+        result = self(input_data)
+        return {
+            "method": "tasks_api",
+            "result": result,
+        }
 
     # Task Lists
     ####################################################################################################
