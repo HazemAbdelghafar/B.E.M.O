@@ -45,7 +45,7 @@ class BaseMQTTHandler:
 
         print(f"{self.__name} initialized successfully!")
     
-    def __call__(self, input_data: dict | list):
+    def __call__(self, input_data: dict | list, topic_name: str = ""):
         """
         Executes the main functionality of the class.
 
@@ -60,8 +60,11 @@ class BaseMQTTHandler:
         
         # Publish the result after execution
         if self._result:
-            self.publish_result_server(self._result)
-        
+            if topic_name:
+                self.publish_result_server(self._result)
+            else:
+                self.publish_result_specific(self._result, topic_name)
+            
     def __on_connect(self, client: mqtt.Client, userdata: any, flags: dict, rc: int):
         """
         Callback function for when the client connects to the broker.
