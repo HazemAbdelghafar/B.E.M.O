@@ -168,7 +168,7 @@ class PreProcessing(BaseMQTTHandler):
                 results.append({"method": label, "response": "", "error": str(e)})
 
             if response is None:
-                self.publish_result_server(results[-1])
+                self.publish_result(results[-1])
                 continue
 
             error = ""
@@ -196,8 +196,8 @@ class PreProcessing(BaseMQTTHandler):
             # Limit the chat history
             self.limit_chat_history(label)
             
-            # Add the response to the results   
-            self.publish_result_server(results[-1])
+            # Publish the result
+            self.publish_result(results[-1])
                             
 if __name__ == "__main__": 
     pp = PreProcessing()
