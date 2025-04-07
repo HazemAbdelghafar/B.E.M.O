@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 
 # Add the root directory of the project to sys.path at the beginning
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from utils import BaseMQTTHandler
 
 NAME = "task_handler"
@@ -108,5 +108,5 @@ class TaskHandler(BaseMQTTHandler):
 
 if __name__ == "__main__":
     print("Starting Task Handler...")
-    task_handler = TaskHandler
+    task_handler = TaskHandler()
     task_handler.start()
