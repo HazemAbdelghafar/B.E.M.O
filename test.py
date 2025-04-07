@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt  # Import the MQTT client library for Python
+import json  # Import json to handle message formatting
 
 
 test_prompts = [
@@ -18,13 +19,33 @@ test_prompts = [
 
 # Define broker address and topic
 BROKER = "localhost"  # The MQTT broker address (localhost for local testing)
-# TOPIC = "task_classifier/prompt"
-TOPIC = "preprocessing/prompt"
+TOPIC = "task_classifier/prompt"
+SUB_TOPIC = "server/main"
+# TOPIC = "preprocessing/prompt"
 
 # Create a new MQTT client instance
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, "python_publisher")
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, "server")
 # Connect the client to the broker
+
+# Add a callback function to handle messages received from the broker
+def on_message(client, userdata, message):
+    """
+    Callback function to handle messages received from the broker.
+    
+    Args:
+        client: The MQTT client instance.
+        userdata: User-defined data of any type.
+        message: The message received from the broker.
+    """
+    print(f"Received message '{message.payload.decode()}' on topic '{message.topic}'")
+    
+# Set the callback function for when a message is received
+client.on_message = on_message
+
 client.connect(BROKER, 1883, 60)  # Default MQTT port is 1883, timeout is 60 seconds
+
+# Subscribe to the topic
+client.subscribe(SUB_TOPIC, qos=1)  # Subscribe to the topic with QoS level 1
 
 send = {
         'predicted_labels': ['general'],
@@ -41,7 +62,7 @@ send = {
 #         'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
 #         'module_name': 'task_classifier'
 #     }
-# send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
+send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
 # send = {
 #         'predicted_labels': ['test'],
 #         'preprocessed_prompt': 'My name is Ali and I am a software engineer. I am working on a project that involves using MQTT for communication.',
@@ -53,8 +74,15 @@ send = {
 #         'module_name': 'task_classifier'
 #     }
 
-client.publish(TOPIC, str(send))  # Publish the message to the defined topic
+client.loop_start()  # Start the MQTT client loop
+
+# Publish the message to the defined topic
+client.publish(TOPIC, json.dumps(send))  # Use json.dumps to serialize dict properly
 print(f"Message published to topic {TOPIC}")
 
-client.disconnect()  # Disconnect the client
-print("Disconnected from the broker")
+# Optional: Keep running briefly to allow message receipt
+import time
+time.sleep(2)
+
+# client.disconnect()  # Disconnect the client
+# print("Disconnected from the broker")
