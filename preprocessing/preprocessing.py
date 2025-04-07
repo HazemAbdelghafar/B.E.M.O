@@ -16,11 +16,20 @@ from pathlib import Path
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from utils import BaseMQTTHandler, SYSTEM_PROMPTS, switch_mapping
+from utils import BaseMQTTHandler, SYSTEM_PROMPTS
 
 # Define the name of the module and the topics
 NAME = "preprocessing"
 SUB_TOPIC = "preprocessing/prompt"
+
+LIMITS = {
+    "smart_home": 3,
+    "todo": 7,
+    "mail": 7,
+    "general": 10,
+    "learning_resources": 3,
+    "other": 3,
+}
 
 class PreProcessing(BaseMQTTHandler):
     """
@@ -47,6 +56,24 @@ class PreProcessing(BaseMQTTHandler):
         self.__output_parser = JsonOutputParser()
         self.__system_prompts = self.__initialize_prompts()
         self.__chains = self.__initialize_chains()
+        self.__chat_history = self.initialize_chat_history()
+        
+    def initialize_chat_history(self) -> dict:
+        """
+        Initializes the chat history.
+        
+        Returns:
+            dict: The initialized chat history.
+        """
+        
+        # Initialize the chat history
+        chat_history = {}
+        
+        # Add the system prompts to the chat history
+        for key, value in SYSTEM_PROMPTS.items():
+            chat_history[key] = []
+        
+        return chat_history
                                         
     def __initialize_prompts(self) -> dict[str, PromptTemplate]:
         """
@@ -79,7 +106,7 @@ class PreProcessing(BaseMQTTHandler):
         # Add the language model to the prompts
         for key, value in self.__system_prompts.items():
             initialized_chains[key] = value | self.__llm
-            
+        
         return initialized_chains
     
     def clean_json(self, json_str: str) -> str:
@@ -97,6 +124,19 @@ class PreProcessing(BaseMQTTHandler):
         json_str = json_str.replace("```json", "").replace("```", "").strip()
             
         return json_str
+    
+    
+    def limit_chat_history(self, label: str) -> None:
+        """
+        Limits the chat history for a given label.
+        
+        Args:
+            label (str): The label to limit the chat history for.
+        """
+        
+        # Limit the chat history
+        if len(self.__chat_history[label]) > LIMITS[label]:
+            self.__chat_history[label] = self.__chat_history[label][-LIMITS[label]:]
                     
     
     def execute_main(self, input_data: dict) -> dict:
@@ -121,7 +161,7 @@ class PreProcessing(BaseMQTTHandler):
             print(f"Label: {label}")
             response = None
             try:
-                response = self.__chains[label].invoke({"prompt": prompt, "current_time": datetime.now()})
+                response = self.__chains[label].invoke({"prompt": prompt, "current_time": datetime.now(), "chat_history": self.__chat_history[label]})
             except Exception as e:
                 print(f"Error: {e}")
                 response = None
@@ -149,7 +189,14 @@ class PreProcessing(BaseMQTTHandler):
                         print(f"Error: {e}")
                         error += str(e) + " "
                         results.append({"method": label, "response": response.content, "error": error})
-                        
+            
+            # Add the response to the chat history
+            self.__chat_history[label].append({"human": prompt, "assistant": response.content})
+            
+            # Limit the chat history
+            self.limit_chat_history(label)
+            
+            # Add the response to the results   
             self.publish_result_server(results[-1])
                             
 if __name__ == "__main__": 
