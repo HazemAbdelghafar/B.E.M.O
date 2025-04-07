@@ -15,7 +15,6 @@ from help_functions import (
     get_current_time,
 )
 
-from pprint import pprint
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
