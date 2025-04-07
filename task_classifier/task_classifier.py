@@ -19,6 +19,7 @@ LABELS_PATH = f"{CURRENT_DIR}/models/labels.pkl"
 NAME = "task_classifier"
 SUB_TOPIC = "task_classifier/prompt"
 
+# TODO: Add learning resources
 class TaskClassifier(BaseMQTTHandler):
     """
     TaskClassifier is a class for classifying tasks based on a given prompt.
