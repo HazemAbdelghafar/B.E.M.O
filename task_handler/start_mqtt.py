@@ -65,7 +65,11 @@ def on_message(client, userdata, msg):
 def main():
     # Generate a unique client ID
     unique_client_id = f"start_mqtt_{uuid.uuid4().hex[:8]}"
-    client = mqtt.Client(unique_client_id)  # Use the unique client ID
+    try:
+        client = mqtt.Client(unique_client_id)  # Use the unique client ID
+    except Exception as e:
+        client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, unique_client_id)
+
     client.on_message = on_message
 
     # Connect to the MQTT broker
