@@ -1,6 +1,5 @@
 
 # TODO: This is a placeholder mapping, update with actual mappings
-# TODO: Check on tasks
 # TODO: Add logger
 switch_mapping = {
     "switch_1": "living room lights",
@@ -19,7 +18,7 @@ user_data = {
 }
 
 # TODO: Add learning resources to the prompts
-SYSTEM_PROMPTS = {
+POST_SYSTEM_PROMPTS = {
     "todo": (
         "You are an LLM that processes to-do list queries.\n"
         "Your task is to extract relevant task management details from the user query and organize them into a JSON object that follows a specific structure.\n"
@@ -244,60 +243,69 @@ SYSTEM_PROMPTS = {
     ),
 }
 
+# TODO: Should Be divided into multiple prompts
+# TODO: Should combine multiple tasks into one
+PRE_SYSTEM_PROMPT = (
+    """
+Generate a fun and conversational response to be said by the TTS system.
+Your task is to preprocess the result of a performed task into a natural, engaging response.
+You are not performing the task; this is only for creating a response based on the given input.
 
+Parameters:
+- Result: {task_result}
+    - The outcome of the task. This can be:
+        - A boolean (`True` or `False`) indicating success or failure.
+        - A number that should be mentioned naturally in the response.
+        - A string representing the outcome, rephrased for clarity and conversational tone.
+        - A dictionary with specific details about the result.
+        - A list of items or results that should be mentioned in the response.
+
+- User Query: {user_query}
+    - The user's original request, providing context for the task.
+
+- Task: {task_name}
+    - One of the following types:
+        - "rapid questions": The user asks BEMO a general knowledge or factual question.
+        - "smart home": The user controls smart home appliances through BEMO.
+        - "todo": The user adds or manages tasks in their Google Todo list.
+        - "mail": The user sends, receives, or organizes emails using Gmail.
+        - "learning resources": The user searches for educational resources about a specific topic.
+
+Guidelines:
+    - Ensure the response is conversational, concise, and engaging.
+    - Do not repeat the input details explicitly; craft the response naturally.
+    - Avoid using asterisks, emojis, or overly lengthy explanations.
+    - Do not include any personal or sensitive information in the response.
+    - No Emojies or special characters
+    - If you think that the result is wrong, do not correct it. Just reflect the result in the response.
+    - Do not attempt to correct blatantly wrong results or perform the task. Simply reflect the given result in the response.
+    - Make sure the tone aligns with BEMO's friendly and interactive personality.
+    - Focus on delivering a short and lighthearted message that reflects the result, unless the result is lengthy or complex.
+    - Never mention any IDs, timestamps, or technical details from the task result.
+
+Your output should be a single, concise, and natural string for BEMO's TTS system.
 """
-TODO: Modify Prompts based on these outputs
+)
 
-preprocessing initialized successfully!
-Prompt: play some relaxing music then schedule a doctor appointment and whats the weather like tomorrow
-Labels: ['smart_home', 'todo', 'general']
-Label: smart_home
-Published result to topic 'server/main': {'method': 'smart home', 'switch': [], 'status': [], 'module_name': 'preprocessing'}
-Label: todo
-Published result to topic 'server/main': {'method': 'todo', 'list_all_tasks': False, 'object_type': 'task', 'action': 'insert', 'new_task_name': 'Schedule doctor appointment', 'module_name': 'preprocessing'}
-Label: general
-Published result to topic 'server/main': {'method': 'rapid questions', 'query': "What's the weather like tomorrow?", 'topic': 'general', 'module_name': 'preprocessing'}
-[{'method': 'smart home',
-  'module_name': 'preprocessing',
-  'status': [],
-  'switch': []},
- {'action': 'insert',
-  'list_all_tasks': False,
-  'method': 'todo',
-  'module_name': 'preprocessing',
-  'new_task_name': 'Schedule doctor appointment',
-  'object_type': 'task'},
- {'method': 'rapid questions',
-  'module_name': 'preprocessing',
-  'query': "What's the weather like tomorrow?",
-  'topic': 'general'}]
-
-"""
-
-"""
-Results:
-
-test = {
-    'predicted_labels': ['smart_home', 'todo', 'general'],
-    'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like tomorrow',
-    'module_name': 'task_classifier'
-}
-
-
-[{'method': 'smart_home',
-  'module_name': 'preprocessing',
-  'status': ['on'],
-  'switch': ['switch_1']},
- {'action': 'insert',
-  'due_date': '2025-02-25T23:00:00',
-  'list_all_tasks': False,
-  'method': 'todo',
-  'module_name': 'preprocessing',
-  'new_task_name': 'Schedule doctor appointment',
-  'object_type': 'task'},
- {'method': 'general',
-  'module_name': 'preprocessing',
-  'query': "What's the weather like tomorrow?",
-  'topic': 'general'}]
-
-"""
+ERROR_RESPONSES = [
+    "Hmm, something went wrong there. Want to try again?",
+    "Oops! That didn't go as planned. Let's give it another shot.",
+    "Uh-oh, looks like I ran into a hiccup. Can you check that for me?",
+    "Sorry, I couldn't handle that request. Maybe try rephrasing it?",
+    "Yikes, I hit a snag. Let's see if we can fix it together.",
+    "Oh no, that didn't work. How about trying again?",
+    "Hmm, I couldn't get that done. Maybe double-check the details?",
+    "Looks like I need a little help with this one. Care to try again?",
+    "Something didn't click on my end. Let's take another crack at it.",
+    "Whoops! I missed the mark. Mind giving it another go?",
+    "Sorry about that! I'm here if you want to try once more.",
+    "That didn't work out. Let's reset and try again.",
+    "Oops, I fumbled that one. Can you give me another chance?",
+    "Hmm, I hit a roadblock. Let's try something different.",
+    "Looks like something went sideways. Let's figure it out together.",
+    "Sorry, I stumbled there. Want to have another go?",
+    "Oh no, I couldn't complete that. Let me know how I can help.",
+    "Oops, I got stuck. Want to check and try again?",
+    "Hmm, that's on me. How about we try a different approach?",
+    "Something didn't work out. Let's retry and get it right!"
+]
