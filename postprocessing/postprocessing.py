@@ -53,7 +53,7 @@ class PostProcessing(BaseMQTTHandler):
         )
         self.prompts = self._init_prompt()
         self.chain = self._init_chain()
-        self.tasks = [key for key in POST_SYSTEM_PROMPT.keys()] # Todo Make it Post
+        self.tasks = [key for key in POST_SYSTEM_PROMPT.keys()]
         logger.info("PostProcessing initialized successfully.")
 
     def _init_prompt(self) -> dict:
