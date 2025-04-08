@@ -13,7 +13,7 @@ class TaskHandler(BaseMQTTHandler):
         Initialize the TaskHandler object.
         """
         super().__init__(sub_topic=SUB_TOPIC, name=NAME)
-        self.__pub_topic = ""
+        self.__pub_topic = "server/main"
         self.results = []
         self.number_of_tasks = 0
         
@@ -39,18 +39,18 @@ class TaskHandler(BaseMQTTHandler):
                 if not method:
                     continue
                 if method == "smart_home":
-                    self.__pub_topic = "task_handler/smart_home"
+                    topic = "task_handler/smart_home"
                 elif method == "todo":
-                    self.__pub_topic = "task_handler/tasks_api"
+                    topic = "task_handler/tasks_api"
                 elif method == "general":
-                    self.__pub_topic = "task_handler/general_questions"
+                    topic = "task_handler/general_questions"
                 elif method == "learning_resources":
-                    self.__pub_topic = "task_handler/learning_resources"
+                    topic = "task_handler/learning_resources"
                 else:
                     return {"status": "error", "message": f"Unknown method: {method}"}
                 # Publish the input data to the appropriate topic
-                self.publish_result(item)
-                print(f"Published to {self.__pub_topic}: {item}")
+                self.publish_result(item, topic)
+                print(f"Published to {topic}: {item}")
         else:
             # if input data is not a list, process it as dictionary
             print(f"Processing single task")
