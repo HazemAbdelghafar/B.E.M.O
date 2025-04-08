@@ -40,7 +40,6 @@ class SmartHomeAutomation(BaseMQTTHandler):
 
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/smart_home", name="smart_home")
-        self.__pub_topic = "task_handler/global"
         
 
     def control_device(self, switch_id, status):
@@ -85,10 +84,9 @@ class SmartHomeAutomation(BaseMQTTHandler):
             success = self.control_device(switch, status)
             results.append({"switch": switch, "status": status, "success": success})
 
-        return {
-            "method": "smart_home",
-            "results": results
-        }
+        self.publish_result({"results": results}, "task_handler/global")
+        
+        return None
 
 if __name__ == "__main__":
     # Example usage

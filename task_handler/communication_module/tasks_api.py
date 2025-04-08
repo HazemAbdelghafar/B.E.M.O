@@ -43,7 +43,6 @@ class TasksApi(BaseMQTTHandler):
         """
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/tasks_api", name="tasks_api")
-        self.__pub_topic = "task_handler/global"
 
         self._creds = init_user_google(user_id)
         self._service = build("tasks", "v1", credentials=self._creds)
@@ -60,11 +59,12 @@ class TasksApi(BaseMQTTHandler):
             dict: The result of the task operation.
         """
         result = self(input_data)
-        return {
-            "method": "tasks_api",
-            "result": result,
-        }
 
+        self.publish_result(result, "task_handler/global")
+        
+        return None
+
+        
     # Task Lists
     ####################################################################################################
 

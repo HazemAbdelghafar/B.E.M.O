@@ -54,7 +54,6 @@ class FindLearningResources(BaseMQTTHandler):
         """
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/learning_resources", name="learning_resources")
-        self.__pub_topic = "task_handler/global"
 
         # Set the parameters for the class
         self.use_llm = use_llm
@@ -274,10 +273,12 @@ class FindLearningResources(BaseMQTTHandler):
             return
         specific_resources = input_data.get("specific_resources", [])
         result = self.find_resources(topic, specific_resources)
-        return {
-            "method": "learning_resources",
-            "result": result,
-        }
+        
+        self.publish_result(result, "task_handler/global")
+        
+        return None
+
+        
 
     def _init_prompt(self) -> ChatPromptTemplate:
         """

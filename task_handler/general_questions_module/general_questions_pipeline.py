@@ -86,12 +86,8 @@ class GeneralQuestions(BaseMQTTHandler):
             "topic": topic,
             "time": round(time.time() - start_time, 2),
         }
-        response = {
-            "method": "general_questions",
-            "result": result,
-        }
         
-        self.publish_result(response, "task_handler/global")
+        self.publish_result(result, "task_handler/global")
         
         return None
 
