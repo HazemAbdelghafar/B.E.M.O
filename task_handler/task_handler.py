@@ -29,6 +29,7 @@ class TaskHandler(BaseMQTTHandler):
         # Check if input_data is a list
         if isinstance(input_data, list):
             self.number_of_tasks = len(input_data)
+            print(f"Number of tasks: {self.number_of_tasks}")
             
             # Iterate through each item in the list
             for item in input_data:
@@ -50,6 +51,7 @@ class TaskHandler(BaseMQTTHandler):
                 print(f"Published to {self.__pub_topic}: {item}")
         else:
             # if input data is not a list, process it as dictionary
+            print(f"Processing single task")
             self.results.append(input_data)
              
             # If all tasks are completed, publish the results
