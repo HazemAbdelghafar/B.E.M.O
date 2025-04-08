@@ -11,11 +11,19 @@ from datetime import datetime
 
 import sys
 from pathlib import Path
+import logging
 
 
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from utils import BaseMQTTHandler, POST_SYSTEM_PROMPTS
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
 
 # Define the name of the module and the topics
 NAME = "preprocessing"
@@ -157,12 +165,12 @@ class PreProcessing(BaseMQTTHandler):
         results = []
         
         for label in labels:
-            print(f"Label: {label}")
+            logger.info(f"Label: {label}")
             response = None
             try:
                 response = self.__chains[label].invoke({"prompt": prompt, "current_time": datetime.now(), "chat_history": self.__chat_history[label]})
             except Exception as e:
-                print(f"Error: {e}")
+                logger.error(f"Error: {e}")
                 response = None
                 results.append({"method": label, "response": "", "error": str(e)})
 
@@ -174,18 +182,18 @@ class PreProcessing(BaseMQTTHandler):
             try: 
                 results.append(self.__output_parser.parse(response.content))
             except Exception as e:
-                print(f"Error: {e}")
+                logger.error(f"Error: {e}")
                 error += str(e) + " "
                 cleaned_json = self.clean_json(response.content)
                 try:
                     results.append(literal_eval(cleaned_json))
                 except Exception as e:
-                    print(f"Error: {e}")
+                    logger.error(f"Error: {e}")
                     error += str(e) + " "
                     try:
                         results.append(json.loads(cleaned_json))
                     except Exception as e:
-                        print(f"Error: {e}")
+                        logger.error(f"Error: {e}")
                         error += str(e) + " "
                         results.append({"method": label, "response": response.content, "error": error})
             

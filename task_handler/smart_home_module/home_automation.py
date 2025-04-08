@@ -9,6 +9,14 @@ load_dotenv()
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from utils import BaseMQTTHandler
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
 
 DEFAULT_PATH = os.path.dirname(__file__)
 
@@ -60,7 +68,7 @@ class SmartHomeAutomation(BaseMQTTHandler):
             )
             return result.get("success", False)
         except Exception as e:
-            print(f"Error controlling device: {e}")
+            logger.infor.info(f"Error controlling device: {e}")
             return False
 
     def execute_main(self, input_data: dict) -> dict:

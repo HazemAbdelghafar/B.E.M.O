@@ -2,6 +2,14 @@ import paho.mqtt.client as mqtt
 import time
 from ast import literal_eval
 import json
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
 
 class BaseMQTTHandler:
     """
@@ -43,7 +51,7 @@ class BaseMQTTHandler:
         
         self.client.subscribe(self.__sub_topic, self.__qos) # Subscribe to the input topic
 
-        print(f"{self.__name} initialized successfully!")
+        logger.info(f"{self.__name} initialized successfully!")
     
     def __built_in_run(self, input_data: dict | list):
         """
@@ -56,7 +64,7 @@ class BaseMQTTHandler:
         self._result = self.execute_main(input_data)
         end = time.time()  # End the timer
         
-        print(f"Execution time for {self.__name}: {end - start} seconds")
+        logger.info(f"Execution time for {self.__name}: {end - start} seconds")
         
         # Publish the result after execution
         if self._result:
@@ -73,9 +81,9 @@ class BaseMQTTHandler:
             rc (int): The connection result code.
         """
         if rc == 0:
-            print("Connected to broker!")
+            logger.info("Connected to broker!")
         else:
-            print(f"Failed to connect, return code {rc}")
+            logger.error(f"Failed to connect, return code {rc}")
     
     def __callback(self, client: mqtt.Client, userdata: any, msg: mqtt.MQTTMessage):
         """
@@ -92,7 +100,7 @@ class BaseMQTTHandler:
         except:
             input_data_parsed = json.loads(input_data)
             
-        print(f"Received message: {input_data_parsed}")
+        logger.info(f"Received message: {input_data_parsed}")
         self.__built_in_run(input_data_parsed)  # Call the main function with the received input data
 
     def execute_main(self, input_data: dict | list) -> dict | list:
@@ -131,7 +139,7 @@ class BaseMQTTHandler:
             result["module_name"] = self.__name
             str_result = str(result)
             self.client.publish(topic, str_result, self.__qos)
-            print(f"Published result to topic '{topic}': {str_result}")
+            logger.info(f"Published result to topic '{topic}': {str_result}")
     
     def start(self):
         """

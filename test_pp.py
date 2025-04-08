@@ -1,6 +1,15 @@
 import paho.mqtt.client as mqtt
 import json
 from ast import literal_eval
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
+
 
 send = {
         'predicted_labels': ['general'],
@@ -58,21 +67,21 @@ class GlobalMQTTHandler:
         self.client.connect(BROKER, PORT, 60)
         self.client.subscribe(self.__sub_topic, self.__qos)
 
-        print(f"[{self.__name}] Connected and listening to '{self.__sub_topic}'")
+        logger.info(f"[{self.__name}] Connected and listening to '{self.__sub_topic}'")
 
     def __on_connect(self, client, userdata, flags, rc):
         if rc == 0:
-            print(f"[{self.__name}] Successfully connected to broker.")
+            logger.info(f"[{self.__name}] Successfully connected to broker.")
         else:
-            print(f"[{self.__name}] Connection failed with code {rc}.")
+            logger.error(f"[{self.__name}] Connection failed with code {rc}.")
 
     def __callback(self, client, userdata, msg):
         input_data = msg.payload.decode()
         try:
             input_data_eval = literal_eval(input_data)
-            print(f"[{self.__name}] Received message: {input_data_eval}")
+            logger.info(f"[{self.__name}] Received message: {input_data_eval}")
         except Exception as e:
-            print(f"[{self.__name}] Error processing message: {e}")
+            logger.error(f"[{self.__name}] Error processing message: {e}")
 
     def execute_main(self, input_data: dict | list) -> list:
         """
@@ -84,12 +93,12 @@ class GlobalMQTTHandler:
         if result:
             payload = json.dumps(result)
             self.client.publish(self.__pub_topic, payload, self.__qos)
-            print(f"[{self.__name}] Published to '{self.__pub_topic}': {payload}")
+            logger.info(f"[{self.__name}] Published to '{self.__pub_topic}': {payload}")
 
     def start(self):
         self._result = self.execute_main({})
         self.publish_result(self._result)
-        print(f"[{self.__name}] MQTT loop started.")
+        logger.info(f"[{self.__name}] MQTT loop started.")
         self.client.loop_forever()
 
 if __name__ == "__main__":

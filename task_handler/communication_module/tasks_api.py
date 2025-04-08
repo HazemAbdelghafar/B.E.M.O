@@ -14,11 +14,19 @@ from helper_functions import (
     date_and_time_to_datetime,
     get_current_time,
 )
+import logging
 
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from utils import BaseMQTTHandler
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
 
 DEFAULT_NOTE = "\n\nB.E.M.O"
 DEFAULT_PATH = os.path.dirname(__file__)
@@ -109,7 +117,7 @@ class TasksApi(BaseMQTTHandler):
 
             return return_list
         except HttpError as err:
-            print(err)
+            logger.error(err)
             return None
 
     # Task Lists (Get)
@@ -128,7 +136,7 @@ class TasksApi(BaseMQTTHandler):
         try:
             return self._service.tasklists().get(tasklist=task_list_id).execute()
         except HttpError as err:
-            print(err)
+            logger.error(err)
             return None
 
     def get_task_lists_by_name(self, name: str) -> list:
@@ -182,7 +190,7 @@ class TasksApi(BaseMQTTHandler):
             self._service.tasklists().delete(tasklist=task_list_id).execute()
             return True
         except HttpError as err:
-            print(err)
+            logger.error(err)
             return False
 
     def delete_task_lists_by_name(self, name: str) -> bool:
@@ -242,7 +250,7 @@ class TasksApi(BaseMQTTHandler):
             }
 
         except HttpError as err:
-            print(err)
+            logger.infor.info(err)
             return None
 
     # Task Lists (Update)
@@ -281,7 +289,7 @@ class TasksApi(BaseMQTTHandler):
             }
 
         except HttpError as err:
-            print(err)
+            logger.error(err)
             return None
 
     def update_task_lists_by_name(self, old_name: str, new_name: str) -> list:
@@ -359,7 +367,7 @@ class TasksApi(BaseMQTTHandler):
                 .execute()
             )
         except HttpError as err:
-            print(err)
+            logger.error(err)
             return None
 
     def list_tasks_by_task_list_name(
@@ -595,7 +603,7 @@ class TasksApi(BaseMQTTHandler):
                 self._service.tasks().get(tasklist=task_list_id, task=task_id).execute()
             )
         except HttpError as err:
-            print(err)
+            logger.error(err)
             return None
 
     def get_tasks_by_name(self, task_name: str) -> list:
@@ -641,7 +649,7 @@ class TasksApi(BaseMQTTHandler):
             self._service.tasks().delete(tasklist=task_list_id, task=task_id).execute()
             return True
         except HttpError as err:
-            print(err)
+            logger.error(err)
             return False
 
     def delete_tasks_by_name(self, task_name: str) -> bool:
@@ -732,7 +740,7 @@ class TasksApi(BaseMQTTHandler):
             }
 
         except HttpError as err:
-            print(err)
+            logger.error(err)
             return None
 
     def insert_task_by_list_name_parent_name(
@@ -844,7 +852,7 @@ class TasksApi(BaseMQTTHandler):
             ).execute()
             return True
         except HttpError as err:
-            print(err)
+            logger.error(err)
             return False
 
     # Tasks (Update)
@@ -937,7 +945,7 @@ class TasksApi(BaseMQTTHandler):
             }
 
         except HttpError as err:
-            print(err)
+            logger.infor.info(err)
             return None
 
     def update_task_by_list_name_task_name(

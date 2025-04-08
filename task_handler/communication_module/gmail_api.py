@@ -19,10 +19,18 @@ from helper_functions import hex_to_color_name, color_name_to_hex
 
 import sys
 from pathlib import Path
+import logging
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from utils import BaseMQTTHandler
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
 
 
 DEFAULT_NOTE = "\n\nSent or Modified by B.E.M.O"
@@ -84,7 +92,7 @@ class GmailAPI(BaseMQTTHandler):
         try:
             return self._service.users().getProfile(userId="me").execute()
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def _get_user_history_id(self) -> int:
@@ -187,7 +195,7 @@ class GmailAPI(BaseMQTTHandler):
                 .execute()
             )
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def list_drafts_content(
@@ -245,7 +253,7 @@ class GmailAPI(BaseMQTTHandler):
                 .execute()
             )
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def _get_draft_content(self, draft_id: str) -> list:
@@ -269,7 +277,7 @@ class GmailAPI(BaseMQTTHandler):
             return drafts
 
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def get_draft_content_by_subjects(self, subjects: list) -> list:
@@ -498,7 +506,7 @@ class GmailAPI(BaseMQTTHandler):
             self._service.users().drafts().delete(userId="me", id=draft_id).execute()
             return True
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return False
 
     def delete_all_drafts(self) -> bool:
@@ -736,7 +744,7 @@ class GmailAPI(BaseMQTTHandler):
             self._service.users().drafts().send(userId="me", body=draft).execute()
             return True
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return False
 
     def send_all_drafts(self) -> bool:
@@ -1036,7 +1044,7 @@ class GmailAPI(BaseMQTTHandler):
             return draft_id
 
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def create_drafts(
@@ -1295,7 +1303,7 @@ class GmailAPI(BaseMQTTHandler):
                         "</body>", f"<p>{DEFAULT_NOTE}</p></body>"
                     )
                 except:
-                    print("No HTML content found. Using plain text content.")
+                    logger.error("No HTML content found. Using plain text content.")
                     content = draft["content"] + DEFAULT_NOTE
 
         if add_labels == []:
@@ -1379,7 +1387,7 @@ class GmailAPI(BaseMQTTHandler):
 
             return draft_id
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.errorr(f"An error occurred: {e}")
             return None
 
     def _update_drafts_by_id(
@@ -1547,7 +1555,7 @@ class GmailAPI(BaseMQTTHandler):
         try:
             return self._service.users().labels().list(userId="me").execute()
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def list_labels_content(self, type="all") -> list:
@@ -1622,7 +1630,7 @@ class GmailAPI(BaseMQTTHandler):
                 self._service.users().labels().get(userId="me", id=label_id).execute()
             )
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def _get_label_by_name_raw(self, label_name: str) -> dict:
@@ -1735,7 +1743,7 @@ class GmailAPI(BaseMQTTHandler):
             self._service.users().labels().delete(userId="me", id=label_id).execute()
             return True
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return False
 
     def delete_all_labels(self) -> bool:
@@ -1843,7 +1851,7 @@ class GmailAPI(BaseMQTTHandler):
                 .execute()["id"]
             )
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def create_labels(
@@ -1954,7 +1962,7 @@ class GmailAPI(BaseMQTTHandler):
                 .execute()["id"]
             )
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def _update_labels_by_id(
@@ -2089,7 +2097,7 @@ class GmailAPI(BaseMQTTHandler):
                 .execute()["resultSizeEstimate"]
             )
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def count_by_label_name(self, label_name: str) -> int:
@@ -2287,7 +2295,7 @@ class GmailAPI(BaseMQTTHandler):
                 .execute()
             )
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     # Thread
@@ -2313,7 +2321,7 @@ class GmailAPI(BaseMQTTHandler):
                 .execute()
             )
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     # Message
@@ -2354,7 +2362,7 @@ class GmailAPI(BaseMQTTHandler):
                 .execute()
             )
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def list_messages_content(
@@ -2422,7 +2430,7 @@ class GmailAPI(BaseMQTTHandler):
                 .execute()
             )
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
     def _get_message_content_by_thread_id(self, thread_id: str) -> list:
@@ -2881,7 +2889,7 @@ class GmailAPI(BaseMQTTHandler):
             self._service.users().messages().trash(userId="me", id=message_id).execute()
             return True
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return False
 
     def delete_all_messages(self) -> bool:
@@ -3166,7 +3174,7 @@ class GmailAPI(BaseMQTTHandler):
                 },
             ).execute()
         except HttpError as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
             return None
 
         return message_ids
@@ -3463,68 +3471,68 @@ if __name__ == "__main__":
 
     gmail_api = GmailAPI("1")
 
-    print("USER:")
-    print()
+    logger.info("USER:")
+    logger.info()
 
-    print(f"Email: {gmail_api.get_user_email_address()}")
-    print(f"Total emails: {gmail_api.get_user_total_emails()}")
-    print(f"Total threads: {gmail_api.get_user_total_threads()}")
+    logger.info(f"Email: {gmail_api.get_user_email_address()}")
+    logger.info(f"Total emails: {gmail_api.get_user_total_emails()}")
+    logger.info(f"Total threads: {gmail_api.get_user_total_threads()}")
 
-    print("-" * 100)
+    logger.info("-" * 100)
 
-    print("DRAFTS:")
-    print()
+    logger.info("DRAFTS:")
+    logger.info()
 
     drafts = gmail_api.list_drafts_content()
     with open(DEFAULT_PATH + "/test/drafts.json", "w") as f:
         json.dump(drafts, f, indent=4)
-    print(f"Drafts saved to {DEFAULT_PATH + '/test/drafts.json'}")
+    logger.info(f"Drafts saved to {DEFAULT_PATH + '/test/drafts.json'}")
 
-    # print("Get Draft by:")
+    # logger.info("Get Draft by:")
 
-    # print("Subject:")
+    # logger.info("Subject:")
     # drafts = gmail_api.get_draft_content_by_subjects(["hi 1"])
     # if drafts:
     #     for draft in drafts:
-    #         print(draft["id"])
+    #         logger.info(draft["id"])
     # else:
-    #     print("No drafts found")
+    #     logger.error("No drafts found")
 
-    # print("Recipients:")
+    # logger.info("Recipients:")
     # drafts = gmail_api.get_draft_content_by_recipients(
     #     ["zomAboss23@gmail.com", "begadtAmim.a@gmail.com"]
     # )
     # if drafts:
     #     for draft in drafts:
-    #         print(draft["id"])
+    #         logger.info(draft["id"])
     # else:
-    #     print("No drafts found")
+    #     logger.error("No drafts found")
 
-    # print("Attachment:")
-    # drafts = gmail_api.get_draft_content_by_attachment_names(["3D prInting Sheet"])
+    # logger.info("Attachment:")
+    # drafts = gmail_api.get_draft_content_by_attachment_names(["3D logger.infoing Sheet"])
     # if drafts:
     #     for draft in drafts:
-    #         print(draft["id"])
+    #         logger.info(draft["id"])
     # else:
-    #     print("No drafts found")
+    #     logger.error("No drafts found")
 
-    # print("Attachment:")
+    # logger.info("Attachment:")
     # drafts = gmail_api.get_draft_by_has_attachment()
     # if drafts:
     #     for draft in drafts:
-    #         print(draft["id"])
+    #         logger.info(draft["id"])
     # else:
-    #     print("No drafts found")
+    #     logger.error("No drafts found")
 
-    # print("Labels:")
+    # logger.info("Labels:")
     # drafts = gmail_api.get_drafts_by_labels(["Test LABEL 1"])
     # if drafts:
     #     for draft in drafts:
-    #         print(draft["id"])
+    #         logger.info(draft["id"])
     # else:
-    #     print("No drafts found")
+    #     logger.error("No drafts found")
 
-    # print("Drafts by Multiple:")
+    # logger.info("Drafts by Multiple:")
     # drafts = gmail_api.get_drafts_by_multiple(
     #     subjects=["hi 1"],
     #     # recipients=["zomAboss23@gmail.com", "begadtAmim.a@gmail.com"],
@@ -3535,24 +3543,24 @@ if __name__ == "__main__":
 
     # if drafts:
     #     for draft in drafts:
-    #         print(draft["id"])
+    #         logger.info(draft["id"])
     # else:
-    #     print("No drafts found")
+    #     logger.error("No drafts found")
 
-    # print("Delete Drafts by:")
-    # print("Subject:")
-    # print(gmail_api.delete_drafts_by_subjects(["hi"]))
-    # print("Recipients:")
-    # print(gmail_api.delete_drafts_by_recipients(["ZomAboss23@gmail.com"]))
-    # print("Attachment:")
-    # print(gmail_api.delete_drafts_by_attachment_names(["3D prInting Sheet"]))
-    # print("Attachment:")
-    # print(gmail_api.delete_drafts_by_has_attachment())
-    # print("Labels:")
-    # print(gmail_api.delete_drafts_by_labels(["Test LABEL 1"]))
+    # logger.info("Delete Drafts by:")
+    # logger.info("Subject:")
+    # logger.info(gmail_api.delete_drafts_by_subjects(["hi"]))
+    # logger.info("Recipients:")
+    # logger.info(gmail_api.delete_drafts_by_recipients(["ZomAboss23@gmail.com"]))
+    # logger.info("Attachment:")
+    # logger.info(gmail_api.delete_drafts_by_attachment_names(["3D prInting Sheet"]))
+    # logger.info("Attachment:")
+    # logger.info(gmail_api.delete_drafts_by_has_attachment())
+    # logger.info("Labels:")
+    # logger.info(gmail_api.delete_drafts_by_labels(["Test LABEL 1"]))
 
-    # print("Drafts by Multiple:")
-    # print(
+    # logger.info("Drafts by Multiple:")
+    # logger.info(
     #     gmail_api.delete_drafts_by_multiple(
     #         subjects=["test 1"],
     #         recipients=["ZomAboss23@gmail.com"],
@@ -3561,21 +3569,21 @@ if __name__ == "__main__":
     #     )
     # )
 
-    # print("Delete all drafts:")
-    # print(gmail_api.delete_all_drafts())
+    # logger.info("Delete all drafts:")
+    # logger.info(gmail_api.delete_all_drafts())
 
-    # print("Send Drafts by:")
-    # print("Subject:")
-    # print(gmail_api.send_drafts_by_subjects(["hi 1"]))
-    # print("Recipients:")
-    # print(gmail_api.send_drafts_by_recipients(["begadtAmim.a@gmail.coM"]))
-    # print("Attachment:")
-    # print(gmail_api.send_drafts_by_attachment_names(["3D prInting Sheet"]))
-    # print("Attachment:")
-    # print(gmail_api.send_drafts_by_has_attachment())
+    # logger.info("Send Drafts by:")
+    # logger.info("Subject:")
+    # logger.info(gmail_api.send_drafts_by_subjects(["hi 1"]))
+    # logger.info("Recipients:")
+    # logger.info(gmail_api.send_drafts_by_recipients(["begadtAmim.a@gmail.coM"]))
+    # logger.info("Attachment:")
+    # logger.info(gmail_api.send_drafts_by_attachment_names(["3D prInting Sheet"]))
+    # logger.info("Attachment:")
+    # logger.info(gmail_api.send_drafts_by_has_attachment())
 
-    # print("Drafts by Multiple:")
-    # print(
+    # logger.info("Drafts by Multiple:")
+    # logger.info(
     #     gmail_api.send_drafts_by_multiple(
     #         subjects=["test 1"],
     #         recipients=["ZomAboss23@gmail.com"],
@@ -3584,18 +3592,18 @@ if __name__ == "__main__":
     #     )
     # )
 
-    # print("Send all drafts:")
-    # print(gmail_api.send_all_drafts())
+    # logger.info("Send all drafts:")
+    # logger.info(gmail_api.send_all_drafts())
 
-    # print("Create Draft:")
-    # print(
+    # logger.info("Create Draft:")
+    # logger.info(
     #     gmail_api.create_drafts(
     #         subjects=["Test 1"],
     #         contents=["Hello"],
     #         labels=[["Test LABEL 1"]],
     #     )
     # )
-    # print(
+    # logger.info(
     #     gmail_api.create_send_draft(
     #         subject="Hi Foad",
     #         content="Hello Foad",
@@ -3603,9 +3611,9 @@ if __name__ == "__main__":
     #     )
     # )
 
-    # print("Update Draft:")
-    # print("By Subjects:")
-    # print(
+    # logger.info("Update Draft:")
+    # logger.info("By Subjects:")
+    # logger.info(
     #     gmail_api.update_drafts_by_subjects(
     #         ["Test 1"],
     #         new_subject="Test 2",
@@ -3613,8 +3621,8 @@ if __name__ == "__main__":
     #     )
     # )
 
-    # print("By Recipients:")
-    # print(
+    # logger.info("By Recipients:")
+    # logger.info(
     #     gmail_api.update_drafts_by_recipients(
     #         ["begadtAmim.a@gmail.coM"],
     #         new_subject="Test 2",
@@ -3622,10 +3630,10 @@ if __name__ == "__main__":
     #     )
     # )
 
-    print("-" * 100)
+    logger.info("-" * 100)
 
-    print("LABELS:")
-    print()
+    logger.info("LABELS:")
+    logger.info()
 
     labels = gmail_api.list_labels_content(type="all")
     label_id = labels[-1]["id"]
@@ -3634,25 +3642,25 @@ if __name__ == "__main__":
     with open(DEFAULT_PATH + "/test/labels.json", "w") as f:
         json.dump(labels, f, indent=4)
 
-    print(f"Labels saved to {DEFAULT_PATH + '/test/labels.json'}")
+    logger.info(f"Labels saved to {DEFAULT_PATH + '/test/labels.json'}")
 
-    # print("Label by Name:")
+    # logger.info("Label by Name:")
     # pprint(gmail_api.get_labels_by_name(label_name))
 
-    # print("Delete all labels:")
-    # print(gmail_api.delete_all_labels())
+    # logger.info("Delete all labels:")
+    # logger.info(gmail_api.delete_all_labels())
 
-    # print("Delete labels by name:")
-    # print(gmail_api.delete_labels_by_name([label_name]))
+    # logger.info("Delete labels by name:")
+    # logger.info(gmail_api.delete_labels_by_name([label_name]))
 
-    # print("Create Label:")
-    # print(
+    # logger.info("Create Label:")
+    # logger.info(
     #     gmail_api.create_label(
     #         label_name="Test Label 1", background_color="red", text_color="black"
     #     )
     # )
 
-    # print(
+    # logger.info(
     #     gmail_api.create_label(
     #         label_name="Test Label 2",
     #         parent_label_name="Test Label 1",
@@ -3661,8 +3669,8 @@ if __name__ == "__main__":
     #     )
     # )
 
-    # print("Update Label:")
-    # print(
+    # logger.info("Update Label:")
+    # logger.info(
     #     gmail_api.update_labels_by_name(
     #         label_names=["Test LabEl 3"],
     #         new_background_colors=["Yellow"],
@@ -3670,16 +3678,16 @@ if __name__ == "__main__":
     #     )
     # )
 
-    # print("Count by Label:")
-    # print("Inbox:")
-    # print(gmail_api.count_by_label_inbox())
-    # print("Drafts:")
-    # print(gmail_api.count_by_label_draft())
+    # logger.info("Count by Label:")
+    # logger.info("Inbox:")
+    # logger.info(gmail_api.count_by_label_inbox())
+    # logger.info("Drafts:")
+    # logger.info(gmail_api.count_by_label_draft())
 
-    print("-" * 100)
+    logger.info("-" * 100)
 
-    print("MESSAGES:")
-    print()
+    logger.info("MESSAGES:")
+    logger.info()
 
     messages = gmail_api.list_messages_content(max_results=5)
     message_id = messages[-1]["id"]
@@ -3687,143 +3695,143 @@ if __name__ == "__main__":
 
     with open(DEFAULT_PATH + "/test/messages.json", "w") as f:
         json.dump(messages, f, indent=4)
-    print(f"Messages saved to {DEFAULT_PATH + '/test/messages.json'}")
+    logger.info(f"Messages saved to {DEFAULT_PATH + '/test/messages.json'}")
 
-    # print("Get Message by:")
-    # print("Subject:")
+    # logger.info("Get Message by:")
+    # logger.info("Subject:")
     # messages = gmail_api.get_message_content_by_subjects(["WeLcome to Airtm!"])
     # if messages:
     #     for message in messages:
-    #         print(message["id"])
+    #         logger.info(message["id"])
     # else:
-    #     print("No messages found")
+    #     logger.error("No messages found")
 
-    # print("Recipients:")
+    # logger.info("Recipients:")
     # messages = gmail_api.get_message_content_by_recipients(
     #     ["notmomadoo55555@gmail.com"]
     # )
     # if messages:
     #     for message in messages:
-    #         print(message["id"])
+    #         logger.info(message["id"])
     # else:
-    #     print("No messages found")
+    #     logger.error("No messages found")
 
-    # print("Senders:")
+    # logger.info("Senders:")
     # messages = gmail_api.get_message_content_by_senders(
     #     ["noreply@airtM.com", "no-reply@accounts.google.com"]
     # )
     # if messages:
     #     for message in messages:
-    #         print(message["id"])
+    #         logger.info(message["id"])
     # else:
-    #     print("No messages found")
+    #     logger.error("No messages found")
 
-    # print("Attachment:")
+    # logger.info("Attachment:")
     # messages = gmail_api.get_message_content_by_attachment_names(["Airtm"])
     # if messages:
     #     for message in messages:
-    #         print(message["id"])
+    #         logger.info(message["id"])
     # else:
-    #     print("No messages found")
+    #     logger.error("No messages found")
 
-    # print("Has Attachment:")
+    # logger.info("Has Attachment:")
     # messages = gmail_api.get_message_by_has_attachment()
     # if messages:
     #     for message in messages:
-    #         print(message["id"])
+    #         logger.info(message["id"])
     # else:
-    #     print("No messages found")
+    #     logger.error("No messages found")
 
-    # print("Labels:")
+    # logger.info("Labels:")
     # messages = gmail_api.get_messages_by_labels(["Test LABEL 1"])
     # if messages:
     #     for message in messages:
-    #         print(message["id"])
+    #         logger.info(message["id"])
     # else:
-    #     print("No messages found")
+    #     logger.error("No messages found")
 
-    # print("Messages by Multiple:")
+    # logger.info("Messages by Multiple:")
     # messages = gmail_api.get_messages_by_multiple(
     #     subjects=["WeLcome to Airtm!"],
     #     labels=["Test LABEL 1"],
     # )
     # if messages:
     #     for message in messages:
-    #         print(message["id"])
+    #         logger.info(message["id"])
     # else:
-    #     print("No messages found")
+    #     logger.error("No messages found")
 
-    # print("Delete Messages by:")
-    # print("Subject:")
-    # print(gmail_api.delete_messages_by_subjects(["WeLcome to Airtm!"]))
-    # print("Recipients:")
-    # print(gmail_api.delete_messages_by_recipients(["no-reply@accounts.google.com"]))
-    # print("Senders:")
-    # print(gmail_api.delete_messages_by_senders(["no-reply@accounts.google.com"]))
-    # print("Attachment:")
-    # print(gmail_api.delete_messages_by_attachment_names(["Airtm"]))
-    # print("Has Attachment:")
-    # print(gmail_api.delete_messages_by_has_attachment())
-    # print("Labels:")
-    # print(gmail_api.delete_messages_by_labels(["Test LABEL 1"]))
-    # print("Messages by Multiple:")
-    # print(
+    # logger.info("Delete Messages by:")
+    # logger.info("Subject:")
+    # logger.info(gmail_api.delete_messages_by_subjects(["WeLcome to Airtm!"]))
+    # logger.info("Recipients:")
+    # logger.info(gmail_api.delete_messages_by_recipients(["no-reply@accounts.google.com"]))
+    # logger.info("Senders:")
+    # logger.info(gmail_api.delete_messages_by_senders(["no-reply@accounts.google.com"]))
+    # logger.info("Attachment:")
+    # logger.info(gmail_api.delete_messages_by_attachment_names(["Airtm"]))
+    # logger.info("Has Attachment:")
+    # logger.info(gmail_api.delete_messages_by_has_attachment())
+    # logger.info("Labels:")
+    # logger.info(gmail_api.delete_messages_by_labels(["Test LABEL 1"]))
+    # logger.info("Messages by Multiple:")
+    # logger.info(
     #     gmail_api.delete_messages_by_multiple(
     #         subjects=["WeLcome to Airtm!"],
     #         labels=["Test LABEL 1"],
     #     )
     # )
 
-    # print("Update Messages by:")
-    # print("Subject:")
-    # print(
+    # logger.info("Update Messages by:")
+    # logger.info("Subject:")
+    # logger.info(
     #     gmail_api.update_messages_by_subjects(
     #         ["WeLcome to Airtm!"],
     #         add_label_names=["Test LABEL 1"],
     #         remove_label_names=[],
     #     )
     # )
-    # print("Recipients:")
-    # print(
+    # logger.info("Recipients:")
+    # logger.info(
     #     gmail_api.update_messages_by_recipients(
     #         ["no-reply@accounts.google.com"],
     #         add_label_names=["Test LABEL 1"],
     #         remove_label_names=[],
     #     )
     # )
-    # print("Senders:")
-    # print(
+    # logger.info("Senders:")
+    # logger.info(
     #     gmail_api.update_messages_by_senders(
     #         ["no-reply@accounts.google.com"],
     #         add_label_names=["Test LABEL 1"],
     #         remove_label_names=[],
     #     )
     # )
-    # print("Attachment:")
-    # print(
+    # logger.info("Attachment:")
+    # logger.info(
     #     gmail_api.update_messages_by_attachment_names(
     #         ["Airtm"],
     #         add_label_names=["Test LABEL 1"],
     #         remove_label_names=[],
     #     )
     # )
-    # print("Has Attachment:")
-    # print(
+    # logger.info("Has Attachment:")
+    # logger.info(
     #     gmail_api.update_messages_by_has_attachment(
     #         add_label_names=["Test LABEL 1"],
     #         remove_label_names=[],
     #     )
     # )
-    # print("Labels:")
-    # print(
+    # logger.info("Labels:")
+    # logger.info(
     #     gmail_api.update_messages_by_labels(
     #         ["Test LABEL 1"],
     #         add_label_names=["Test LABEL 2"],
     #         remove_label_names=[],
     #     )
     # )
-    # print("Messages by Multiple:")
-    # print(
+    # logger.info("Messages by Multiple:")
+    # logger.info(
     #     gmail_api.update_messages_by_multiple(
     #         subjects=["WeLcome to Airtm!"],
     #         senders=["no-reply@accounts.google.com"],
@@ -3832,4 +3840,4 @@ if __name__ == "__main__":
     #     )
     # )
 
-    print("-" * 100)
+    logger.info("-" * 100)

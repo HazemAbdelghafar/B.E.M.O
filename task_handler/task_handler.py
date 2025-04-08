@@ -1,10 +1,20 @@
 import sys
 import json
 from pathlib import Path
+import logging
+
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from utils import BaseMQTTHandler
+
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
+
 
 NAME = "task_handler"
 SUB_TOPIC = "task_handler/global"
@@ -31,7 +41,7 @@ class TaskHandler(BaseMQTTHandler):
 
         # Check if input_data is a list
         if isinstance(input_data, list):
-            print(f"Processing {len(input_data)} tasks")
+            logger.error(f"Processing {len(input_data)} tasks")
                         
             # Iterate through each item in the list
             for item in input_data:
@@ -55,7 +65,7 @@ class TaskHandler(BaseMQTTHandler):
                 output_data.append({"status": "success", "method": method, "topic": topic})
         else:
             # if input data is not a list, process it as dictionary
-            print(f"Processing single task")
+            logger.error(f"Processing single task")
             result = {"method": NAME, "results": input_data}
             self.publish_result(result, "server/main")
             output_data.append(result)

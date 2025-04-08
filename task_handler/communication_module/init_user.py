@@ -8,6 +8,14 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from scopes import SCOPES
 from dotenv import find_dotenv, dotenv_values
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
 
 DEFAULT_PATH = os.path.dirname(__file__)
 USER_DATA_PATH = os.path.join(DEFAULT_PATH, "user_data")
@@ -50,7 +58,7 @@ def init_smtp_server(id: str) -> tuple[SMTP_SSL, str]:
     # host = SMTP_HOSTS['yahoo']
     
     try:
-        print(f"Connecting to {host}...")
+        logger.info(f"Connecting to {host}...")
         smtpserver = SMTP_SSL(host, SMTP_PORT, timeout=10)
     except Exception as e:
         return {"error": f"Error connecting to {host}", "details": str(e)}, None
@@ -74,7 +82,7 @@ def new_user_google(id: str) -> Credentials:
         Credentials: The credentials object
     """
 
-    print("Creating a new user...")
+    logger.info("Creating a new user...")
 
     # Initialize the credentials
     creds = None
@@ -85,7 +93,7 @@ def new_user_google(id: str) -> Credentials:
 
     auth_url, _ = flow.authorization_url(prompt="consent")
 
-    print("Please go to this URL if you are not redirected: ", auth_url)
+    logger.info("Please go to this URL if you are not redirected: ", auth_url)
 
     creds = flow.run_local_server(
         open_browser=True,
@@ -121,17 +129,17 @@ def init_user_google(id: str) -> Credentials:
 
     # If the user is not new, load the token file
     if os.path.exists(f"{USER_DATA_PATH}/token_{id}.pkl"):
-        print("Loading existing user...")
+        logger.info("Loading existing user...")
         with open(f"{USER_DATA_PATH}/token_{id}.pkl", "rb") as token:
             creds = pickle.load(token)
 
     # If there are credentials but they are not valid, refresh the token
     if creds and creds.expired and creds.refresh_token:
-        print("Refreshing token...")
+        logger.info("Refreshing token...")
         try:
             creds.refresh(Request())
         except:
-            print("Error refreshing token, Re-creating user...")
+            logger.error("Error refreshing token, Re-creating user...")
             return new_user_google(id)
 
     # If the user is new (no token file), create a new user
@@ -145,7 +153,7 @@ def init_user_google(id: str) -> Credentials:
 if __name__ == "__main__":
     input = input("Enter your user id: ")
     server = init_smtp_server(input)
-    print(server.ehlo())
+    logger.info(server.ehlo())
     creds = init_user_google(input)
-    print(creds)
+    logger.info(creds)
     

@@ -2,6 +2,14 @@ from datetime import datetime
 from colory.color import Color
 import webcolors
 import pytz
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
 
 tz = pytz.timezone("Europe/Berlin")
 berlin_now = datetime.now(tz)
@@ -128,7 +136,7 @@ def get_current_time(timezone: str = "UTC") -> datetime:
         datetime: The current time in the specified timezone.
     """
     if timezone not in allowed_timezones:
-        print("Invalid timezone, Defaulting to UTC")
+        logger.error("Invalid timezone, Defaulting to UTC")
         timezone = "UTC"
 
     return datetime.now(pytz.timezone(timezone))
@@ -228,11 +236,11 @@ def RFC3339_change_timezones(
         return "Invalid Date"
 
     if from_timezone not in allowed_timezones:
-        print("Invalid timezone, Defaulting to UTC")
+        logger.error("Invalid timezone, Defaulting to UTC")
         from_timezone = "UTC"
 
     if to_timezone not in allowed_timezones:
-        print("Invalid timezone, Defaulting to UTC")
+        logger.error("Invalid timezone, Defaulting to UTC")
         to_timezone = "UTC"
 
     try:
@@ -424,7 +432,7 @@ def date_and_time_to_relative_time(
         return "Invalid Date"
 
     if timezone not in allowed_timezones:
-        print("Invalid timezone, Defaulting to UTC")
+        logger.error("Invalid timezone, Defaulting to UTC")
         timezone = "UTC"
 
     return epoch_to_relative_time(
@@ -498,7 +506,7 @@ def epoch_to_relative_time(epoch: int, timezone: str = "UTC") -> str:
 
     """
     if timezone not in allowed_timezones:
-        print("Invalid timezone, Defaulting to UTC")
+        logger.error("Invalid timezone, Defaulting to UTC")
         timezone = "UTC"
 
     current_time = datetime.now(pytz.timezone(timezone))
@@ -682,19 +690,19 @@ def color_name_to_hex(color_name: str) -> str:
 
 
 if __name__ == "__main__":
-    # print(date_and_time_to_RFC3339(2022, 1, 1, 0, 0, 0))
-    # print(RFC3339_to_datetime("2022-01-01T00:00:00.00Z"))
-    # print(datetime_to_RFC3339(datetime(2022, 1, 1, 0, 0, 0)))
-    # print(RFC3339_to_date_and_time("2022-01-01T00:00:00.00Z"))
-    # print(epoch_to_datetime(1732040151000 / 1000))
-    # print(datetime_to_epoch(datetime(2022, 1, 1, 0, 0, 0)))
-    # print(epoch_to_date_and_time(1640995200))
-    # print(date_and_time_to_epoch(2022, 1, 1, 0, 0, 0))
-    # print(date_and_time_to_relative_time(2024, 11, 19, 20, 15, 51, "Africa/Cairo"))
-    # print(RFC3339_to_relative_time("2024-11-19T22:29:20.00Z", "Africa/Cairo"))
-    # print(datetime_to_relative_time(datetime.now(), "Africa/Cairo"))
-    # print(epoch_to_relative_time(1732040151000 / 1000, "Africa/Cairo"))
+    # logger.info(date_and_time_to_RFC3339(2022, 1, 1, 0, 0, 0))
+    # logger.info(RFC3339_to_datetime("2022-01-01T00:00:00.00Z"))
+    # logger.info(datetime_to_RFC3339(datetime(2022, 1, 1, 0, 0, 0)))
+    # logger.info(RFC3339_to_date_and_time("2022-01-01T00:00:00.00Z"))
+    # logger.info(epoch_to_datetime(1732040151000 / 1000))
+    # logger.info(datetime_to_epoch(datetime(2022, 1, 1, 0, 0, 0)))
+    # logger.info(epoch_to_date_and_time(1640995200))
+    # logger.info(date_and_time_to_epoch(2022, 1, 1, 0, 0, 0))
+    # logger.info(date_and_time_to_relative_time(2024, 11, 19, 20, 15, 51, "Africa/Cairo"))
+    # logger.info(RFC3339_to_relative_time("2024-11-19T22:29:20.00Z", "Africa/Cairo"))
+    # logger.info(datetime_to_relative_time(datetime.now(), "Africa/Cairo"))
+    # logger.info(epoch_to_relative_time(1732040151000 / 1000, "Africa/Cairo"))
 
-    # print(hex_to_color_name("#FF0000"))
-    # print(color_name_to_hex("red"))
+    # logger.info(hex_to_color_name("#FF0000"))
+    # logger.info(color_name_to_hex("red"))
     pass
