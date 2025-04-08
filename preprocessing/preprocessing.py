@@ -201,6 +201,4 @@ class PreProcessing(BaseMQTTHandler):
                             
 if __name__ == "__main__": 
     pp = PreProcessing()
-        
-    # Start the MQTT client loop
     pp.start()

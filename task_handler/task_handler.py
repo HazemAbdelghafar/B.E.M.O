@@ -57,6 +57,5 @@ class TaskHandler(BaseMQTTHandler):
 
 
 if __name__ == "__main__":
-    #
     task_handler = TaskHandler()
     task_handler.start()

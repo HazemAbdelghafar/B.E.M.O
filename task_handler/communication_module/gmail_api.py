@@ -14,11 +14,15 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 from init_user import init_user_google
-from utils import epoch_to_date_and_time, epoch_to_relative_time
-from utils import hex_to_color_name, color_name_to_hex
-from utils import BaseMQTTHandler
+from helper_functions import epoch_to_date_and_time, epoch_to_relative_time
+from helper_functions import hex_to_color_name, color_name_to_hex
 
-from pprint import pprint
+import sys
+from pathlib import Path
+
+# Add the root directory of the project to sys.path at the beginning
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+from utils import BaseMQTTHandler
 
 
 DEFAULT_NOTE = "\n\nSent or Modified by B.E.M.O"

@@ -6,7 +6,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from init_user import init_user_google
 
-from help_functions import (
+from helper_functions import (
     RFC3339_to_date_and_time,
     datetime_to_RFC3339,
     RFC3339_to_relative_time,
@@ -1115,7 +1115,5 @@ class TasksApi(BaseMQTTHandler):
         return {"error": "Invalid action or object type"}
 
 if __name__ == "__main__":
-    
-    # Initialize the tasks API
     tasks_api = TasksApi("0")
     tasks_api.start()

@@ -162,5 +162,4 @@ Your output should be a single, concise, and natural string for BEMO's TTS syste
     
 if __name__ == "__main__":
     pp = Postprocessing()
-    
     pp.start()

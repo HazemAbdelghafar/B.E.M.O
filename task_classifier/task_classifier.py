@@ -92,8 +92,6 @@ class TaskClassifier(BaseMQTTHandler):
             
 if __name__ == "__main__":
     tc = TaskClassifier()
-    
-    # Start the MQTT client loop
     tc.start()
 
 
