@@ -8,7 +8,7 @@ from pathlib import Path
 load_dotenv()
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from utils import BaseMQTTHandler
+from utilities import BaseMQTTHandler
 import logging
 
 logger = logging.getLogger(__name__)

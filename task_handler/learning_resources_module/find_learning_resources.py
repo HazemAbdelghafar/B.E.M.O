@@ -19,7 +19,7 @@ import time
 import requests
 import random
 
-from utils import BaseMQTTHandler
+from utilities import BaseMQTTHandler
 
 DEFAULT_PATH = os.path.dirname(__file__)
 

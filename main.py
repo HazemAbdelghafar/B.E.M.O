@@ -4,7 +4,7 @@ from pathlib import Path
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from utils import BaseMQTTHandler
+from utilities import BaseMQTTHandler
 
 # Define the name of the module and the topics
 NAME = "server"

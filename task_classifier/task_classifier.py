@@ -8,7 +8,7 @@ from pathlib import Path
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from utils import BaseMQTTHandler
+from utilities import BaseMQTTHandler
 
 # Specify the paths to the model and labels
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))

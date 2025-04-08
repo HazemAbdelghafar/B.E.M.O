@@ -10,7 +10,7 @@ from pathlib import Path
 
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from utils import BaseMQTTHandler, PRE_SYSTEM_PROMPT, ERROR_RESPONSES
+from utilities import BaseMQTTHandler, PRE_SYSTEM_PROMPT, ERROR_RESPONSES
 
 class PostProcessing(BaseMQTTHandler):
     """
