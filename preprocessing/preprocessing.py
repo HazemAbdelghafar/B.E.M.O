@@ -15,8 +15,7 @@ from pathlib import Path
 
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-
-from utils import BaseMQTTHandler, SYSTEM_PROMPTS
+from utils import BaseMQTTHandler, POST_SYSTEM_PROMPTS
 
 # Define the name of the module and the topics
 NAME = "preprocessing"
@@ -70,7 +69,7 @@ class PreProcessing(BaseMQTTHandler):
         chat_history = {}
         
         # Add the system prompts to the chat history
-        for key, value in SYSTEM_PROMPTS.items():
+        for key, value in POST_SYSTEM_PROMPTS.items():
             chat_history[key] = []
         
         return chat_history
@@ -87,7 +86,7 @@ class PreProcessing(BaseMQTTHandler):
         initialized_prompts = {}
         
         # Add the system prompts to the initialized prompts
-        for key, value in SYSTEM_PROMPTS.items():
+        for key, value in POST_SYSTEM_PROMPTS.items():
             initialized_prompts[key] = PromptTemplate.from_template(value)
                 
         return initialized_prompts
