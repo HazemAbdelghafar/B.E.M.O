@@ -5,6 +5,12 @@ from dotenv import dotenv_values, find_dotenv
 import os
 import random
 import time
+import sys
+from pathlib import Path
+
+# Add the root directory to sys.path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+from utils import BaseMQTTHandler, PRE_SYSTEM_PROMPT, ERROR_RESPONSES
 
 class Postprocessing:
     """
@@ -31,29 +37,7 @@ class Postprocessing:
         )
         self.prompt = self._init_prompt()
         self.chain = self._init_chain()
-        self.error_responses = [
-            "Hmm, something went wrong there. Want to try again?",
-            "Oops! That didn't go as planned. Let's give it another shot.",
-            "Uh-oh, looks like I ran into a hiccup. Can you check that for me?",
-            "Sorry, I couldn't handle that request. Maybe try rephrasing it?",
-            "Yikes, I hit a snag. Let's see if we can fix it together.",
-            "Oh no, that didn't work. How about trying again?",
-            "Hmm, I couldn't get that done. Maybe double-check the details?",
-            "Looks like I need a little help with this one. Care to try again?",
-            "Something didn't click on my end. Let's take another crack at it.",
-            "Whoops! I missed the mark. Mind giving it another go?",
-            "Sorry about that! I'm here if you want to try once more.",
-            "That didn't work out. Let's reset and try again.",
-            "Oops, I fumbled that one. Can you give me another chance?",
-            "Hmm, I hit a roadblock. Let's try something different.",
-            "Looks like something went sideways. Let's figure it out together.",
-            "Sorry, I stumbled there. Want to have another go?",
-            "Oh no, I couldn't complete that. Let me know how I can help.",
-            "Oops, I got stuck. Want to check and try again?",
-            "Hmm, that's on me. How about we try a different approach?",
-            "Something didn't work out. Let's retry and get it right!"
-        ]
-        self.tasks = ["rapid questions", "smart home", "todo", "mail", "learning resources"]
+        self.tasks = [key for key in PRE_SYSTEM_PROMPT.keys()] # Todo Make it Post
         
     def _init_prompt(self) -> PromptTemplate:
         """
@@ -67,45 +51,6 @@ class Postprocessing:
         """
         
         return PromptTemplate.from_template(
-"""
-Generate a fun and conversational response to be said by the TTS system.
-Your task is to preprocess the result of a performed task into a natural, engaging response.
-You are not performing the task; this is only for creating a response based on the given input.
-
-Parameters:
-- Result: {task_result}
-    - The outcome of the task. This can be:
-        - A boolean (`True` or `False`) indicating success or failure.
-        - A number that should be mentioned naturally in the response.
-        - A string representing the outcome, rephrased for clarity and conversational tone.
-        - A dictionary with specific details about the result.
-        - A list of items or results that should be mentioned in the response.
-
-- User Query: {user_query}
-    - The user's original request, providing context for the task.
-
-- Task: {task_name}
-    - One of the following types:
-        - "rapid questions": The user asks BEMO a general knowledge or factual question.
-        - "smart home": The user controls smart home appliances through BEMO.
-        - "todo": The user adds or manages tasks in their Google Todo list.
-        - "mail": The user sends, receives, or organizes emails using Gmail.
-        - "learning resources": The user searches for educational resources about a specific topic.
-
-Guidelines:
-    - Ensure the response is conversational, concise, and engaging.
-    - Do not repeat the input details explicitly; craft the response naturally.
-    - Avoid using asterisks, emojis, or overly lengthy explanations.
-    - Do not include any personal or sensitive information in the response.
-    - No Emojies or special characters
-    - If you think that the result is wrong, do not correct it. Just reflect the result in the response.
-    - Do not attempt to correct blatantly wrong results or perform the task. Simply reflect the given result in the response.
-    - Make sure the tone aligns with BEMO's friendly and interactive personality.
-    - Focus on delivering a short and lighthearted message that reflects the result, unless the result is lengthy or complex.
-    - Never mention any IDs, timestamps, or technical details from the task result.
-
-Your output should be a single, concise, and natural string for BEMO's TTS system.
-"""
         )
 
             
@@ -135,10 +80,10 @@ Your output should be a single, concise, and natural string for BEMO's TTS syste
             """
             
             if task_name not in self.tasks:
-                return self.error_responses[random.randint(0, len(self.error_responses)-1)]
+                return ERROR_RESPONSES[random.randint(0, len(ERROR_RESPONSES)-1)]
             
             if user_query == "" or task_result == "" or task_name == "":
-                return self.error_responses[random.randint(0, len(self.error_responses)-1)]
+                return ERROR_RESPONSES[random.randint(0, len(ERROR_RESPONSES)-1)]
             
             try:
                 response = self.chain.invoke(
@@ -151,9 +96,9 @@ Your output should be a single, concise, and natural string for BEMO's TTS syste
                 try:
                     response = response.content.strip()
                 except:
-                    response = self.error_responses[random.randint(0, len(self.error_responses)-1)]
+                    response = ERROR_RESPONSES[random.randint(0, len(ERROR_RESPONSES)-1)]
             except:
-                response = self.error_responses[random.randint(0, len(self.error_responses)-1)]
+                response = ERROR_RESPONSES[random.randint(0, len(ERROR_RESPONSES)-1)]
                 
             return response
         
