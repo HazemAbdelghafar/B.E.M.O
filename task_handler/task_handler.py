@@ -13,6 +13,7 @@ class TaskHandler(BaseMQTTHandler):
         Initialize the TaskHandler object.
         """
         super().__init__(sub_topic=SUB_TOPIC, name=NAME)
+        self.__pub_topic = ""
         self.results = []
         self.number_of_tasks = 0
         
@@ -34,6 +35,7 @@ class TaskHandler(BaseMQTTHandler):
             # Iterate through each item in the list
             for item in input_data:
                 method = item.get("method")
+                print(f"Processing task with method: {method}")
                 if not method:
                     continue
                 if method == "smart_home":
