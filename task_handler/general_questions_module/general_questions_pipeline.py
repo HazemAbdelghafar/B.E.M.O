@@ -1,14 +1,15 @@
 import sys
 from pathlib import Path
 
-# Add the root directory of the project to sys.path at the beginning
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 import os
 import json
 import time
 from dotenv import load_dotenv
 from tavily import TavilyClient
+
+# Add the root directory of the project to sys.path at the beginning
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from utils import BaseMQTTHandler
 
 # Todo: Add Gemini usage to the pipeline to ensure that the answer is correct
