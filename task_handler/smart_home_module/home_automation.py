@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from utils import BaseMQTTHandler
 
 DEFAULT_PATH = os.path.dirname(__file__)
+
 # Cloud API credentials
 API_REGION = os.getenv("API_REGION")
 ACCESS_ID = os.getenv("ACCESS_ID")
@@ -89,6 +90,5 @@ class SmartHomeAutomation(BaseMQTTHandler):
         return None
 
 if __name__ == "__main__":
-    # Example usage
     smart_home = SmartHomeAutomation()
     smart_home.start() 

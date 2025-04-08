@@ -22,7 +22,7 @@ from utils import BaseMQTTHandler
 
 DEFAULT_NOTE = "\n\nB.E.M.O"
 DEFAULT_PATH = os.path.dirname(__file__)
-DEFAULT_TIMEZONE = "Africa/Cairo"
+DEFAULT_TIMEZONE = "Africa/Cairo" # Todo: To be edited based on the user's location
 
 
 class TasksApi(BaseMQTTHandler):

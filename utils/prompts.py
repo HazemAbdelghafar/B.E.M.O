@@ -1,6 +1,7 @@
 
 # TODO: This is a placeholder mapping, update with actual mappings
 # TODO: Check on tasks
+# TODO: Add logger
 switch_mapping = {
     "switch_1": "living room lights",
     "switch_2": "fan",

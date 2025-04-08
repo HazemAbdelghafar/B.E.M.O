@@ -7,6 +7,7 @@ from utils import BaseMQTTHandler
 
 NAME = "task_handler"
 SUB_TOPIC = "task_handler/global"
+
 class TaskHandler(BaseMQTTHandler):
     def __init__(self):
         """
@@ -46,15 +47,16 @@ class TaskHandler(BaseMQTTHandler):
                     return {"error": f"Unknown method: {method}"}
                 # Publish the input data to the appropriate topic
                 self.publish_result(item, topic)
+                
+        # if input data is not a list, process it as dictionary
         else:
-            # if input data is not a list, process it as dictionary
-            print(f"Processing single task")
+            print("Processing single task")
             self.publish_result({"method": NAME, "results": input_data},  "server/main")
              
         return None
 
 
 if __name__ == "__main__":
-    print("Starting Task Handler...")
+    #
     task_handler = TaskHandler()
     task_handler.start()
