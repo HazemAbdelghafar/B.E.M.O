@@ -43,7 +43,7 @@ class TaskHandler(BaseMQTTHandler):
                 elif method == "learning_resources":
                     topic = "task_handler/learning_resources"
                 else:
-                    return {"status": "error", "message": f"Unknown method: {method}"}
+                    return {"error": f"Unknown method: {method}"}
                 # Publish the input data to the appropriate topic
                 self.publish_result(item, topic)
         else:
