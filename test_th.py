@@ -75,7 +75,9 @@ class GlobalMQTTHandler:
             },
             {
                 "method": "learning_resources",
-                "topic": "arabic language"
+                "topic": "Deep Learning",
+                "specific_resources": ["Courses", "Books"],
+                "module_name": "preprocessing"
             }
         ]
 
