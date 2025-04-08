@@ -124,6 +124,9 @@ class BaseMQTTHandler:
         Args:
             result (dict | list): The result to publish.
         """
+        if not self.__pub_topic:
+            return
+
         if result is not {}:
             result["module_name"] = self.__name
             str_result = str(result)
