@@ -45,7 +45,7 @@ class BaseMQTTHandler:
 
         print(f"{self.__name} initialized successfully!")
     
-    def __run(self, input_data: dict | list):
+    def __built_in_run(self, input_data: dict | list):
         """
         Executes the main functionality of the class.
 
@@ -89,11 +89,12 @@ class BaseMQTTHandler:
         """
         input_data = msg.payload.decode()
         try:
-            input_data_eval = literal_eval(input_data)
-        except Exception as e:
-            input_data_eval = json.loads(input_data)
-        print(f"Received message: {input_data_eval}")
-        self.__run(input_data_eval)  # Call the main function with the received input data
+            input_data_parsed = literal_eval(input_data)
+        except:
+            input_data_parsed = json.loads(input_data)
+            
+        print(f"Received message: {input_data_parsed}")
+        self.__built_in_run(input_data_parsed)  # Call the main function with the received input data
 
     def execute_main(self, input_data: dict | list) -> dict | list:
         """
