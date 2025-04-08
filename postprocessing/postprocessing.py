@@ -35,11 +35,11 @@ class Postprocessing:
             timeout=None,
             max_retries=2,
         )
-        self.prompt = self._init_prompt()
+        self.prompts = self._init_prompt()
         self.chain = self._init_chain()
         self.tasks = [key for key in PRE_SYSTEM_PROMPT.keys()] # Todo Make it Post
         
-    def _init_prompt(self) -> PromptTemplate:
+    def _init_prompt(self) -> dict:
         """
         Initialize the prompt for the task.
         
@@ -47,12 +47,12 @@ class Postprocessing:
             None
             
         Returns:
-            PromptTemplate: The prompt for the task.
+            dict: A dictionary of task-specific prompts.
         """
-        
-        return PromptTemplate.from_template(
-        )
-
+        initialized_prompts = {}
+        for task, prompt in PRE_SYSTEM_PROMPT.items():
+            initialized_prompts[task] = PromptTemplate.from_template(prompt)
+        return initialized_prompts
             
     def _init_chain(self) -> RunnableSerializable:
         """
@@ -64,7 +64,7 @@ class Postprocessing:
         Returns:
             RunnableSerializable: The chain for the task.
         """
-        return self.prompt | self.llm
+        return self.prompts | self.llm
     
     def __call__(self, task_result: str, user_query: str, task_name: str) -> str:
             """

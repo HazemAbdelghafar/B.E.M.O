@@ -1,5 +1,4 @@
 import sys
-import json
 from pathlib import Path
 import logging
 
@@ -18,7 +17,6 @@ logger.addHandler(console_handler)
 
 NAME = "task_handler"
 SUB_TOPIC = "task_handler/global"
-OUTPUT_FILE = "tasks_output.json"
 
 class TaskHandler(BaseMQTTHandler):
     def __init__(self):
@@ -69,10 +67,6 @@ class TaskHandler(BaseMQTTHandler):
             result = {"method": NAME, "results": input_data}
             self.publish_result(result, "server/main")
             output_data.append(result)
-        
-        # Save the output data to a JSON file
-        with open(OUTPUT_FILE, "w") as f:
-            json.dump(output_data, f, indent=4)
              
         return None
 

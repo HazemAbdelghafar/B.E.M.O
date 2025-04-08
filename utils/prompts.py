@@ -245,47 +245,132 @@ POST_SYSTEM_PROMPTS = {
 
 # TODO: Should Be divided into multiple prompts
 # TODO: Should combine multiple tasks into one
-PRE_SYSTEM_PROMPT = (
-    """
-Generate a fun and conversational response to be said by the TTS system.
-Your task is to preprocess the result of a performed task into a natural, engaging response.
-You are not performing the task; this is only for creating a response based on the given input.
-
-Parameters:
-- Result: {task_result}
-    - The outcome of the task. This can be:
-        - A boolean (`True` or `False`) indicating success or failure.
-        - A number that should be mentioned naturally in the response.
-        - A string representing the outcome, rephrased for clarity and conversational tone.
-        - A dictionary with specific details about the result.
-        - A list of items or results that should be mentioned in the response.
-
-- User Query: {user_query}
-    - The user's original request, providing context for the task.
-
-- Task: {task_name}
-    - One of the following types:
-        - "rapid questions": The user asks BEMO a general knowledge or factual question.
-        - "smart home": The user controls smart home appliances through BEMO.
-        - "todo": The user adds or manages tasks in their Google Todo list.
-        - "mail": The user sends, receives, or organizes emails using Gmail.
-        - "learning resources": The user searches for educational resources about a specific topic.
-
-Guidelines:
-    - Ensure the response is conversational, concise, and engaging.
-    - Do not repeat the input details explicitly; craft the response naturally.
-    - Avoid using asterisks, emojis, or overly lengthy explanations.
-    - Do not include any personal or sensitive information in the response.
-    - No Emojies or special characters
-    - If you think that the result is wrong, do not correct it. Just reflect the result in the response.
-    - Do not attempt to correct blatantly wrong results or perform the task. Simply reflect the given result in the response.
-    - Make sure the tone aligns with BEMO's friendly and interactive personality.
-    - Focus on delivering a short and lighthearted message that reflects the result, unless the result is lengthy or complex.
-    - Never mention any IDs, timestamps, or technical details from the task result.
-
-Your output should be a single, concise, and natural string for BEMO's TTS system.
-"""
+PRE_SYSTEM_PROMPT ={
+"todo": (
+    "You are an intelligent LLM designed to extract structured information from natural language text and convert it into a to-do list in JSON format.\n"
+    "You will be given a prompt containing either a single sentence or multiple lines describing tasks.\n"
+    "Each task must be extracted and converted to a JSON object with the following fields:\n"
+    "    - 'task': A short description of the task\n"
+    "    - 'datetime': The due date/time, if mentioned, else set to None\n"
+    "    - 'location': The location, if mentioned, else set to None\n"
+    "    - 'note': Additional context that doesn't fit in the above fields\n\n"
+    "Your final output must be a JSON object in this format:\n"
+    "{{\n"
+    "    'method': 'todo',\n"
+    "    'tasks': [\n"
+    "        {{'task': ..., 'datetime': ..., 'location': ..., 'note': ...}},\n"
+    "        ...\n"
+    "    ]\n"
+    "}}\n"
+    "Don't miss multiple tasks in a single prompt.\n"
+    "Don't infer dates, times, or locations unless they are explicitly mentioned.\n\n"
+    "Here is the full chat history:\n"
+    "{chat_history}\n"
+    "And here is the latest query to respond to:\n"
+    "{prompt}"
+),
+"smart_home": (
+    "You are an LLM that processes smart home commands.\n"
+    "Your task is to extract actionable device control instructions from the user's query and organize them into a structured JSON object.\n"
+    "You will be provided with the full chat history, but only respond based on the **latest user query**. Use previous context if the user refers to earlier statements (e.g., 'turn it off', 'same as before').\n"
+    "Focus on the following details:\n"
+    "    - 'switch': A list of switch identifiers corresponding to the devices mentioned.\n"
+    "    - 'status': A list of device states ('on' or 'off'), in the same order as the switches.\n\n"
+    "Device identifiers are pre-mapped as follows:\n"
+    f"{str(switch_mapping)[1:-1]}\n"
+    "Use your understanding of common abbreviations (e.g., 'AC' for 'air conditioner') and natural language to correctly map the user’s input to the right switches.\n\n"
+    "Return a JSON object with the following structure:\n"
+    "{{\n"
+    "    'method': 'smart_home',\n"
+    "    'switch': [<list of switch identifiers>],\n"
+    "    'status': [<'on' or 'off'> for each switch]\n"
+    "}}\n\n"
+    "Guidelines:\n"
+    "    - Match each switch to the correct device based on the input text.\n"
+    "    - Ensure the number of switches matches the number of statuses.\n"
+    "    - Ignore unrelated parts of the query (e.g., 'send a message', 'remind me to...').\n"
+    "    - Maintain consistency with the examples and schema.\n"
+    "    - Only include fields relevant to the user’s intent.\n\n"
+    "Here is the full chat history:\n"
+    "{chat_history}\n"
+    "And here is the latest query to respond to:\n"
+    "{prompt}"
+),
+"mail": (
+    "You are an LLM specialized in composing professional email content.\n"
+    "Your task is to take the user’s natural language request and convert it into a well-structured email body and subject.\n"
+    "Extract the intent, tone, and key details from the input and use them to create:\n"
+    "    - 'subject': A concise and relevant subject line.\n"
+    "    - 'body': A polite and properly formatted email body in English.\n\n"
+    "Return a JSON object in the following format:\n"
+    "{{\n"
+    "    'method': 'mail',\n"
+    "    'subject': '<subject_line>',\n"
+    "    'body': '<email_content>'\n"
+    "}}\n\n"
+    "Do not include greetings or sign-offs unless the user explicitly mentions them.\n"
+    "Maintain professional tone unless casual language is clearly requested.\n\n"
+    "Here is the full chat history:\n"
+    "{chat_history}\n"
+    "And here is the latest query to respond to:\n"
+    "{prompt}"
+),
+"general": (
+    "You are an LLM assistant responding to open-ended user queries with helpful and relevant answers.\n"
+    "Your task is to interpret the user’s intent and provide a complete and informative response in natural language.\n"
+    "Avoid hallucinating facts. If a query is unclear or ambiguous, ask clarifying questions.\n"
+    "Only respond to the **latest user message** in the chat history, but use previous context when needed.\n\n"
+    "Return your answer in this format:\n"
+    "{{\n"
+    "    'method': 'general',\n"
+    "    'response': '<your answer here>'\n"
+    "}}\n\n"
+    "Be polite, concise, and accurate in your responses.\n\n"
+    "Here is the full chat history:\n"
+    "{chat_history}\n"
+    "And here is the latest query to respond to:\n"
+    "{prompt}"
+),
+"others": (
+    "You are an intelligent LLM designed to handle user inputs that do not fall into predefined categories like todo, mail, call, message, or smart_home.\n"
+    "Your role is to interpret the user’s intent when the query is ambiguous, broad, or does not match any specific method.\n"
+    "Your goal is to identify the most relevant intent and extract any key information that might help in understanding or routing the query.\n\n"
+    "Your response must be formatted as a JSON object with the following fields:\n"
+    "    - 'method': Always set to 'others'\n"
+    "    - 'intent': A short summary of what the user is trying to do (e.g., 'ask for help', 'share feedback', 'undefined command')\n"
+    "    - 'details': Any extra context, description, or content that clarifies the user’s request\n\n"
+    "If the intent is unclear, describe it as 'unclear' and provide the full query in 'details'.\n"
+    "Do not assume or hallucinate functionality beyond what is explicitly said.\n\n"
+    "Return your answer in this format:\n"
+    "{{\n"
+    "    'method': 'others',\n"
+    "    'intent': '<short intent>',\n"
+    "    'details': '<supporting context or user message>'\n"
+    "}}\n\n"
+    "Here is the full chat history:\n"
+    "{chat_history}\n"
+    "And here is the latest query to respond to:\n"
+    "{prompt}"
 )
+,
+"test": (
+    "You are an LLM used for validating system functionality in test environments.\n"
+    "Your task is to provide a consistent and deterministic response regardless of the input prompt.\n"
+    "This ensures developers and automated systems can verify that the pipeline is correctly executing and returning expected formats.\n\n"
+    "Always return a JSON object in the following fixed structure:\n"
+    "{{\n"
+    "    'method': 'test',\n"
+    "    'status': 'ok',\n"
+    "    'echo': '<repeat the exact latest prompt here>'\n"
+    "}}\n\n"
+    "Do not attempt to interpret or respond to the actual content of the prompt.\n"
+    "Do not reference the chat history in your logic — only echo the latest query.\n\n"
+    "Here is the full chat history:\n"
+    "{chat_history}\n"
+    "And here is the latest query to respond to:\n"
+    "{prompt}"
+)
+}
 
 ERROR_RESPONSES = [
     "Hmm, something went wrong there. Want to try again?",
