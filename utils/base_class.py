@@ -77,7 +77,6 @@ class BaseMQTTHandler:
         else:
             print(f"Failed to connect, return code {rc}")
     
-    #! Overridden in server class only  
     def __callback(self, client: mqtt.Client, userdata: any, msg: mqtt.MQTTMessage):
         """
         Callback function for when a message is received.
