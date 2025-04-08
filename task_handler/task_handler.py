@@ -13,9 +13,6 @@ class TaskHandler(BaseMQTTHandler):
         Initialize the TaskHandler object.
         """
         super().__init__(sub_topic=SUB_TOPIC, name=NAME)
-        self.__pub_topic = "server/main"
-        self.results = []
-        self.number_of_tasks = 0
         
     def execute_main(self, input_data):
         """
@@ -29,13 +26,12 @@ class TaskHandler(BaseMQTTHandler):
         """
         # Check if input_data is a list
         if isinstance(input_data, list):
-            self.number_of_tasks = len(input_data)
-            print(f"Number of tasks: {self.number_of_tasks}")
-            
+            print(f"Processing {len(input_data)} tasks")
+                        
             # Iterate through each item in the list
             for item in input_data:
                 method = item.get("method")
-                print(f"Processing task with method: {method}")
+
                 if not method:
                     continue
                 if method == "smart_home":
@@ -50,48 +46,12 @@ class TaskHandler(BaseMQTTHandler):
                     return {"status": "error", "message": f"Unknown method: {method}"}
                 # Publish the input data to the appropriate topic
                 self.publish_result(item, topic)
-                print(f"Published to {topic}: {item}")
         else:
             # if input data is not a list, process it as dictionary
             print(f"Processing single task")
-            self.results.append(input_data)
+            self.publish_result({"method": NAME, "results": self.results},  "server/main")
              
-            # If all tasks are completed, publish the results
-            if self.number_of_tasks == len(self.results):
-                self.__pub_topic = "server/main"
-                self.publish_result({"method": NAME, "results": self.results})
-                print(f"Published to {self.__pub_topic}: {self.results}")
-                self.results = []
-                self.number_of_tasks = 0                    
         return None
-
-# payloads = [
-#     {
-#         "method": "smart_home",
-#         "switch": ["switch_1"],
-#         "status": ["on"],
-#         "module_name": "preprocessing"
-#     },
-#     {
-#         "method": "todo",
-#         "list_all_tasks": False,
-#         "object_type": "task",
-#         "action": "insert",
-#         "new_task_name": "Schedule doctor appointment",
-#         "due_date": "2025-04-07T23:00:00",
-#         "module_name": "preprocessing"
-#     },
-#     {
-#         "method": "general",
-#         "query": "What's the weather like on 2025-04-07?",
-#         "topic": "general",
-#         "module_name": "preprocessing"
-#     },
-#     {
-#         "topic": "Deep Learning",
-#         "specific_resources": ["Courses", "Books"]
-#     }
-# ]
 
 
 if __name__ == "__main__":
