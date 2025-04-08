@@ -13,19 +13,19 @@ logger.addHandler(console_handler)
 
 send = {
         'predicted_labels': ['general'],
-        'preprocessed_prompt': 'what is the weather like today',
+        'preprocessed_prompt': 'what are names that i can name my son based on my name',
         'module_name': 'task_classifier'
     }
-send = {
-        'predicted_labels': ['general'],
-        'preprocessed_prompt': 'what about tomorrow',
-        'module_name': 'task_classifier'
-    }
-send = {
-        'predicted_labels': ['smart_home', 'todo', 'general'],
-        'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
-        'module_name': 'task_classifier'
-    }
+# send = {
+#         'predicted_labels': ['general'],
+#         'preprocessed_prompt': 'what about tomorrow',
+#         'module_name': 'task_classifier'
+#     }
+# send = {
+#         'predicted_labels': ['smart_home', 'todo', 'general'],
+#         'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
+#         'module_name': 'task_classifier'
+#     }
 # send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
 # send = {
 #         'predicted_labels': ['test'],
