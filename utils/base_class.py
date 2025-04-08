@@ -117,21 +117,21 @@ class BaseMQTTHandler:
         """
         return self._result
     
-    def publish_result(self, result: dict | list):
+    def publish_result(self, result: dict | list, topic: str = None):
         """
         Publishes the result to the specified MQTT topic.
 
         Args:
             result (dict | list): The result to publish.
         """
-        if not self.__pub_topic:
-            return
+        if not topic:
+            topic = self.__pub_topic
 
         if result is not {}:
             result["module_name"] = self.__name
             str_result = str(result)
-            self.client.publish(self.__pub_topic, str_result, self.__qos)
-            print(f"Published result to topic '{self.__pub_topic}': {str_result}")
+            self.client.publish(topic, str_result, self.__qos)
+            print(f"Published result to topic '{topic}': {str_result}")
     
     def start(self):
         """
