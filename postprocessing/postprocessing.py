@@ -12,29 +12,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 from utils import BaseMQTTHandler, PRE_SYSTEM_PROMPT, ERROR_RESPONSES
 
-class postprocessing(BaseMQTTHandler):
-    """
-    Postprocessing is a class for handling the postprocessing of tasks.
-    """
-    
-    def __init__(self):
-        """
-        Initialize the Postprocessing object.
-        """
-        
-        # Initialize the BaseMQTTHandler object
-        super().__init__(sub_topic="postprocessing/prompt", name="postprocessing")
-        
-        # Initialize the ChatGoogleGenerativeAI object    
-        os.environ["GOOGLE_API_KEY"] = dotenv_values(find_dotenv())["GEMINI_API_KEY_TEST"] #! Test
-        self.__llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
-            temperature=0.9,
-            max_tokens=None,
-            timeout=None,
-            max_retries=2,
-        )
-class Postprocessing:
+class PostProcessing(BaseMQTTHandler):
     """
     A class to postprocess the result of a task into a natural, engaging response.
     """
@@ -128,5 +106,5 @@ class Postprocessing:
     
     
 if __name__ == "__main__":
-    pp = Postprocessing()
+    pp = PostProcessing()
     pp.start()
