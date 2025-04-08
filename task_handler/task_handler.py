@@ -1,4 +1,5 @@
 import sys
+import json
 from pathlib import Path
 
 # Add the root directory of the project to sys.path at the beginning
@@ -7,6 +8,7 @@ from utils import BaseMQTTHandler
 
 NAME = "task_handler"
 SUB_TOPIC = "task_handler/global"
+OUTPUT_FILE = "tasks_output.json"
 
 class TaskHandler(BaseMQTTHandler):
     def __init__(self):
@@ -25,6 +27,8 @@ class TaskHandler(BaseMQTTHandler):
         Returns:
             dict: The result of the processing.
         """
+        output_data = []
+
         # Check if input_data is a list
         if isinstance(input_data, list):
             print(f"Processing {len(input_data)} tasks")
@@ -44,14 +48,21 @@ class TaskHandler(BaseMQTTHandler):
                 elif method == "learning_resources":
                     topic = "task_handler/learning_resources"
                 else:
-                    return {"error": f"Unknown method: {method}"}
+                    output_data.append({"status": "error", "message": f"Unknown method: {method}"})
+                    continue
                 # Publish the input data to the appropriate topic
                 self.publish_result(item, topic)
-                
-        # if input data is not a list, process it as dictionary
+                output_data.append({"status": "success", "method": method, "topic": topic})
         else:
-            print("Processing single task")
-            self.publish_result({"method": NAME, "results": input_data},  "server/main")
+            # if input data is not a list, process it as dictionary
+            print(f"Processing single task")
+            result = {"method": NAME, "results": input_data}
+            self.publish_result(result, "server/main")
+            output_data.append(result)
+        
+        # Save the output data to a JSON file
+        with open(OUTPUT_FILE, "w") as f:
+            json.dump(output_data, f, indent=4)
              
         return None
 
