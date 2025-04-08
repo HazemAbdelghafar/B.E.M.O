@@ -49,7 +49,7 @@ class TaskHandler(BaseMQTTHandler):
         else:
             # if input data is not a list, process it as dictionary
             print(f"Processing single task")
-            self.publish_result({"method": NAME, "results": self.results},  "server/main")
+            self.publish_result({"method": NAME, "results": input_data},  "server/main")
              
         return None
 
