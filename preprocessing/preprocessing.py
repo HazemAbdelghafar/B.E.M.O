@@ -16,7 +16,7 @@ import logging
 
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from utilities import BaseMQTTHandler, POST_SYSTEM_PROMPTS
+from utilities import BaseMQTTHandler, PRE_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
@@ -35,7 +35,7 @@ LIMITS = {
     "mail": 7,
     "general": 10,
     "learning_resources": 3,
-    "other": 3,
+    "others": 3,
 }
 
 class PreProcessing(BaseMQTTHandler):
@@ -77,7 +77,7 @@ class PreProcessing(BaseMQTTHandler):
         chat_history = {}
         
         # Add the system prompts to the chat history
-        for key, value in POST_SYSTEM_PROMPTS.items():
+        for key, value in PRE_SYSTEM_PROMPT.items():
             chat_history[key] = []
         
         return chat_history
@@ -94,7 +94,7 @@ class PreProcessing(BaseMQTTHandler):
         initialized_prompts = {}
         
         # Add the system prompts to the initialized prompts
-        for key, value in POST_SYSTEM_PROMPTS.items():
+        for key, value in PRE_SYSTEM_PROMPT.items():
             initialized_prompts[key] = PromptTemplate.from_template(value)
                 
         return initialized_prompts
