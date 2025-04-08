@@ -10,7 +10,7 @@ from pathlib import Path
 
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from utilities import BaseMQTTHandler, PRE_SYSTEM_PROMPT, ERROR_RESPONSES
+from utilities import BaseMQTTHandler, POST_SYSTEM_PROMPT, ERROR_RESPONSES
 
 class PostProcessing(BaseMQTTHandler):
     """
@@ -40,7 +40,7 @@ class PostProcessing(BaseMQTTHandler):
         )
         self.prompts = self._init_prompt()
         self.chain = self._init_chain()
-        self.tasks = [key for key in PRE_SYSTEM_PROMPT.keys()] # Todo Make it Post
+        self.tasks = [key for key in POST_SYSTEM_PROMPT.keys()]
         
     def _init_client(self):
         """
@@ -63,7 +63,7 @@ class PostProcessing(BaseMQTTHandler):
             dict: A dictionary of task-specific prompts.
         """
         initialized_prompts = {}
-        for task, prompt in PRE_SYSTEM_PROMPT.items():
+        for task, prompt in POST_SYSTEM_PROMPT.items():
             initialized_prompts[task] = PromptTemplate.from_template(prompt)
         return initialized_prompts
             
