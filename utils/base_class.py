@@ -88,6 +88,7 @@ class BaseMQTTHandler:
             msg (mqtt.MQTTMessage): The message received from the broker.
         """
         input_data = msg.payload.decode()
+        print(f"Received message: {input_data}")
         input_data_eval = literal_eval(input_data)
         print(f"Received message: {input_data_eval}")
         self.__run(input_data_eval)  # Call the main function with the received input data
