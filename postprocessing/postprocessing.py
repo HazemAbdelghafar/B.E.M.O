@@ -16,16 +16,19 @@ class PostProcessing(BaseMQTTHandler):
     """
     A class to postprocess the result of a task into a natural, engaging response.
     """
-    def __init__(self) -> None:
+    def __init__(self, sub_topic: str = "default_topic", name: str = "PostProcessing") -> None:
         """
         Initialize the Postprocessing class.
         
         Args:
-            None
+            sub_topic (str): The subscription topic for the MQTT client.
+            name (str): The name of the handler.
         
         Returns:
             None
         """
+        super().__init__(sub_topic=sub_topic, name=name)  # Pass required arguments to the parent class
+        self.client = self._init_client()  # Initialize the MQTT client
         random.seed(time.time())
         os.environ["GOOGLE_API_KEY"] = dotenv_values(find_dotenv())["GEMINI_API_KEY_TEST"] #! Test
         self.llm = ChatGoogleGenerativeAI(
@@ -39,6 +42,16 @@ class PostProcessing(BaseMQTTHandler):
         self.chain = self._init_chain()
         self.tasks = [key for key in PRE_SYSTEM_PROMPT.keys()] # Todo Make it Post
         
+    def _init_client(self):
+        """
+        Initialize the MQTT client.
+
+        Returns:
+            MQTT client instance.
+        """
+        # Replace with actual MQTT client initialization logic
+        return super()._init_client()
+
     def _init_prompt(self) -> dict:
         """
         Initialize the prompt for the task.
