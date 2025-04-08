@@ -1,96 +1,134 @@
 import paho.mqtt.client as mqtt
-import json
+import time
 from ast import literal_eval
 
 
-class GlobalMQTTHandler:
+class BaseMQTTHandler:
     """
-    GlobalMQTTHandler listens on 'server/main' and publishes a list of predefined
-    task payloads to 'task_handler/global' once triggered.
+    BaseMQTTHandler is a base class for handling MQTT communication.
     """
 
-    def __init__(self, sub_topic: str = "server/main", name: str = "global_publisher"):
-        self._result = {}
+    def __init__(self, sub_topic: str, name: str):
+        """
+        Initialize the BaseMQTTHandler object.
 
-        self.__pub_topic = "task_handler/global"
-        self.__sub_topic = sub_topic
-        self.__name = name
-        self.__qos = 1
-
+        Args:
+            sub_topic (str): MQTT topic to subscribe to.
+            name (str): Name for the MQTT client.
+        """
+        
+        # Define the broker address and port
         BROKER = "localhost"
         PORT = 1883
+        SERVER_PUB_TOPIC = "server/main"
 
+        self._result = {}  # Initialize the result variable
+        
+        # Set the input and output topics and the name of the MQTT client
+        self.__pub_topic = SERVER_PUB_TOPIC 
+        self.__sub_topic = sub_topic
+        self.__name = name
+        self.__qos = 1  # Quality of Service level
+        
+        # Create a new MQTT client instance
         try:
             self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, self.__name)
-        except Exception:
-            self.client = mqtt.Client(self.__name)
-
-        self.client.on_connect = self.__on_connect
-        self.client.on_message = self.__callback
-
-        self.client.connect(BROKER, PORT, 60)
-        self.client.subscribe(self.__sub_topic, self.__qos)
-
-        print(f"[{self.__name}] Connected and listening to '{self.__sub_topic}'")
-
-    def __on_connect(self, client, userdata, flags, rc):
-        if rc == 0:
-            print(f"[{self.__name}] Successfully connected to broker.")
-        else:
-            print(f"[{self.__name}] Connection failed with code {rc}.")
-
-    def __callback(self, client, userdata, msg):
-        input_data = msg.payload.decode()
-        try:
-            input_data_eval = literal_eval(input_data)
-            print(f"[{self.__name}] Received message: {input_data_eval}")
         except Exception as e:
-            print(f"[{self.__name}] Error processing message: {e}")
+            self.client =  mqtt.Client(self.__name)
+        
+        self.client.on_message = self.__callback  # Set the on_message callback function
+        self.client.on_connect = self.__on_connect  # Set the on_connect callback function
+    
+        self.client.connect(BROKER, PORT, 60)  # Connect to the broker
+        
+        self.client.subscribe(self.__sub_topic, self.__qos) # Subscribe to the input topic
 
-    def execute_main(self, input_data: dict | list) -> list:
+        print(f"{self.__name} initialized successfully!")
+    
+    def __run(self, input_data: dict | list):
         """
-        Returns a predefined list of payloads to be published.
+        Executes the main functionality of the class.
+
+        Args:
+            input_data (dict | list): The input data to process.
         """
-        return [
-            {
-                "method": "smart_home",
-                "switch": ["switch_1"],
-                "status": ["on"],
-                "module_name": "preprocessing"
-            },
-            {
-                "method": "todo",
-                "list_all_tasks": False,
-                "object_type": "task",
-                "action": "insert",
-                "new_task_name": "Schedule doctor appointment",
-                "due_date": "2025-04-07T23:00:00",
-                "module_name": "preprocessing"
-            },
-            {
-                "method": "general",
-                "query": "What's the weather like on 2025-04-07?",
-                "topic": "general",
-                "module_name": "preprocessing"
-            },
-            {
-                "topic": "Deep Learning",
-                "specific_resources": ["Courses", "Books"]
-            }
-        ]
+        start = time.time()  # Start the timer
+        self._result = self.execute_main(input_data)
+        end = time.time()  # End the timer
+        
+        print(f"Execution time for {self.__name}: {end - start} seconds")
+        
+        # Publish the result after execution
+        if self._result:
+            self.publish_result(self._result)
+        
+    def __on_connect(self, client: mqtt.Client, userdata: any, flags: dict, rc: int):
+        """
+        Callback function for when the client connects to the broker.
 
-    def publish_result(self, result: list):
-        if result:
-            payload = json.dumps(result)
-            self.client.publish(self.__pub_topic, payload, self.__qos)
-            print(f"[{self.__name}] Published to '{self.__pub_topic}': {payload}")
+        Args:
+            client (mqtt.Client): The MQTT client instance.
+            userdata (Any): User-defined data of any type.
+            flags (dict): Response flags sent by the broker.
+            rc (int): The connection result code.
+        """
+        if rc == 0:
+            print("Connected to broker!")
+        else:
+            print(f"Failed to connect, return code {rc}")
+    
+    #! Overridden in server class only  
+    def __callback(self, client: mqtt.Client, userdata: any, msg: mqtt.MQTTMessage):
+        """
+        Callback function for when a message is received.
 
+        Args:
+            client (mqtt.Client): The MQTT client instance.
+            userdata (Any): User-defined data of any type.
+            msg (mqtt.MQTTMessage): The message received from the broker.
+        """
+        input_data = msg.payload.decode()
+        input_data_eval = literal_eval(input_data)
+        print(f"Received message: {input_data_eval}")
+        self.__run(input_data_eval)  # Call the main function with the received input data
+
+    def execute_main(self, input_data: dict | list) -> dict | list:
+        """
+        Executes the main function of the class.
+        This method should be overridden by child classes.
+
+        Args:
+            input_data (dict | list): The input data to process.
+
+        Returns:
+            dict | list: The result of the main function.
+        """
+        raise NotImplementedError("This method should be overridden by child classes.")
+    
+    def get_result(self) -> dict | list:
+        """
+        Returns the result of the last executed main function.
+
+        Returns:
+            dict | list: The result of the last executed main function.
+        """
+        return self._result
+    
+    def publish_result(self, result: dict | list):
+        """
+        Publishes the result to the specified MQTT topic.
+
+        Args:
+            result (dict | list): The result to publish.
+        """
+        if result is not {}:
+            result["module_name"] = self.__name
+            str_result = str(result)
+            self.client.publish(self.__pub_topic, str_result, self.__qos)
+            print(f"Published result to topic '{self.__pub_topic}': {str_result}")
+    
     def start(self):
-        self._result = self.execute_main({})
-        self.publish_result(self._result)
-        print(f"[{self.__name}] MQTT loop started.")
+        """
+        Starts the MQTT client loop.
+        """
         self.client.loop_forever()
-
-if __name__ == "__main__":
-    handler = GlobalMQTTHandler()
-    handler.start()
