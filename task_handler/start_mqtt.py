@@ -73,10 +73,6 @@ class GlobalMQTTHandler:
                 "topic": "general",
                 "module_name": "preprocessing"
             },
-            {
-                "topic": "Deep Learning",
-                "specific_resources": ["Courses", "Books"]
-            }
         ]
 
     def publish_result(self, result: list):
