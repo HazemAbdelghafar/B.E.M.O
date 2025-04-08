@@ -53,22 +53,8 @@ class PostProcessing(BaseMQTTHandler):
         )
         self.prompts = self._init_prompt()
         self.chain = self._init_chain()
-<<<<<<< HEAD
-        self.tasks = [key for key in POST_SYSTEM_PROMPT.keys()]
-        
-    def _init_client(self):
-        """
-        Initialize the MQTT client.
-
-        Returns:
-            MQTT client instance.
-        """
-        # Replace with actual MQTT client initialization logic
-        return super()._init_client()
-=======
-        self.tasks = [key for key in PRE_SYSTEM_PROMPT.keys()] # Todo Make it Post
+        self.tasks = [key for key in POST_SYSTEM_PROMPT.keys()] # Todo Make it Post
         logger.info("PostProcessing initialized successfully.")
->>>>>>> b57cbd8 (Add logging functionality to PostProcessing class and enhance error handling in execute_main method)
 
     def _init_prompt(self) -> dict:
         """
