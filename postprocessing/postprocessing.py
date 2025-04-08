@@ -19,6 +19,7 @@ logging.basicConfig(
     level=logging.DEBUG
 )
 console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter('%(asctime)s %(filename)s %(levelname)s: %(message)s', '%m/%d/%Y %I:%M:%S %p'))
 logger.addHandler(console_handler)
 
 # Add the root directory to sys.path
