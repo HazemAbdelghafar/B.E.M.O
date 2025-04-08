@@ -1,51 +1,6 @@
-import paho.mqtt.client as mqtt  # Import the MQTT client library for Python
-import json  # Import json to handle message formatting
-
-
-test_prompts = [
-    "Hey Bemo, play some relaxing music, then schedule a doctor appointment and email my client.", # smart home, todo, mail
-    "Hey Bemo, remind me that I have a meeting at 5 pm and send an email to Dr Ali.",  #todo, mail
-    "Hey Bemo, remind me to water the plants at 7 am and email my assistant about today's schedule.",  #todo, mail
-    "Hey Bemo, turn off the kitchen lights and remind me to pay the electricity bill at 5 pm.",  # smart home, todo
-    "Hey Bemo, send an email to my professor regarding my thesis and turn on the study room lamp.",  # mail, smart home
-    "Hey Bemo, what's the news today and open the living room blinds?",  # general questions, smart home
-    "Hey Bemo, remind me to take my medication at 9 pm and send an email to my doctor.",  #todo, mail
-    "Hey Bemo, what time is my next meeting and lock the front door.",  # general questions, smart home
-    "Hey Bemo, email my manager about the deadline extension and remind me to submit the report by noon.",  # mail, todo
-    "Hey Bemo, turn off the heater and what's today's temperature?",  # smart home, general questions
-    "Hey Bemo, remind me to call Dad at 6 pm, email him about the family gathering, and check what day it is today.",  #todo, mail, general questions
-    "Hey Bemo, set a reminder for my flight at 10 am, email my assistant the itinerary, check the weather, and turn on the porch light.",  #todo, mail, general questions, smart home
-]
-
-# Define broker address and topic
-BROKER = "localhost"  # The MQTT broker address (localhost for local testing)
-# TOPIC = "task_classifier/prompt"
-SUB_TOPIC = "server/main"
-TOPIC = "preprocessing/prompt"
-
-# Create a new MQTT client instance
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, "server")
-# Connect the client to the broker
-
-# Add a callback function to handle messages received from the broker
-def on_message(client, userdata, message):
-    """
-    Callback function to handle messages received from the broker.
-    
-    Args:
-        client: The MQTT client instance.
-        userdata: User-defined data of any type.
-        message: The message received from the broker.
-    """
-    print(f"Received message '{message.payload.decode()}' on topic '{message.topic}'")
-    
-# Set the callback function for when a message is received
-client.on_message = on_message
-
-client.connect(BROKER, 1883, 60)  # Default MQTT port is 1883, timeout is 60 seconds
-
-# Subscribe to the topic
-client.subscribe(SUB_TOPIC, qos=1)  # Subscribe to the topic with QoS level 1
+import paho.mqtt.client as mqtt
+import json
+from ast import literal_eval
 
 send = {
         'predicted_labels': ['general'],
@@ -74,15 +29,69 @@ send = {
 #         'module_name': 'task_classifier'
 #     }
 
-client.loop_start()  # Start the MQTT client loop
 
-# Publish the message to the defined topic
-client.publish(TOPIC, json.dumps(send))  # Use json.dumps to serialize dict properly
-print(f"Message published to topic {TOPIC}")
+class GlobalMQTTHandler:
+    """
+    GlobalMQTTHandler listens on 'server/main' and publishes a list of predefined
+    task payloads to 'task_handler/global' once triggered.
+    """
 
-# Optional: Keep running briefly to allow message receipt
-import time
-time.sleep(10)
+    def __init__(self, sub_topic: str = "server/main", name: str = "global_publisher"):
+        self._result = {}
 
-# client.disconnect()  # Disconnect the client
-# print("Disconnected from the broker")
+        self.__pub_topic = "preprocessing/prompt"
+        self.__sub_topic = sub_topic
+        self.__name = name
+        self.__qos = 1
+
+        BROKER = "localhost"
+        PORT = 1883
+
+        try:
+            self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, self.__name)
+        except Exception:
+            self.client = mqtt.Client(self.__name)
+
+        self.client.on_connect = self.__on_connect
+        self.client.on_message = self.__callback
+
+        self.client.connect(BROKER, PORT, 60)
+        self.client.subscribe(self.__sub_topic, self.__qos)
+
+        print(f"[{self.__name}] Connected and listening to '{self.__sub_topic}'")
+
+    def __on_connect(self, client, userdata, flags, rc):
+        if rc == 0:
+            print(f"[{self.__name}] Successfully connected to broker.")
+        else:
+            print(f"[{self.__name}] Connection failed with code {rc}.")
+
+    def __callback(self, client, userdata, msg):
+        input_data = msg.payload.decode()
+        try:
+            input_data_eval = literal_eval(input_data)
+            print(f"[{self.__name}] Received message: {input_data_eval}")
+        except Exception as e:
+            print(f"[{self.__name}] Error processing message: {e}")
+
+    def execute_main(self, input_data: dict | list) -> list:
+        """
+        Returns a predefined list of payloads to be published.
+        """
+        return send
+
+    def publish_result(self, result: list):
+        if result:
+            payload = json.dumps(result)
+            self.client.publish(self.__pub_topic, payload, self.__qos)
+            print(f"[{self.__name}] Published to '{self.__pub_topic}': {payload}")
+
+    def start(self):
+        self._result = self.execute_main({})
+        self.publish_result(self._result)
+        print(f"[{self.__name}] MQTT loop started.")
+        self.client.loop_forever()
+
+if __name__ == "__main__":
+    handler = GlobalMQTTHandler()
+    handler.start()
