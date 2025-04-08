@@ -11,11 +11,11 @@ console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
 
-send = {
-        'predicted_labels': ['general'],
-        'preprocessed_prompt': 'what are names that i can name my son based on my name',
-        'module_name': 'task_classifier'
-    }
+# send = {
+#         'predicted_labels': ['general'],
+#         'preprocessed_prompt': "what is the average salary for my job in my country?",
+#         'module_name': 'task_classifier'
+#     }
 # send = {
 #         'predicted_labels': ['general'],
 #         'preprocessed_prompt': 'what about tomorrow',
@@ -27,16 +27,11 @@ send = {
 #         'module_name': 'task_classifier'
 #     }
 # send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
-# send = {
-#         'predicted_labels': ['test'],
-#         'preprocessed_prompt': 'My name is Ali and I am a software engineer. I am working on a project that involves using MQTT for communication.',
-#         'module_name': 'task_classifier'
-#     }
-# send = {
-#         'predicted_labels': ['test'],
-#         'preprocessed_prompt': 'What is my job title and what is my name?',
-#         'module_name': 'task_classifier'
-#     }
+send = {
+        'predicted_labels': ['others'],
+        'preprocessed_prompt': 'Tell me some jokes about my job',
+        'module_name': 'task_classifier'
+    }
 
 
 class GlobalMQTTHandler:
