@@ -73,6 +73,10 @@ class GlobalMQTTHandler:
                 "topic": "general",
                 "module_name": "preprocessing"
             },
+            {
+                "method": "learning_resources",
+                "topic": "arabic language"
+            }
         ]
 
     def publish_result(self, result: list):
