@@ -35,11 +35,9 @@ class TaskHandler(BaseMQTTHandler):
         Returns:
             dict: The result of the processing.
         """
-        output_data = []
-
         # Check if input_data is a list
         if isinstance(input_data, list):
-            logger.error(f"Processing {len(input_data)} tasks")
+            logger.info(f"Processing {len(input_data)} tasks")
                         
             # Iterate through each item in the list
             for item in input_data:
@@ -56,17 +54,17 @@ class TaskHandler(BaseMQTTHandler):
                 elif method == "learning_resources":
                     topic = "task_handler/learning_resources"
                 else:
-                    output_data.append({"status": "error", "message": f"Unknown method: {method}"})
+                    logger.error(f"Unknown method: {method}")
+                    self.publish_result({"error": "Unknown method", "level": 1})
                     continue
+                
                 # Publish the input data to the appropriate topic
                 self.publish_result(item, topic)
-                output_data.append({"status": "success", "method": method, "topic": topic})
         else:
-            # if input data is not a list, process it as dictionary
-            logger.error(f"Processing single task")
-            result = {"method": NAME, "results": input_data}
-            self.publish_result(result, "server/main")
-            output_data.append(result)
+            # if input data is not a list, send it to the main topic
+            logger.info(f"Processing single task")
+            result = {"results": input_data}
+            self.publish_result(result)
              
         return None
 
