@@ -3,10 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from utilities import connection_manager
-
-# === Payload schema for sending messages to robot ===
-class RobotMessage(BaseModel):
-    message: str
+from utilities import router as websocket_router
 
 app = FastAPI()
 
@@ -19,32 +16,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# === WebSocket route for robot connection ===
-@app.websocket("/ws/{robot_id}")
-async def websocket_endpoint(websocket: WebSocket, robot_id: str):
-    print(f"New connection: {robot_id}")
-    await connection_manager.connect(robot_id, websocket)
-    print(f"Connected: {robot_id}")
-    try:
-        while True:
-            data = await websocket.receive_text()
-            print(f"[{robot_id}] says: {data}")
-            # Send a response back to the robot
-            try:
-                await connection_manager.send_message(robot_id, f"Sending Back to {robot_id}")
-            except Exception as e:
-                print(f"Error sending message to {robot_id}: {e}")
-                connection_manager.disconnect(robot_id)
-                break
-    except WebSocketDisconnect:
-        connection_manager.disconnect(robot_id)
-        print(f"[{robot_id}] disconnected.")
-
-# === HTTP route to send message to a specific robot ===
-@app.post("/send/{robot_id}")
-async def send_to_robot(robot_id: str, payload: RobotMessage):
-    if not connection_manager.is_connected(robot_id):
-        raise HTTPException(status_code=404, detail=f"Robot '{robot_id}' not connected")
-
-    await connection_manager.send_message(robot_id, payload.message)
-    return JSONResponse(content={"status": "sent", "robot_id": robot_id, "message": payload.message})
+# Include the router with prefix /api
+app.include_router(websocket_router)
