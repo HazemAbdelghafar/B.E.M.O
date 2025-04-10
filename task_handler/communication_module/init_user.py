@@ -7,7 +7,6 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from scopes import SCOPES
-from dotenv import find_dotenv, dotenv_values
 import logging
 
 logger = logging.getLogger(__name__)
@@ -27,49 +26,6 @@ SMTP_HOSTS = {
     "yahoo": "smtp.mail.yahoo.com",
 }
 SMTP_PORT = 465
-
-# Todo: Fix Yahoo, Outlook, Hotmail SMTP servers
-def init_smtp_server(id: str) -> tuple[SMTP_SSL, str]:
-    """
-    This function initializes the SMTP server for the user
-    
-    Args:
-        id (str): The user id
-        
-    Returns:
-        tuple[SMTP_SSL, str]: The SMTP server and the user email
-    """
-    try:
-        creds = dotenv_values(find_dotenv(f"{DEFAULT_PATH}/user_data/user_{id}.env"))
-        user = creds['USER']
-        password = creds['PASSWORD']
-    except Exception as e:
-        return {"error": "User not found", "details": str(e)}, None
-    
-    if user.split('@')[1] == 'gmail.com':
-        host = SMTP_HOSTS['gmail']
-    elif user.split('@')[1] == 'hotmail.com':
-        host = SMTP_HOSTS['hotmail']
-    elif user.split('@')[1] == 'outlook.com':
-        host = SMTP_HOSTS['outlook']
-    elif user.split('@')[1] == 'yahoo.com':
-        host = SMTP_HOSTS['yahoo']
-    
-    # host = SMTP_HOSTS['yahoo']
-    
-    try:
-        logger.info(f"Connecting to {host}...")
-        smtpserver = SMTP_SSL(host, SMTP_PORT, timeout=10)
-    except Exception as e:
-        return {"error": f"Error connecting to {host}", "details": str(e)}, None
-    try:
-        smtpserver.login(user, password)
-    except Exception as e:
-        return {"error": "Error logging in", "details": str(e)}, None
-    
-    return smtpserver, user
-
-
 
 def new_user_google(id: str) -> Credentials:
     """
@@ -148,12 +104,9 @@ def init_user_google(id: str) -> Credentials:
 
     return creds
 
-
 # Test the functions
 if __name__ == "__main__":
     input = input("Enter your user id: ")
-    server = init_smtp_server(input)
-    logger.info(server.ehlo())
     creds = init_user_google(input)
     logger.info(creds)
     
