@@ -7,6 +7,7 @@ connected_robots: Dict[str, WebSocket] = {}
 
 @router.websocket("/ws/{robot_id}")
 async def websocket_endpoint(websocket: WebSocket, robot_id: str):
+    print(f"🤖 New connection: {robot_id}")
     await websocket.accept()
     connected_robots[robot_id] = websocket
     print(f"✅ Robot connected: {robot_id}")
