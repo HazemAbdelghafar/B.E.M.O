@@ -32,7 +32,7 @@ async def websocket_endpoint(websocket: WebSocket, robot_id: str):
     try:
         while True:
             try:
-                text_data = await websocket.receive_text()
+                text_data = await websocket.receive_json()
                 data = json.loads(text_data)
                 logger.info(f"{robot_id} sent: {data}")
 
