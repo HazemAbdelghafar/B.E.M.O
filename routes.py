@@ -1,4 +1,5 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi.websockets import WebSocketState
 from typing import Dict
 import random
 import time
@@ -33,7 +34,7 @@ async def websocket_endpoint(websocket: WebSocket, robot_id: str):
     logger.info(f"Robot connected: {robot_id}")
 
     try:
-        while True:
+        while websocket.client_state == WebSocketState.CONNECTED:
             try:
                 message = await websocket.receive()
                 text_data = message.get("text", "")
