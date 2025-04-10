@@ -1,43 +1,50 @@
-import sys
-from pathlib import Path
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from utilities import connection_manager
 
-# Add the root directory of the project to sys.path at the beginning
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+# === Payload schema for sending messages to robot ===
+class RobotMessage(BaseModel):
+    message: str
 
-from utilities import BaseMQTTHandler
+app = FastAPI()
 
-# Define the name of the module and the topics
-NAME = "server"
-SUB_TOPIC = "server/main"
+# Allow cross-origin access for clients or UIs
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can restrict this to specific domains in prod
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-class Server(BaseMQTTHandler):
-    """
-    Server is a class for handling the main server functionality.
-    """
-    
-    def __init__(self):
-        """
-        Initialize the Server object.
-        """
-        
-        # Initialize the BaseMQTTHandler object
-        super().__init__(SUB_TOPIC, NAME)
-        
-    def execute_main(self, input_data: dict) -> dict:
-        """
-        Executes the main functionality of the class.
-        
-        Args:
-            input_data (dict): The input data to process.
-        
-        Returns:
-            dict: The result of the classification.
-        """
-    
-    def authenticatiom(self, input_data: dict) -> dict:
-        """
-        # TODO
-        Authenticate the input data.
-        
-        """
-        return input_data
+# === WebSocket route for robot connection ===
+@app.websocket("/ws/{robot_id}")
+async def websocket_endpoint(websocket: WebSocket, robot_id: str):
+    print(f"New connection: {robot_id}")
+    await connection_manager.connect(robot_id, websocket)
+    print(f"Connected: {robot_id}")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            print(f"[{robot_id}] says: {data}")
+            # Send a response back to the robot
+            try:
+                await connection_manager.send_message(robot_id, f"Sending Back to {robot_id}")
+            except Exception as e:
+                print(f"Error sending message to {robot_id}: {e}")
+                connection_manager.disconnect(robot_id)
+                break
+    except WebSocketDisconnect:
+        connection_manager.disconnect(robot_id)
+        print(f"[{robot_id}] disconnected.")
+
+# === HTTP route to send message to a specific robot ===
+@app.post("/send/{robot_id}")
+async def send_to_robot(robot_id: str, payload: RobotMessage):
+    if not connection_manager.is_connected(robot_id):
+        raise HTTPException(status_code=404, detail=f"Robot '{robot_id}' not connected")
+
+    await connection_manager.send_message(robot_id, payload.message)
+    return JSONResponse(content={"status": "sent", "robot_id": robot_id, "message": payload.message})
