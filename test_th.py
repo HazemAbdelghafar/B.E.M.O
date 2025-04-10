@@ -60,27 +60,27 @@ class GlobalMQTTHandler:
         Returns a predefined list of payloads to be published.
         """
         return [
-            {
-                "method": "smart_home",
-                "switch": ["switch_1"],
-                "status": ["on"],
-                "module_name": "preprocessing"
-            },
-            {
-                "method": "todo",
-                "list_all_tasks": False,
-                "object_type": "task",
-                "action": "insert",
-                "new_task_name": "Schedule doctor appointment",
-                "due_date": "2025-04-07T23:00:00",
-                "module_name": "preprocessing"
-            },
-            {
-                "method": "general",
-                "query": "What's the weather like on 2025-04-07?",
-                "topic": "general",
-                "module_name": "preprocessing"
-            },
+            # {
+            #     "method": "smart_home",
+            #     "switch": ["switch_1"],
+            #     "status": ["on"],
+            #     "module_name": "preprocessing"
+            # },
+            # {
+            #     "method": "todo",
+            #     "list_all_tasks": False,
+            #     "object_type": "task",
+            #     "action": "insert",
+            #     "new_task_name": "Schedule doctor appointment",
+            #     "due_date": "2025-04-07T23:00:00",
+            #     "module_name": "preprocessing"
+            # },
+            # {
+            #     "method": "general",
+            #     "query": "What's the weather like on 2025-04-07?",
+            #     "topic": "general",
+            #     "module_name": "preprocessing"
+            # },
             {
                 "method": "learning_resources",
                 "topic": "Deep Learning",
