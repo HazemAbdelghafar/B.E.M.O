@@ -68,7 +68,7 @@ class SmartHomeAutomation(BaseMQTTHandler):
             )
             return result.get("success", False)
         except Exception as e:
-            logger.infor.info(f"Error controlling device: {e}")
+            logger.error(f"Error controlling device: {e}")
             return False
 
     def execute_main(self, input_data: dict) -> dict:
