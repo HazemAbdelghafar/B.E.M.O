@@ -3,11 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from websocket_manager import connection_manager
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-
-from utilities import TEST
 
 # === Payload schema for sending messages to robot ===
 class RobotMessage(BaseModel):
@@ -34,7 +29,7 @@ async def websocket_endpoint(websocket: WebSocket, robot_id: str):
             print(f"[{robot_id}] says: {data}")
             # Send a response back to the robot
             try:
-                await connection_manager.send_message(robot_id, f"Sending {TEST} to {robot_id}")
+                await connection_manager.send_message(robot_id, f"Sending Back to {robot_id}")
             except Exception as e:
                 print(f"Error sending message to {robot_id}: {e}")
                 connection_manager.disconnect(robot_id)
