@@ -3,6 +3,7 @@ from typing import Dict
 import random
 import time
 import logging
+import json
 
 # ✅ Setup logging
 logging.basicConfig(
@@ -36,8 +37,9 @@ async def websocket_endpoint(websocket: WebSocket, robot_id: str):
     try:
         while True:
             data = await websocket.receive_text()
+            data = json.loads(data)
             logger.info(f"📥 {robot_id} says: {data}")
-            await websocket.send_text(random.choice(friendly_responses))
+            await websocket.send_text(friendly_responses[int(data["index"])])
     except WebSocketDisconnect:
         logger.warning(f"❌ {robot_id} disconnected")
         connected_robots.pop(robot_id, None)
