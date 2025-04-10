@@ -285,10 +285,21 @@ class FindLearningResources(BaseMQTTHandler):
             try:
                 result = self.find_resources(topic, specific_resources)
                 logger.info(f"Result is: {result}")
-            except Exception as e:
-                result = {"error": f"Error in Tavily API or Gemini: {e}", "level": 2}
-                logger.error(f"Error in Tavily API or Gemini: {e}")
+            except Exception as e:                
+                # Detect if the error from the llm
+                if self.use_llm and "LLM" in str(e):
+                    self.use_llm = False
+                    try:
+                        result = self.find_resources(topic, specific_resources)
+                        logger.info(f"Result is: {result}")
+                    except Exception as e:
+                        logger.error(f"Error in Tavily API: {e}")
+                        result = {"error": f"Error in Tavily API: {e}", "level": 2}
+                else:
+                    logger.error(f"Error in Tavily API: {e}")
+                    result = {"error": f"Error in Tavily API: {e}", "level": 2}
 
+        # Publish the result to the MQTT topic
         self.publish_result(result, "task_handler/main")
         
         return None
@@ -435,12 +446,12 @@ Returns:
                         {**input_, "messages": [ai_msg, *tool_msgs]}, config=config
                     )
                 except Exception as e:
-                    raise e
+                    raise ValueError("Error in LLM tool chain") from e
 
                 try:
                     parsed_output = self.output_parser.parse(response.content)
                 except Exception as e:
-                    raise e
+                    raise ValueError("Error parsing LLM output") from e
 
                 return parsed_output
 
@@ -450,7 +461,7 @@ Returns:
             try:
                 total_resources = len(result["resources"])
             except Exception as e:
-                raise e
+                raise ValueError("Error in LLM output") from e
 
             result["topic"] = topic
             result["total_resources"] = total_resources
@@ -523,7 +534,7 @@ Returns:
                             exclude_domains=[],
                         )
                     except Exception as e:
-                        raise e
+                        raise ValueError("Error in Tavily API") from e
                 else:
                     try:
                         results = self.tavily.search(
@@ -537,7 +548,7 @@ Returns:
                             exclude_domains=[],
                         )
                     except Exception as e:
-                        raise e
+                        raise ValueError("Error in Tavily API") from e
 
                 if not is_image:
                     for result in results["results"]:
