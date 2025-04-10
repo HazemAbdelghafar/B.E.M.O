@@ -64,7 +64,7 @@ class GeneralQuestions(BaseMQTTHandler):
         
         if not query:
             logger.error("Query is empty or not provided.")
-            result = {"error": "Query is empty or not provided."}
+            result = {"error": "Query is empty or not provided.", "level": 2}
 
         else:
             try:
@@ -72,7 +72,7 @@ class GeneralQuestions(BaseMQTTHandler):
                 logger.info(f"Response from Tavily API: {response}")
             except Exception as e:
                 logger.error(f"Error in Tavily API: {e}")
-                result = {"error": f"Error in Tavily API: {e}"}
+                result = {"error": f"Error in Tavily API: {e}", "level": 2}
             else:
                 answer = self.clean_answer(response["answer"])
                 result = {

@@ -279,14 +279,14 @@ class FindLearningResources(BaseMQTTHandler):
         
         if not topic:
             logger.info("Topic is empty or not provided.")
-            result = {"error": "Topic is empty or not provided."}
+            result = {"error": "Topic is empty or not provided.", "level": 2}
             
         else:
             try:
                 result = self.find_resources(topic, specific_resources)
                 logger.info(f"Result is: {result}")
             except Exception as e:
-                result = {"error": f"Error in Tavily API or Gemini: {e}"}
+                result = {"error": f"Error in Tavily API or Gemini: {e}", "level": 2}
                 logger.error(f"Error in Tavily API or Gemini: {e}")
 
         self.publish_result(result, "task_handler/main")
@@ -435,12 +435,12 @@ Returns:
                         {**input_, "messages": [ai_msg, *tool_msgs]}, config=config
                     )
                 except Exception as e:
-                    response = {"error": str(e)}
+                    raise e
 
                 try:
                     parsed_output = self.output_parser.parse(response.content)
                 except Exception as e:
-                    parsed_output = {"error": str(e)}
+                    raise e
 
                 return parsed_output
 
@@ -449,8 +449,8 @@ Returns:
 
             try:
                 total_resources = len(result["resources"])
-            except:
-                return {"error": "LLM failed to generate resources."}
+            except Exception as e:
+                raise e
 
             result["topic"] = topic
             result["total_resources"] = total_resources
@@ -523,7 +523,7 @@ Returns:
                             exclude_domains=[],
                         )
                     except Exception as e:
-                        results = {"error": str(e)}
+                        raise e
                 else:
                     try:
                         results = self.tavily.search(
@@ -537,7 +537,7 @@ Returns:
                             exclude_domains=[],
                         )
                     except Exception as e:
-                        results = {"error": str(e)}
+                        raise e
 
                 if not is_image:
                     for result in results["results"]:
