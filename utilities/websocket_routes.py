@@ -32,17 +32,27 @@ async def websocket_endpoint(websocket: WebSocket, robot_id: str):
     try:
         while True:
             try:
-                text_data = await websocket.receive_text()
-                data = json.loads(text_data)
-                logger.info(f"{robot_id} sent: {data}")
-
-                index = int(data.get("index", -1))
-                if 0 <= index < len(friendly_responses):
-                    await websocket.send_text(friendly_responses[index])
+                message = await websocket.receive()
+                text_data = message.get("text", "")
+                binary_data = message.get("bytes", b"")
+                if text_data:
+                    logger.info(f"{robot_id} - Received text data: {text_data}")
+                    data = json.loads(text_data)
+                elif binary_data:
+                    logger.info(f"{robot_id} - Received binary data")
+                    data = json.loads(binary_data.decode("utf-8"))
                 else:
-                    error_msg = f"Invalid index: {index}"
-                    logger.warning(f"{robot_id} - {error_msg}")
-                    await websocket.send_text(error_msg)
+                    logger.warning(f"{robot_id} - No valid data received")
+                    continue
+                
+                return_dict = {
+                    "robot_id": robot_id,
+                    "response": random.choice(friendly_responses),
+                    "data": data
+                }
+                
+                await websocket.send_json(return_dict)
+                logger.info(f"{robot_id} - Sent response: {return_dict}")
             except json.JSONDecodeError:
                 logger.error(f"{robot_id} - Invalid JSON")
                 await websocket.send_text("Invalid JSON format.")
