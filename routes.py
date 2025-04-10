@@ -35,6 +35,7 @@ async def websocket_endpoint(websocket: WebSocket, robot_id: str):
                 message = await websocket.receive()
                 text_data = message.get("text", "")
                 binary_data = message.get("bytes", b"")
+                
                 if text_data:
                     logger.info(f"{robot_id} - Received text data: {text_data}")
                     data = json.loads(text_data)
