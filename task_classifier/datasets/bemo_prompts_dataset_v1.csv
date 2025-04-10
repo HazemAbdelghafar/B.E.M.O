@@ -1,0 +1,251 @@
+prompt,general,smart_home,todo,mail
+"What time is it?",1,0,0,0
+"How's the weather today?",1,0,0,0
+"What's the capital of France?",1,0,0,0
+"Can you tell me a fun fact?",1,0,0,0
+"Who won the game last night?",1,0,0,0
+"What is the latest news?",1,0,0,0
+"How do I bake a cake?",1,0,0,0
+"What are the benefits of meditation?",1,0,0,0
+"How does the stock market work?",1,0,0,0
+"What's a good book to read?",1,0,0,0
+"Where can I find a good restaurant?",1,0,0,0
+"What is the history of Rome?",1,0,0,0
+"How do I improve my productivity?",1,0,0,0
+"What's the distance from Earth to the Moon?",1,0,0,0
+"Can you explain quantum physics in simple terms?",1,0,0,0
+"What is the meaning of life?",1,0,0,0
+"How do I get started with programming?",1,0,0,0
+"Turn on the living room lights.",0,1,0,0
+"Dim the bedroom lights.",0,1,0,0
+"Set the thermostat to 22 degrees.",0,1,0,0
+"Lock the front door.",0,1,0,0
+"Open the garage door.",0,1,0,0
+"Close the window blinds.",0,1,0,0
+"Activate the security alarm.",0,1,0,0
+"Turn off the kitchen lights.",0,1,0,0
+"Start the vacuum cleaner.",0,1,0,0
+"Play relaxing music in the living room.",0,1,0,0
+"Adjust the air conditioner to a cooler setting.",0,1,0,0
+"Switch on the garden lights.",0,1,0,0
+"Set the mood lighting in the dining room.",0,1,0,0
+"Lower the thermostat for the night.",0,1,0,0
+"Activate the home surveillance system.",0,1,0,0
+"Turn on the porch light.",0,1,0,0
+"Open the curtains in the living room.",0,1,0,0
+"Add a reminder to call the dentist.",0,0,1,0
+"Schedule a meeting with my team.",0,0,1,0
+"Add 'buy groceries' to my to-do list.",0,0,1,0
+"Remind me to submit the report.",0,0,1,0
+"Set a task to renew my passport.",0,0,1,0
+"Remember to water the plants.",0,0,1,0
+"Add a note to review the budget.",0,0,1,0
+"Set a reminder to exercise at 6 PM.",0,0,1,0
+"Add 'finish the project' to my tasks.",0,0,1,0
+"Schedule an appointment with the doctor.",0,0,1,0
+"Remember to call mom tomorrow.",0,0,1,0
+"Add a reminder to pay the electricity bill.",0,0,1,0
+"Set a task to clean the house this weekend.",0,0,1,0
+"Add 'finish reading the book' to my list.",0,0,1,0
+"Schedule a conference call for Monday.",0,0,1,0
+"Remind me to update my calendar.",0,0,1,0
+"Add a task to organize my files.",0,0,1,0
+"Send an email to Sarah.",0,0,0,1
+"Draft an email to my manager.",0,0,0,1
+"Compose an email to Ahmed.",0,0,0,1
+"Forward the latest report via email.",0,0,0,1
+"Reply to John's email.",0,0,0,1
+"Send a thank-you email to my professor.",0,0,0,1
+"Email the meeting minutes to the team.",0,0,0,1
+"Send an invitation email for the event.",0,0,0,1
+"Draft an email regarding the new policy.",0,0,0,1
+"Compose an email to my client.",0,0,0,1
+"Send an update email about the project.",0,0,0,1
+"Email the schedule to the team.",0,0,0,1
+"Draft a follow-up email for the interview.",0,0,0,1
+"Compose an email to the support team.",0,0,0,1
+"Forward the contract via email.",0,0,0,1
+"Send an email confirming the appointment.",0,0,0,1
+"Email the summary of the meeting.",0,0,0,1
+"What time is it and turn on the living room lights.",1,1,0,0
+"How's the weather today and dim the bedroom lights.",1,1,0,0
+"What's the latest news and set the thermostat to 22 degrees.",1,1,0,0
+"Can you tell me a fun fact and lock the front door.",1,1,0,0
+"How do I improve productivity and open the garage door.",1,1,0,0
+"What is the capital of France and close the window blinds.",1,1,0,0
+"Who won the game last night and activate the security alarm.",1,1,0,0
+"What's a good book to read and turn off the kitchen lights.",1,1,0,0
+"How does the stock market work and start the vacuum cleaner.",1,1,0,0
+"What are the benefits of meditation and play relaxing music.",1,1,0,0
+"How do I cook a perfect meal and adjust the air conditioner.",1,1,0,0
+"What's the meaning of life and switch on the garden lights.",1,1,0,0
+"How can I save money and set the mood lighting in the dining room.",1,1,0,0
+"What's the distance to the Moon and lower the thermostat for the night.",1,1,0,0
+"Can you explain quantum physics and activate the home surveillance system.",1,1,0,0
+"What is the history of Rome and turn on the porch light.",1,1,0,0
+"How do I get started with programming and open the curtains in the living room.",1,1,0,0
+"What time is it and add a reminder to call the dentist.",1,0,1,0
+"How's the weather today and schedule a meeting with my team.",1,0,1,0
+"What's the latest news and add 'buy groceries' to my to-do list.",1,0,1,0
+"Can you tell me a fun fact and remind me to submit the report.",1,0,1,0
+"Who won the game last night and set a task to renew my passport.",1,0,1,0
+"What is the capital of France and remember to water the plants.",1,0,1,0
+"How do I improve productivity and add a note to review the budget.",1,0,1,0
+"What are the benefits of meditation and set a reminder to exercise at 6 PM.",1,0,1,0
+"How does the stock market work and add 'finish the project' to my tasks.",1,0,1,0
+"What's a good book to read and schedule an appointment with the doctor.",1,0,1,0
+"Where can I find a good restaurant and remember to call mom tomorrow.",1,0,1,0
+"What is the history of Rome and add a reminder to pay the electricity bill.",1,0,1,0
+"How do I bake a cake and set a task to clean the house this weekend.",1,0,1,0
+"What is the meaning of life and add 'finish reading the book' to my list.",1,0,1,0
+"Can you explain quantum physics and schedule a conference call for Monday.",1,0,1,0
+"How do I get started with programming and remind me to update my calendar.",1,0,1,0
+"What's the best movie tonight and add a task to organize my files.",1,0,1,0
+"What time is it and send an email to Sarah.",1,0,0,1
+"How's the weather today and draft an email to my manager.",1,0,0,1
+"What's the latest news and compose an email to Ahmed.",1,0,0,1
+"Can you tell me a fun fact and forward the latest report via email.",1,0,0,1
+"Who won the game last night and reply to John's email.",1,0,0,1
+"What is the capital of France and send a thank-you email to my professor.",1,0,0,1
+"How do I improve productivity and email the meeting minutes to the team.",1,0,0,1
+"What are the benefits of meditation and send an invitation email for the event.",1,0,0,1
+"How does the stock market work and draft an email regarding the new policy.",1,0,0,1
+"What's a good book to read and compose an email to my client.",1,0,0,1
+"Where can I find a good restaurant and send an update email about the project.",1,0,0,1
+"What is the history of Rome and email the schedule to the team.",1,0,0,1
+"How do I bake a cake and draft a follow-up email for the interview.",1,0,0,1
+"What is the meaning of life and compose an email to the support team.",1,0,0,1
+"Can you explain quantum physics and forward the contract via email.",1,0,0,1
+"How do I get started with programming and send an email confirming the appointment.",1,0,0,1
+"What's the best movie tonight and email the summary of the meeting.",1,0,0,1
+"Turn on the living room lights and add a reminder to call the dentist.",0,1,1,0
+"Dim the bedroom lights and schedule a meeting with my team.",0,1,1,0
+"Set the thermostat to 22 degrees and add 'buy groceries' to my to-do list.",0,1,1,0
+"Lock the front door and remind me to submit the report.",0,1,1,0
+"Open the garage door and set a task to renew my passport.",0,1,1,0
+"Close the window blinds and remember to water the plants.",0,1,1,0
+"Activate the security alarm and add a note to review the budget.",0,1,1,0
+"Turn off the kitchen lights and set a reminder to exercise at 6 PM.",0,1,1,0
+"Start the vacuum cleaner and add 'finish the project' to my tasks.",0,1,1,0
+"Play relaxing music and schedule an appointment with the doctor.",0,1,1,0
+"Adjust the air conditioner and remember to call mom tomorrow.",0,1,1,0
+"Switch on the garden lights and add a reminder to pay the electricity bill.",0,1,1,0
+"Set the mood lighting in the dining room and set a task to clean the house this weekend.",0,1,1,0
+"Lower the thermostat for the night and add 'finish reading the book' to my list.",0,1,1,0
+"Activate the home surveillance system and schedule a conference call for Monday.",0,1,1,0
+"Turn on the porch light and remind me to update my calendar.",0,1,1,0
+"Open the curtains in the living room and add a task to organize my files.",0,1,1,0
+"Turn on the living room lights and send an email to Sarah.",0,1,0,1
+"Dim the bedroom lights and draft an email to my manager.",0,1,0,1
+"Set the thermostat to 22 degrees and compose an email to Ahmed.",0,1,0,1
+"Lock the front door and forward the latest report via email.",0,1,0,1
+"Open the garage door and reply to John's email.",0,1,0,1
+"Close the window blinds and send a thank-you email to my professor.",0,1,0,1
+"Activate the security alarm and email the meeting minutes to the team.",0,1,0,1
+"Turn off the kitchen lights and send an invitation email for the event.",0,1,0,1
+"Start the vacuum cleaner and draft an email regarding the new policy.",0,1,0,1
+"Play relaxing music and compose an email to my client.",0,1,0,1
+"Adjust the air conditioner and send an update email about the project.",0,1,0,1
+"Switch on the garden lights and email the schedule to the team.",0,1,0,1
+"Set the mood lighting in the dining room and draft a follow-up email for the interview.",0,1,0,1
+"Lower the thermostat for the night and compose an email to the support team.",0,1,0,1
+"Activate the home surveillance system and forward the contract via email.",0,1,0,1
+"Turn on the porch light and send an email confirming the appointment.",0,1,0,1
+"Open the curtains in the living room and email the summary of the meeting.",0,1,0,1
+"Add a reminder to call the dentist and send an email to Sarah.",0,0,1,1
+"Schedule a meeting with my team and draft an email to my manager.",0,0,1,1
+"Add 'buy groceries' to my list and compose an email to Ahmed.",0,0,1,1
+"Remind me to submit the report and forward the latest report via email.",0,0,1,1
+"Set a task to renew my passport and reply to John's email.",0,0,1,1
+"Remember to water the plants and send a thank-you email to my professor.",0,0,1,1
+"Add a note to review the budget and email the meeting minutes to the team.",0,0,1,1
+"Set a reminder to exercise at 6 PM and send an invitation email for the event.",0,0,1,1
+"Add 'finish the project' to my tasks and draft an email regarding the new policy.",0,0,1,1
+"Schedule an appointment with the doctor and compose an email to my client.",0,0,1,1
+"Remember to call mom tomorrow and send an update email about the project.",0,0,1,1
+"Add a reminder to pay the electricity bill and email the schedule to the team.",0,0,1,1
+"Set a task to clean the house this weekend and draft a follow-up email for the interview.",0,0,1,1
+"Add 'finish reading the book' to my list and compose an email to the support team.",0,0,1,1
+"Schedule a conference call for Monday and forward the contract via email.",0,0,1,1
+"Remind me to update my calendar and send an email confirming the appointment.",0,0,1,1
+"Add a task to organize my files and email the summary of the meeting.",0,0,1,1
+"What time is it, turn on the living room lights, and add a reminder to call the dentist.",1,1,1,0
+"How's the weather today, dim the bedroom lights, and schedule a meeting with my team.",1,1,1,0
+"What's the latest news, set the thermostat to 22 degrees, and add 'buy groceries' to my to-do list.",1,1,1,0
+"Can you tell me a fun fact, lock the front door, and remind me to submit the report.",1,1,1,0
+"Who won the game last night, open the garage door, and set a task to renew my passport.",1,1,1,0
+"What is the capital of France, close the window blinds, and remember to water the plants.",1,1,1,0
+"How do I improve productivity, activate the security alarm, and add a note to review the budget.",1,1,1,0
+"What are the benefits of meditation, turn off the kitchen lights, and set a reminder to exercise at 6 PM.",1,1,1,0
+"How does the stock market work, start the vacuum cleaner, and add 'finish the project' to my tasks.",1,1,1,0
+"What's a good book to read, play relaxing music, and schedule an appointment with the doctor.",1,1,1,0
+"Where can I find a good restaurant, adjust the air conditioner, and remember to call mom tomorrow.",1,1,1,0
+"What is the history of Rome, switch on the garden lights, and add a reminder to pay the electricity bill.",1,1,1,0
+"How do I bake a cake, set the mood lighting in the dining room, and set a task to clean the house this weekend.",1,1,1,0
+"What is the meaning of life, lower the thermostat for the night, and add 'finish reading the book' to my list.",1,1,1,0
+"Can you explain quantum physics, activate the home surveillance system, and schedule a conference call for Monday.",1,1,1,0
+"How do I get started with programming, turn on the porch light, and remind me to update my calendar.",1,1,1,0
+"What's the best movie tonight, open the curtains in the living room, and add a task to organize my files.",1,1,1,0
+"What time is it, turn on the living room lights, and send an email to Sarah.",1,1,0,1
+"How's the weather today, dim the bedroom lights, and draft an email to my manager.",1,1,0,1
+"What's the latest news, set the thermostat to 22 degrees, and compose an email to Ahmed.",1,1,0,1
+"Can you tell me a fun fact, lock the front door, and forward the latest report via email.",1,1,0,1
+"Who won the game last night, open the garage door, and reply to John's email.",1,1,0,1
+"What is the capital of France, close the window blinds, and send a thank-you email to my professor.",1,1,0,1
+"How do I improve productivity, activate the security alarm, and email the meeting minutes to the team.",1,1,0,1
+"What are the benefits of meditation, turn off the kitchen lights, and send an invitation email for the event.",1,1,0,1
+"How does the stock market work, start the vacuum cleaner, and draft an email regarding the new policy.",1,1,0,1
+"What's a good book to read, play relaxing music, and compose an email to my client.",1,1,0,1
+"Where can I find a good restaurant, adjust the air conditioner, and send an update email about the project.",1,1,0,1
+"What is the history of Rome, switch on the garden lights, and email the schedule to the team.",1,1,0,1
+"How do I bake a cake, set the mood lighting in the dining room, and draft a follow-up email for the interview.",1,1,0,1
+"What is the meaning of life, lower the thermostat for the night, and compose an email to the support team.",1,1,0,1
+"Can you explain quantum physics, activate the home surveillance system, and forward the contract via email.",1,1,0,1
+"How do I get started with programming, turn on the porch light, and send an email confirming the appointment.",1,1,0,1
+"What's the best movie tonight, open the curtains in the living room, and email the summary of the meeting.",1,1,0,1
+"What time is it, add a reminder to call the dentist, and send an email to Sarah.",1,0,1,1
+"How's the weather today, schedule a meeting with my team, and draft an email to my manager.",1,0,1,1
+"What's the latest news, add 'buy groceries' to my list, and compose an email to Ahmed.",1,0,1,1
+"Can you tell me a fun fact, remind me to submit the report, and forward the latest report via email.",1,0,1,1
+"Who won the game last night, set a task to renew my passport, and reply to John's email.",1,0,1,1
+"What is the capital of France, remember to water the plants, and send a thank-you email to my professor.",1,0,1,1
+"How do I improve productivity, add a note to review the budget, and email the meeting minutes to the team.",1,0,1,1
+"What are the benefits of meditation, set a reminder to exercise at 6 PM, and send an invitation email for the event.",1,0,1,1
+"How does the stock market work, add 'finish the project' to my tasks, and draft an email regarding the new policy.",1,0,1,1
+"What's a good book to read, schedule an appointment with the doctor, and compose an email to my client.",1,0,1,1
+"Where can I find a good restaurant, remember to call mom tomorrow, and send an update email about the project.",1,0,1,1
+"What is the history of Rome, add a reminder to pay the electricity bill, and email the schedule to the team.",1,0,1,1
+"How do I bake a cake, set a task to clean the house this weekend, and draft a follow-up email for the interview.",1,0,1,1
+"What is the meaning of life, add 'finish reading the book' to my list, and compose an email to the support team.",1,0,1,1
+"Can you explain quantum physics, schedule a conference call for Monday, and forward the contract via email.",1,0,1,1
+"How do I get started with programming, remind me to update my calendar, and send an email confirming the appointment.",1,0,1,1
+"What's the best movie tonight, add a task to organize my files, and email the summary of the meeting.",1,0,1,1
+"Turn on the living room lights, add a reminder to call the dentist, and send an email to Sarah.",0,1,1,1
+"Dim the bedroom lights, schedule a meeting with my team, and draft an email to my manager.",0,1,1,1
+"Set the thermostat to 22 degrees, add 'buy groceries' to my list, and compose an email to Ahmed.",0,1,1,1
+"Lock the front door, remind me to submit the report, and forward the latest report via email.",0,1,1,1
+"Open the garage door, set a task to renew my passport, and reply to John's email.",0,1,1,1
+"Close the window blinds, remember to water the plants, and send a thank-you email to my professor.",0,1,1,1
+"Activate the security alarm, add a note to review the budget, and email the meeting minutes to the team.",0,1,1,1
+"Turn off the kitchen lights, set a reminder to exercise at 6 PM, and send an invitation email for the event.",0,1,1,1
+"Start the vacuum cleaner, add 'finish the project' to my tasks, and draft an email regarding the new policy.",0,1,1,1
+"Play relaxing music, schedule an appointment with the doctor, and compose an email to my client.",0,1,1,1
+"Adjust the air conditioner, remember to call mom tomorrow, and send an update email about the project.",0,1,1,1
+"Switch on the garden lights, add a reminder to pay the electricity bill, and email the schedule to the team.",0,1,1,1
+"Set the mood lighting in the dining room, set a task to clean the house this weekend, and draft a follow-up email for the interview.",0,1,1,1
+"Lower the thermostat for the night, add 'finish reading the book' to my list, and compose an email to the support team.",0,1,1,1
+"Activate the home surveillance system, schedule a conference call for Monday, and forward the contract via email.",0,1,1,1
+"Turn on the porch light, remind me to update my calendar, and send an email confirming the appointment.",0,1,1,1
+"Open the curtains in the living room, add a task to organize my files, and email the summary of the meeting.",0,1,1,1
+"What time is it, turn on the living room lights, add a reminder to call the dentist, and send an email to Sarah.",1,1,1,1
+"How's the weather today, dim the bedroom lights, schedule a meeting with my team, and draft an email to my manager.",1,1,1,1
+"What's the latest news, set the thermostat to 22 degrees, add 'buy groceries' to my to-do list, and compose an email to Ahmed.",1,1,1,1
+"Can you tell me a fun fact, lock the front door, remind me to submit the report, and forward the latest report via email.",1,1,1,1
+"Who won the game last night, open the garage door, set a task to renew my passport, and reply to John's email.",1,1,1,1
+"What is the capital of France, close the window blinds, remember to water the plants, and send a thank-you email to my professor.",1,1,1,1
+"How do I improve productivity, activate the security alarm, add a note to review the budget, and email the meeting minutes to the team.",1,1,1,1
+"What are the benefits of meditation, turn off the kitchen lights, set a reminder to exercise at 6 PM, and send an invitation email for the event.",1,1,1,1
+"How does the stock market work, start the vacuum cleaner, add 'finish the project' to my tasks, and draft an email regarding the new policy.",1,1,1,1
+"What's a good book to read, play relaxing music, schedule an appointment with the doctor, and compose an email to my client.",1,1,1,1
+"Where can I find a good restaurant, adjust the air conditioner, remember to call mom tomorrow, and send an update email about the project.",1,1,1,1
+"What is the history of Rome, switch on the garden lights, add a reminder to pay the electricity bill, and email the schedule to the team.",1,1,1,1
