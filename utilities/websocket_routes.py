@@ -1,6 +1,6 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from typing import Dict
-import time
+import asyncio
 
 router = APIRouter(prefix="/api")
 
@@ -9,20 +9,20 @@ connected_robots: Dict[str, WebSocket] = {}
 @router.websocket("/ws/{robot_id}")
 async def websocket_endpoint(websocket: WebSocket, robot_id: str):
     print(f"🤖 New connection: {robot_id}")
-    time.sleep(0.1)  # Simulate some delay
+    await asyncio.sleep(0.5)  # Simulate some delay
     await websocket.accept()
     connected_robots[robot_id] = websocket
     print(f"✅ Robot connected: {robot_id}")
-    time.sleep(0.1)  # Simulate some delay
+    await asyncio.sleep(0.5)  # Simulate some delay
 
     try:
         while True:
             data = await websocket.receive_text()
             print(f"📥 {robot_id} says: {data}")
-            time.sleep(0.1)
+            await asyncio.sleep(0.5)
             # Respond to the robot
             await websocket.send_text(f"Echo: {data}")
     except WebSocketDisconnect:
         print(f"❌ {robot_id} disconnected")
-        time.sleep(0.1)
+        await asyncio.sleep(0.5)
         connected_robots.pop(robot_id, None)
