@@ -1,8 +1,6 @@
 import sys
 from pathlib import Path
 
-# Add the root directory of the project to sys.path at the beginning
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from langchain_community.tools import TavilySearchResults
 from tavily import TavilyClient
@@ -15,16 +13,24 @@ from langchain_core.runnables import chain, RunnableConfig
 from dotenv import find_dotenv, dotenv_values
 
 import os
-import time
 import requests
 import random
+import time
+import logging
 
+# Add the root directory of the project to sys.path at the beginning
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from utilities import BaseMQTTHandler
 
 DEFAULT_PATH = os.path.dirname(__file__)
 
 random.seed(time.time())
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
 
 class FindLearningResources(BaseMQTTHandler):
     """
@@ -63,10 +69,10 @@ class FindLearningResources(BaseMQTTHandler):
         self.confidence_threshold = confidence_threshold / 100
 
         # Load API keys from .env file
-        self.tavily_api_key = dotenv_values(find_dotenv())["TAVILY_API_KEY"]
+        self.tavily_api_key = dotenv_values(find_dotenv())["TAVILY_API_KEY_TEST"] #! Test
 
         if self.use_llm:
-            self.gemini_api_key = dotenv_values(find_dotenv())["GEMINI_API_KEY"]
+            self.gemini_api_key = dotenv_values(find_dotenv())["GEMINI_API_KEY_TEST"] #! Test
 
         # Set the API keys as environment variables
         if self.use_llm:
@@ -268,17 +274,25 @@ class FindLearningResources(BaseMQTTHandler):
         Returns:
             dict: The result of the learning resources search.
         """
-        topic = input_data.get("topic", None)
-        if not topic:
-            return
+        topic = input_data.get("topic")
         specific_resources = input_data.get("specific_resources", [])
-        result = self.find_resources(topic, specific_resources)
         
+        if not topic:
+            logger.info("Topic is empty or not provided.")
+            result = {"error": "Topic is empty or not provided."}
+            
+        else:
+            try:
+                result = self.find_resources(topic, specific_resources)
+                logger.info(f"Result is: {result}")
+            except Exception as e:
+                result = {"error": f"Error in Tavily API or Gemini: {e}"}
+                logger.error(f"Error in Tavily API or Gemini: {e}")
+
         self.publish_result(result, "task_handler/main")
         
         return None
 
-        
 
     def _init_prompt(self) -> ChatPromptTemplate:
         """
@@ -431,7 +445,6 @@ Returns:
                 return parsed_output
 
             # Run the tool chain
-            start_time = time.time()
             result = tool_chain.invoke(input)
 
             try:
@@ -439,8 +452,6 @@ Returns:
             except:
                 return {"error": "LLM failed to generate resources."}
 
-            # Add the time taken and topic to the result
-            result["time_taken"] = round(time.time() - start_time, 2)
             result["topic"] = topic
             result["total_resources"] = total_resources
             result["specific_resources_names"] = specific_resources_names
@@ -448,7 +459,6 @@ Returns:
             if self.clean_resources:
                 return self.clean_llm_resources(result)
             else:
-                result["cleaning_time"] = 0
                 return result
 
         else:
@@ -499,7 +509,6 @@ Returns:
             resources = []
 
             # Find resources using the Tavily API
-            start_time = time.time()
             for is_image, resource in zip(is_image, specific_resources):
                 if is_image:
                     try:
@@ -556,8 +565,6 @@ Returns:
                 "topic": topic,
                 "total_resources": len(resources),
                 "model_output": f"Learning resources found for the topic '{topic}', results have been sent to Telegram and B.E.M.O app.",
-                "generation_time": round(time.time() - start_time, 2),
-                "cleaning_time": 0,
                 "specific_resources": specific_resources_names,
             }
 
@@ -601,8 +608,6 @@ Returns:
         Returns:
             dict: The cleaned learning resources
         """
-
-        start_time = time.time()
 
         allowed_status_codes = [
             200,
@@ -696,8 +701,6 @@ Returns:
             "topic": resources["topic"],
             "total_resources": len(non_error_resources),
             "model_output": resources["model_output"],
-            "generation_time": resources["time_taken"],
-            "cleaning_time": round(time.time() - start_time, 2),
             "specific_resources": resources["specific_resources_names"],
         }
 
@@ -711,8 +714,6 @@ Returns:
         Returns:
             dict: The cleaned learning resources
         """
-
-        start_time = time.time()
 
         allowed_status_codes = [
             200,
@@ -820,8 +821,6 @@ Returns:
             "topic": resources["topic"],
             "total_resources": len(non_error_resources),
             "model_output": resources["model_output"],
-            "generation_time": resources["generation_time"],
-            "cleaning_time": round(time.time() - start_time, 2),
             "specific_resources": resources["specific_resources"],
         }
 
