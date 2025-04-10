@@ -16,6 +16,8 @@ async def websocket_endpoint(websocket: WebSocket, robot_id: str):
         while True:
             data = await websocket.receive_text()
             print(f"📥 {robot_id} says: {data}")
+            # Respond to the robot
+            await websocket.send_text(f"Echo: {data}")
     except WebSocketDisconnect:
         print(f"❌ {robot_id} disconnected")
         connected_robots.pop(robot_id, None)
