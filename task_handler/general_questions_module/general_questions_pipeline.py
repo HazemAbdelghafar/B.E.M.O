@@ -1,22 +1,26 @@
 import sys
 from pathlib import Path
 
-
 import os
-import json
-import time
 from dotenv import load_dotenv
 from tavily import TavilyClient
+import logging
+import random
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from utilities import BaseMQTTHandler
+from utilities import BaseMQTTHandler, ERROR_RESPONSES
 
 # Todo: Add Gemini usage to the pipeline to ensure that the answer is correct
 
 load_dotenv()
 DEFAULT_PATH = os.path.dirname(__file__)
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
 
 class GeneralQuestions(BaseMQTTHandler):
     """
@@ -30,40 +34,21 @@ class GeneralQuestions(BaseMQTTHandler):
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/general_questions", name="general_questions")
         
-        self.tavily = TavilyClient(os.getenv("TAVILY_API"))
+        self.tavily = TavilyClient(os.getenv("TAVILY_API_KEY_TEST")) #! Test
 
-    def read_request(self, request_path: str = None):
-        if request_path:
-            with open(request_path, "r") as f:
-                return json.load(f)
-        else:
-            with open(DEFAULT_PATH + "/request.json", "r") as f:
-                return json.load(f)
-
-    def write_response(self, data: dict):
-        with open(DEFAULT_PATH + "/response.json", "w") as f:
-            json.dump(data, f, indent=4)
-
-    def clean_answer(self, answer: str):
-        # Remove any extra characters and end of sentence characters
+    def clean_answer(self, answer: str) -> str:
+        """
+        Cleans the answer string by removing unwanted characters.
+        Args:
+            answer (str): The answer string to clean.
+        Returns:
+            str: The cleaned answer string.
+        """
         cleaned_answer = "".join(char for char in answer if ord(char) < 128)
         cleaned_answer = (
             cleaned_answer.strip()
         )  # Remove leading and trailing whitespace
         return cleaned_answer
-
-    def get_response(self, request_path: str = None):
-        request = self.read_request(request_path)
-        start_time = time.time()
-        response = self.tavily.search(
-            request["query"], include_answer=True, topic=request["topic"]
-        )
-        cleaned_answer = self.clean_answer(response["answer"])
-        response_json = {
-            "response": cleaned_answer,
-            "time": round(time.time() - start_time, 2),
-        }
-        self.write_response(response_json)
 
     def execute_main(self, input_data: dict) -> dict:
         """
@@ -75,16 +60,27 @@ class GeneralQuestions(BaseMQTTHandler):
         Returns:
             dict: The result of the general question processing.
         """
-        query = input_data.get("query", "default_query")
+        query = input_data.get("query")
         topic = input_data.get("topic", "general")
-        start_time = time.time()
-        response = self.tavily.search(query, include_answer=True, topic=topic)
-        answer = self.clean_answer(response["answer"])
+        
+        if not query:
+            logger.error("Query is empty or not provided.")
+            answer = random.choice(ERROR_RESPONSES)
+
+        else:
+            try:
+                response = self.tavily.search(query, include_answer=True, topic=topic)
+            except Exception as e:
+                logger.error(f"Error in Tavily API: {e}")
+                answer = random.choice(ERROR_RESPONSES)
+            else:
+                logger.info(f"Response from Tavily API: {response}")
+                answer = self.clean_answer(response["answer"])
+        
         result = {
             "query": query,
             "answer": answer,
             "topic": topic,
-            "time": round(time.time() - start_time, 2),
         }
         
         self.publish_result(result, "task_handler/main")
