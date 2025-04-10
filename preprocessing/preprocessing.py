@@ -1,4 +1,3 @@
-from pprint import pprint
 from dotenv import dotenv_values, find_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
