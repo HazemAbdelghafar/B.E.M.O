@@ -61,7 +61,11 @@ class BaseMQTTHandler:
             input_data (dict | list): The input data to process.
         """
         start = time.time()  # Start the timer
-        self._result = self.execute_main(input_data)
+        try:
+            self._result = self.execute_main(input_data)
+        except Exception as e:
+            logger.error(f"Error in executing main function: {e}")
+            self._result = {"error": str(e)}
         end = time.time()  # End the timer
         
         logger.info(f"Execution time for {self.__name}: {end - start} seconds")
@@ -84,6 +88,22 @@ class BaseMQTTHandler:
             logger.info("Connected to broker!")
         else:
             logger.error(f"Failed to connect, return code {rc}")
+            
+            is_connected = False
+            
+            while not is_connected:
+                # Try to reconnect if the connection fails
+                try:
+                    self.client.reconnect()
+                    logger.info("Reconnecting to broker...")
+                except Exception as e:
+                    logger.error(f"Reconnection failed: {e}")
+                    time.sleep(5)
+                else:
+                    is_connected = True
+                    logger.info("Reconnected to broker!")
+                    self.client.subscribe(self.__sub_topic, self.__qos)  # Resubscribe to the topic
+                    logger.info(f"Subscribed to topic '{self.__sub_topic}'")
     
     def __callback(self, client: mqtt.Client, userdata: any, msg: mqtt.MQTTMessage):
         """
@@ -94,7 +114,11 @@ class BaseMQTTHandler:
             userdata (Any): User-defined data of any type.
             msg (mqtt.MQTTMessage): The message received from the broker.
         """
-        input_data = msg.payload.decode()
+        try:
+            input_data = msg.payload.decode()
+        except Exception as e:
+            logger.error(f"Error decoding message: {e}")
+            return
         try:
             input_data_parsed = literal_eval(input_data)
         except:
@@ -138,7 +162,12 @@ class BaseMQTTHandler:
         if result is not {}:
             result["module_name"] = self.__name
             str_result = str(result)
-            self.client.publish(topic, str_result, self.__qos)
+            try:
+                self.client.publish(topic, str_result, self.__qos)
+            except Exception as e:
+                logger.error(f"Error publishing result: {e}")
+                return
+            
             logger.info(f"Published result to topic '{topic}': {str_result}")
     
     def start(self):
