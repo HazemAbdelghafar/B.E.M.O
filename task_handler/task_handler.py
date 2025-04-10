@@ -16,7 +16,7 @@ logger.addHandler(console_handler)
 
 
 NAME = "task_handler"
-SUB_TOPIC = "task_handler/global"
+SUB_TOPIC = "task_handler/main"
 
 class TaskHandler(BaseMQTTHandler):
     def __init__(self):

@@ -68,7 +68,7 @@ class TasksApi(BaseMQTTHandler):
         """
         result = self(input_data)
 
-        self.publish_result(result, "task_handler/global")
+        self.publish_result(result, "task_handler/main")
         
         return None
 

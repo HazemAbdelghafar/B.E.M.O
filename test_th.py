@@ -14,13 +14,13 @@ logger.addHandler(console_handler)
 class GlobalMQTTHandler:
     """
     GlobalMQTTHandler listens on 'server/main' and publishes a list of predefined
-    task payloads to 'task_handler/global' once triggered.
+    task payloads to 'task_handler/main' once triggered.
     """
 
     def __init__(self, sub_topic: str = "server/main", name: str = "global_publisher"):
         self._result = {}
 
-        self.__pub_topic = "task_handler/global"
+        self.__pub_topic = "task_handler/main"
         self.__sub_topic = sub_topic
         self.__name = name
         self.__qos = 1

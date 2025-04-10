@@ -93,7 +93,7 @@ class SmartHomeAutomation(BaseMQTTHandler):
             success = self.control_device(switch, status)
             results.append({"switch": switch, "status": status, "success": success})
 
-        self.publish_result({"results": results}, "task_handler/global")
+        self.publish_result({"results": results}, "task_handler/main")
         
         return None
 

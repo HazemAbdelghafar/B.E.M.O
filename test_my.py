@@ -32,12 +32,17 @@ send = {
         'preprocessed_prompt': 'Tell me some jokes about my job',
         'module_name': 'task_classifier'
     }
+send = {
+        'predicted_labels': ['others'],
+        'preprocessed_prompt': 'Haha that was funny, tell me another one',
+        'module_name': 'task_classifier'
+    }
 
 
 class GlobalMQTTHandler:
     """
     GlobalMQTTHandler listens on 'server/main' and publishes a list of predefined
-    task payloads to 'task_handler/global' once triggered.
+    task payloads to 'task_handler/main' once triggered.
     """
 
     def __init__(self, sub_topic: str = "server/main", name: str = "global_publisher"):

@@ -274,7 +274,7 @@ class FindLearningResources(BaseMQTTHandler):
         specific_resources = input_data.get("specific_resources", [])
         result = self.find_resources(topic, specific_resources)
         
-        self.publish_result(result, "task_handler/global")
+        self.publish_result(result, "task_handler/main")
         
         return None
 
