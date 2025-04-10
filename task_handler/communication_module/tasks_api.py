@@ -19,7 +19,7 @@ import logging
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from utilities import BaseMQTTHandler
+from utilities import BaseMQTTHandler, user_data
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
@@ -30,7 +30,7 @@ logger.addHandler(console_handler)
 
 DEFAULT_NOTE = "\n\nB.E.M.O"
 DEFAULT_PATH = os.path.dirname(__file__)
-DEFAULT_TIMEZONE = "Africa/Cairo" # Todo: To be edited based on the user's location
+DEFAULT_TIMEZONE = user_data.get("timezone", "Africa/Cairo")
 
 
 class TasksApi(BaseMQTTHandler):

@@ -3,6 +3,11 @@ from colory.color import Color
 import webcolors
 import pytz
 import logging
+import sys
+from pathlib import Path
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+from utilities import user_data
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
@@ -11,7 +16,7 @@ logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s'
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
-tz = pytz.timezone("Europe/Berlin")
+tz = pytz.timezone(user_data.get("timezone", "Africa/Cairo"))
 berlin_now = datetime.now(tz)
 
 allowed_hex_colors = [

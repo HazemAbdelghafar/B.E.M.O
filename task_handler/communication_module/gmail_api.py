@@ -23,7 +23,7 @@ import logging
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from utilities import BaseMQTTHandler
+from utilities import BaseMQTTHandler, user_data
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
@@ -35,7 +35,7 @@ logger.addHandler(console_handler)
 
 DEFAULT_NOTE = "\n\nSent or Modified by B.E.M.O"
 DEFAULT_PATH = os.path.dirname(__file__)
-DEFAULT_TIMEZONE = "Africa/Cairo"
+DEFAULT_TIMEZONE = user_data.get("timezone", "Africa/Cairo")
 
 
 class GmailAPI(BaseMQTTHandler):
@@ -3645,7 +3645,7 @@ if __name__ == "__main__":
     logger.info(f"Labels saved to {DEFAULT_PATH + '/test/labels.json'}")
 
     # logger.info("Label by Name:")
-    # pprint(gmail_api.get_labels_by_name(label_name))
+    # logger.info(gmail_api.get_labels_by_name(label_name))
 
     # logger.info("Delete all labels:")
     # logger.info(gmail_api.delete_all_labels())
