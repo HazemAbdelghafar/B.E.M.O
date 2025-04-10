@@ -10,8 +10,9 @@ switch_mapping = {
 
 # TODO: Add more user data
 user_data = {
-    "location": "Cairo",
-    "name": "Ali",
+    "location": "Cairo, Egypt",
+    "timezone": "Africa/Cairo",
+    "name": "Ali Mohamed Abdelnasser",
     "job_title": "Software Engineer",
 }
 
