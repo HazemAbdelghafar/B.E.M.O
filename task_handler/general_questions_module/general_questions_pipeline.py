@@ -5,11 +5,10 @@ import os
 from dotenv import load_dotenv
 from tavily import TavilyClient
 import logging
-import random
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from utilities import BaseMQTTHandler, ERROR_RESPONSES
+from utilities import BaseMQTTHandler
 
 # Todo: Add Gemini usage to the pipeline to ensure that the answer is correct
 
@@ -65,24 +64,23 @@ class GeneralQuestions(BaseMQTTHandler):
         
         if not query:
             logger.error("Query is empty or not provided.")
-            answer = random.choice(ERROR_RESPONSES)
+            result = {"error": "Query is empty or not provided."}
 
         else:
             try:
                 response = self.tavily.search(query, include_answer=True, topic=topic)
+                logger.info(f"Response from Tavily API: {response}")
             except Exception as e:
                 logger.error(f"Error in Tavily API: {e}")
-                answer = random.choice(ERROR_RESPONSES)
+                result = {"error": f"Error in Tavily API: {e}"}
             else:
-                logger.info(f"Response from Tavily API: {response}")
                 answer = self.clean_answer(response["answer"])
-        
-        result = {
-            "query": query,
-            "answer": answer,
-            "topic": topic,
-        }
-        
+                result = {
+                    "query": query,
+                    "answer": answer,
+                    "topic": topic,
+                }
+                
         self.publish_result(result, "task_handler/main")
         
         return None
