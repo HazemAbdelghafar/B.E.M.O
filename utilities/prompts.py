@@ -380,3 +380,5 @@ ERROR_RESPONSES = [
     "Hmm, that's on me. How about we try a different approach?",
     "Something didn't work out. Let's retry and get it right!"
 ]
+
+TEST = "Hi from MY"
