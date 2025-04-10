@@ -1,9 +1,6 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-from utilities import connection_manager
-from utilities import router as websocket_router
+from utilities import websocket_router
 
 app = FastAPI()
 
