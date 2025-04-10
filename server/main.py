@@ -22,7 +22,9 @@ app.add_middleware(
 # === WebSocket route for robot connection ===
 @app.websocket("/ws/{robot_id}")
 async def websocket_endpoint(websocket: WebSocket, robot_id: str):
+    print(f"New connection: {robot_id}")
     await connection_manager.connect(robot_id, websocket)
+    print(f"Connected: {robot_id}")
     try:
         while True:
             data = await websocket.receive_text()
