@@ -16,8 +16,12 @@ class WebSocketManager:
             print(f"Disconnected: {robot_id}")
 
     async def send_message(self, robot_id: str, message: str):
-        if robot_id in self.active_connections:
-            await self.active_connections[robot_id].send_text(message)
+        websocket = self.active_connections.get(robot_id)
+        if websocket:
+            await websocket.send_text(message)
+
+    def is_connected(self, robot_id: str) -> bool:
+        return robot_id in self.active_connections
 
     async def broadcast(self, message: str):
         for ws in self.active_connections.values():
