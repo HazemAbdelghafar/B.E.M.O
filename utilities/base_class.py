@@ -65,7 +65,7 @@ class BaseMQTTHandler:
             self._result = self.execute_main(input_data)
         except Exception as e:
             logger.error(f"Error in executing main function: {e}")
-            self._result = {"error": str(e)}
+            self._result = {"error": str(e), "level": 2}
         end = time.time()  # End the timer
         
         logger.info(f"Execution time for {self.__name}: {end - start} seconds")
