@@ -66,8 +66,18 @@ class TasksApi(BaseMQTTHandler):
         Returns:
             dict: The result of the task operation.
         """
-        result = self(input_data)
-
+        
+        if not isinstance(input_data, dict):
+            result = {"error": "Invalid input data", "level": 2}
+            logger.error(f"Error processing input data: {result}")
+        else:
+            try:
+                result = self(input_data)
+                logger.info(f"Result: {result}")
+            except Exception as e:
+                logger.error(f"Error processing input data: {e}")
+                result = {"error": str(e), "level": 2}
+        
         self.publish_result(result, "task_handler/main")
         
         return None
@@ -1046,11 +1056,11 @@ class TasksApi(BaseMQTTHandler):
 
         if list_all:
             result = self.list_tasks_all(max_results)
-            return result if result else {"error": "No tasks found"}
+            return result if result else {"error": "No tasks found", "level": 1}
         if object_type == None:
-            return {"error": "object_type is required"}
+            return {"error": "object_type is required", "level": 2}
         if action == None:
-            return {"error": "action is required"}
+            return {"error": "action is required", "level": 2}
         if due_date:
             year = int(due_date[0:4])
             month = int(due_date[5:7])
@@ -1065,24 +1075,24 @@ class TasksApi(BaseMQTTHandler):
         if object_type == "list":                
             if action == "list":
                 result = self.list_task_lists_all()
-                return result if result else {"error": "No task lists found"}
+                return result if result else {"error": "No task lists found", "level": 1}
             elif action == "insert":
                 result = self.insert_task_list(new_list_name)
-                return result if result else {"error": "Task list not inserted"}
+                return result if result else {"error": "Task list not inserted", "level": 2}
             elif action == "update":
                 result = self.update_task_lists_by_name(list_name, new_list_name)
-                return result if result else {"error": "Task list not updated"}
+                return result if result else {"error": "Task list not updated", "level": 2}
             elif action == "remove":
                 result = self.delete_task_lists_by_name(list_name)
-                return result if result else {"error": "Task list not deleted"}
+                return result if result else {"error": "Task list not deleted", "level": 2}
             elif action == "get":
                 result = self.get_task_lists_by_name(list_name)
-                return result if result else {"error": "Task list not found"}
+                return result if result else {"error": "Task list not found", "level": 1}
 
         elif object_type == "task":                
             if action == "list":
                 result = self.list_tasks_by_task_list_name(list_name, max_results)
-                return result if result else {"error": "No tasks found"}
+                return result if result else {"error": "No tasks found", "level": 1}
             elif action == "insert":
                 result = self.insert_task_by_list_name_parent_name(
                     list_name,
@@ -1096,7 +1106,7 @@ class TasksApi(BaseMQTTHandler):
                     notes,
                     parent_task_name,
                 )
-                return result if result else {"error": "Task not inserted"}
+                return result if result else {"error": "Task not inserted", "level": 2}
             elif action == "update":
                 result = self.update_task_by_list_name_task_name(
                     list_name,
@@ -1112,15 +1122,15 @@ class TasksApi(BaseMQTTHandler):
                     parent_task_name,
                     mark_as_done,
                 )
-                return result if result else {"error": "Task not updated"}
+                return result if result else {"error": "Task not updated", "level": 2}
             elif action == "remove":
                 result = self.delete_tasks_by_name(task_name)
-                return result if result else {"error": "Task not deleted"}
+                return result if result else {"error": "Task not deleted", "level": 2}
             elif action == "get":
                 result = self.get_tasks_by_name(task_name)
-                return result if result else {"error": "Task not found"}
+                return result if result else {"error": "Task not found", "level": 1}
 
-        return {"error": "Invalid action or object type"}
+        return {"error": "Invalid action or object type", "level": 2}
 
 if __name__ == "__main__":
     tasks_api = TasksApi("0")
