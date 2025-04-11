@@ -36,7 +36,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     continue
                 
                 if data:
-                    target_robot_id = data.get("robot_id")
+                    target_robot_id = data.get("target_robot_id")
                     if target_robot_id in connected_devices:
                         await connected_devices[target_robot_id].send_text(message)
                         logger.info(f"Forwarded message to {target_robot_id}: {message}")
