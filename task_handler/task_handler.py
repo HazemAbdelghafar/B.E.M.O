@@ -36,11 +36,13 @@ class TaskHandler(BaseMQTTHandler):
             dict: The result of the processing.
         """
         # Check if input_data is a list
-        if isinstance(input_data, list):
-            logger.info(f"Processing {len(input_data)} tasks")
+        preprocessed_data = input_data.get("preprocessed_data")
+        
+        if preprocessed_data:
+            logger.info(f"Processing {len(preprocessed_data)} tasks")
                         
             # Iterate through each item in the list
-            for item in input_data:
+            for item in preprocessed_data:
                 method = item.get("method")
 
                 if not method:
