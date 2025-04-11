@@ -72,16 +72,15 @@ class RobotWebSocketClient:
 
 if __name__ == "__main__":
     # Create the WebSocket client instance
-    robot_client = RobotWebSocketClient(id="server", server_url="wss://b-e-m-o.onrender.com/api/ws/")
+    server_client = RobotWebSocketClient(id="server", server_url="wss://b-e-m-o.onrender.com/api/ws/")
     
     # Start the WebSocket connection
-    robot_client.start_connection()
+    server_client.start_connection()
 
     while True:
         # Example: Press Enter to send status update
         x = input("Press Enter to send status... ")
-        robot_client.send_data({
-            "status": "active",
-            "battery": 74,
-            'index' : x 
+        server_client.send_data({
+            "robot_id": "bemo-MK1",
+            "message": "Hello from the server!",
         })

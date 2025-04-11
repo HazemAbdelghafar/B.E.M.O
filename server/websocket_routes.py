@@ -14,7 +14,7 @@ router = APIRouter(prefix="/api")
 
 connected_devices: Dict[str, WebSocket] = {}
 
-@router.websocket("/ws/{robot_id}")
+@router.websocket("/ws/{id}")
 async def websocket_endpoint(websocket: WebSocket, id: str):
     logger.info(f"New connection: {id}")
     await websocket.accept()
