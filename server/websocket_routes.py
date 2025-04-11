@@ -4,19 +4,6 @@ from typing import Dict
 import logging
 import json
 import os
-import sys
-from pathlib import Path
-
-# Add the root directory to sys.path
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-from utilities import BaseMQTTHandler
-
-# Define the name of the module and the topics
-NAME = "server"
-SUB_TOPIC = "server/main"
-
-# Initialize the BaseMQTTHandler object
-handler = BaseMQTTHandler(sub_topic=SUB_TOPIC, name=NAME)
 
 # Set up logging
 logger = logging.getLogger("uvicorn")
