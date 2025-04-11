@@ -32,6 +32,7 @@ class Main(BaseMQTTHandler):
         self.emotions = {}
         self.prompt = ""
         self.predicted_labels = []
+        self.preprocessed_data = []
     
     def clean_emotions(self, emotions: dict) -> dict:
         # If both the key and value are empty, remove the key from the dictionary
@@ -53,9 +54,17 @@ class Main(BaseMQTTHandler):
             dict: The result of the classification.
         """
         module_name = input_data.get("module_name")
+        error = input_data.get("error")
         logger.info(f"Module name: {module_name}")
+        
+        if error:
+            # Todo: Handle the error case
+            logger.error(f"Error in input data: {error}")
+            pass
+        
         if not module_name:
             # Todo: Handle the case where module_name is not provided
+            logger.error("Module name is missing")
             pass
         
         # Handle the case where module_name is "server"
@@ -87,13 +96,29 @@ class Main(BaseMQTTHandler):
             
             # self.publish_result({"status": "success", "message": "Data processed successfully", "data": input_data, "target_robot_id": self.robot_id}, topic="server/main") #! Test
             self.publish_result({"prompt": self.prompt}, topic="task_classifier/prompt")
-        
-        # Input data: {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
-        
+                
         # Handle the case where module_name is "task_classifier"
         if module_name == "task_classifier":
             logger.info(f"Received task_classifier module data")
+            
             predicted_labels = input_data.get("predicted_labels")
+            self.predicted_labels = predicted_labels
+            logger.info(f"Predicted labels: {predicted_labels}")
+            
+            self.publish_result({"prompt": self.prompt, "predicted_labels": self.predicted_labels}, topic="preprocessing/prompt")
+                
+        if module_name == "preprocessing":
+            logger.info(f"Received preprocessing module data")
+            logger.info(f"Preprocessed data: {input_data}")
+            self.preprocessed_data = [input_data]
+
+            self.publish_result({"preprocessed_data": self.preprocessed_data}, topic="task_handler/main")            
+        
+        # Task handler data: {'results': {'query': "What's the weather like on 2025-04-11 in Cairo, Egypt?", 'answer': 'On April 11, 2025, Cairo will have partly cloudy skies with a temperature of 17.3C (63.1F). Winds will come from the WNW at 7.6 mph (12.2 kph). No precipitation is expected.', 'topic': 'general', 'module_name': 'general_questions'}, 'module_name': 'task_handler'}       
+ 
+        if module_name == "task_handler":
+            logger.info(f"Received task_handler module data")
+            logger.info(f"Task handler data: {input_data}")
         
         # Return the result
         return None
