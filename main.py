@@ -7,8 +7,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from utilities import BaseMQTTHandler
 
 # Define the name of the module and the topics
-NAME = "server"
-SUB_TOPIC = "server/main"
+NAME = "main"
+SUB_TOPIC = "main/main"
 
 class Server(BaseMQTTHandler):
     """
@@ -33,11 +33,12 @@ class Server(BaseMQTTHandler):
         Returns:
             dict: The result of the classification.
         """
-    
-    def authenticatiom(self, input_data: dict) -> dict:
-        """
-        # TODO
-        Authenticate the input data.
+        # Process the input data
+        result = {
+            "status": "success",
+            "message": "Data processed successfully",
+            "data": input_data
+        }
         
-        """
-        return input_data
+        # Return the result
+        return result
