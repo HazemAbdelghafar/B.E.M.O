@@ -10,7 +10,7 @@ from dotenv import find_dotenv, dotenv_values
 import logging
 
 # Add the root directory of the project to sys.path at the beginning
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from utilities import BaseMQTTHandler
 
 DEFAULT_PATH = os.path.dirname(__file__)
@@ -130,7 +130,7 @@ class ServerWebSocketClient(BaseMQTTHandler):
             message (str): The message to process.
         """
         thread_name = threading.current_thread().name
-        logger.info(f"[{thread_name}] Processing: {message}")
+        logger.info(f"[{thread_name}] Publishing message: {message}")
         
         # Convert message to JSON
         try:
@@ -140,16 +140,18 @@ class ServerWebSocketClient(BaseMQTTHandler):
             logger.error(f"[{thread_name}] Invalid JSON format")
             return
         
-        logger.info(f"[{thread_name}] Finished processing: {message}")
+        self.publish_result(data) # Publish the result to the MQTT broker
+        
+        logger.info(f"[{thread_name}] Published message: {message}")
 
 if __name__ == "__main__":
     server_client = ServerWebSocketClient()
     server_client.start_connection()
     server_client.start_mqtt()
 
-    while True:
-        input("Press Enter to send status...\n")
-        server_client.send_data({
-            "target_robot_id": "bemo-MK1",
-            "message": "Hello from the server!",
-        })
+    # while True:
+    #     input("Press Enter to send status...\n")
+    #     server_client.send_data({
+    #         "target_robot_id": "bemo-MK1",
+    #         "message": "Hello from the server!",
+    #     })
