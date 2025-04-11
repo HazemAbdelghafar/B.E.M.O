@@ -10,8 +10,10 @@ logger = logging.getLogger("uvicorn")
 # Define the name of the module and the topics
 SERVER_ID = "server"
 
+# Initialize the router
 router = APIRouter(prefix="/api")
 
+# Dictionary to keep track of connected devices
 connected_devices: Dict[str, WebSocket] = {}
 
 @router.websocket("/ws/{id}")
@@ -20,6 +22,12 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
     await websocket.accept()
     
     if id == "server":
+        # Check if the server is already connected
+        if SERVER_ID in connected_devices:
+            logger.error("Server is already connected.")
+            await websocket.close()
+            return
+        
         logger.info("Server connected")
         connected_devices[id] = websocket
         try:
@@ -55,6 +63,8 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             logger.error("Server is not connected. Cannot proceed.")
             await websocket.close()
             return  
+        
+        
         
         logger.info(f"Robot connected: {id}")
         connected_devices[id] = websocket
