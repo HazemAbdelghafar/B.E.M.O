@@ -91,6 +91,3 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         except WebSocketDisconnect:
             logger.warning(f"{id} disconnected")
             connected_devices.pop(id, None)
-                    
-            
-    
