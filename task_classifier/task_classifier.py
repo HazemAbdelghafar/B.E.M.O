@@ -7,7 +7,6 @@ from pathlib import Path
 
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-
 from utilities import BaseMQTTHandler
 
 # Specify the paths to the model and labels
