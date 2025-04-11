@@ -64,8 +64,6 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             await websocket.close()
             return  
         
-        
-        
         logger.info(f"Robot connected: {id}")
         connected_devices[id] = websocket
         try:
