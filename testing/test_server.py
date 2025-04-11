@@ -37,18 +37,12 @@ send = {
         'preprocessed_prompt': 'Haha that was funny, tell me another one',
         'module_name': 'task_classifier'
     }
-
-
+send = {'message': "hey robot, what's the weather like today?", 'top_label': 'curiosity', 'top_label_prob': 0.6451504230499268, 'second_top_label': 'neutral', 'second_top_label_prob': 0.32930633425712585, 'Third_top_label': 'confusion', 'Third_top_label_prob': 0.05925249680876732, 'module_name': 'server', "src_robot_id": "bemo-MK1"}
 class GlobalMQTTHandler:
-    """
-    GlobalMQTTHandler listens on 'main/main' and publishes a list of predefined
-    task payloads to 'task_handler/main' once triggered.
-    """
-
-    def __init__(self, sub_topic: str = "main/main", name: str = "global_publisher"):
+    def __init__(self, sub_topic: str = "server/main", name: str = "server"):
         self._result = {}
 
-        self.__pub_topic = "preprocessing/prompt"
+        self.__pub_topic = "main/main"
         self.__sub_topic = sub_topic
         self.__name = name
         self.__qos = 1
@@ -87,7 +81,7 @@ class GlobalMQTTHandler:
         """
         Returns a predefined list of payloads to be published.
         """
-        # return send
+        return send
 
     def publish_result(self, result: list):
         if result:
