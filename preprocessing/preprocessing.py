@@ -157,7 +157,7 @@ class PreProcessing(BaseMQTTHandler):
         """
         
         # Get the prompt and labels from the input data
-        prompt = input_data["preprocessed_prompt"]
+        prompt = input_data["prompt"]
         labels = input_data["predicted_labels"]
                 
         # Initialize the results
@@ -171,7 +171,7 @@ class PreProcessing(BaseMQTTHandler):
             except Exception as e:
                 logger.error(f"Error: {e}")
                 response = None
-                results.append({"method": label, "response": "", "error": str(e)})
+                results.append({"error": str(e), "level": 2, "method": label})
 
             if response is None:
                 self.publish_result(results[-1])
@@ -194,7 +194,7 @@ class PreProcessing(BaseMQTTHandler):
                     except Exception as e:
                         logger.error(f"Error: {e}")
                         error += str(e) + " "
-                        results.append({"method": label, "response": response.content, "error": error})
+                        results.append({"error": error, "level": 2, "method": label})
             
             # Add the response to the chat history
             self.__chat_history[label].append({"human": prompt, "assistant": response.content})
