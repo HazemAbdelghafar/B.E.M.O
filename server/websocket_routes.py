@@ -3,59 +3,84 @@ from fastapi.websockets import WebSocketState
 from typing import Dict
 import logging
 import json
-import os
 
 # Set up logging
 logger = logging.getLogger("uvicorn")
 
+# Define the name of the module and the topics
+SERVER_ID = "server"
+
 router = APIRouter(prefix="/api")
 
-connected_robots: Dict[str, WebSocket] = {}
-
-AUDIO_SAVE_DIR = "received_audio"
-os.makedirs(AUDIO_SAVE_DIR, exist_ok=True)
+connected_devices: Dict[str, WebSocket] = {}
 
 @router.websocket("/ws/{robot_id}")
-async def websocket_endpoint(websocket: WebSocket, robot_id: str):
-    logger.info(f"New connection: {robot_id}")
+async def websocket_endpoint(websocket: WebSocket, id: str):
+    logger.info(f"New connection: {id}")
     await websocket.accept()
-    connected_robots[robot_id] = websocket
-    logger.info(f"Robot connected: {robot_id}")
-
-    try:
-        while websocket.client_state == WebSocketState.CONNECTED:
-            try:
-                message = await websocket.receive()
-                text_data = message.get("text", "")
-                binary_data = message.get("bytes", b"")
-
-                if text_data:
-                    logger.info(f"{robot_id} - Received text data: {text_data}")
-                    data = json.loads(text_data)
-
-                    return_dict = {
-                        "robot_id": robot_id,
-                        "data": data
-                    }
-
-                    await websocket.send_json(return_dict)
-                    logger.info(f"{robot_id} - Sent response: {return_dict}")
-
-                elif binary_data:
-                    logger.info(f"{robot_id} - Received binary audio data")
-                    raise NotImplementedError("Binary data handling not implemented yet.")
-                    
-                else:
-                    logger.warning(f"{robot_id} - No valid data received")
+    
+    if id == "server":
+        logger.info("Server connected")
+        connected_devices[id] = websocket
+        try:
+            while websocket.client_state == WebSocketState.CONNECTED:
+                message = await websocket.receive_text()
+                logger.info(f"Server sent: {message}")
+                
+                try:
+                    # Assuming the message is JSON formatted
+                    data = json.loads(message)
+                except json.JSONDecodeError:
+                    logger.error("Invalid JSON format")
+                    await websocket.send_text("Invalid JSON format.")
                     continue
-
-            except json.JSONDecodeError:
-                logger.error(f"{robot_id} - Invalid JSON format")
-                await websocket.send_text("Invalid JSON format.")
-            except Exception as e:
-                logger.exception(f"{robot_id} - Unexpected error: {e}")
-                await websocket.send_text(f"Error: {str(e)}")
-
-    except WebSocketDisconnect:
-        logger.warning(f"{robot_id} disconnected")
-        connected_robots.pop(robot_id, None)
+                
+                if data:
+                    target_robot_id = data.get("robot_id")
+                    if target_robot_id in connected_devices:
+                        await connected_devices[target_robot_id].send_text(message)
+                        logger.info(f"Forwarded message to {target_robot_id}: {message}")
+                    else:
+                        logger.warning(f"Robot {target_robot_id} not connected.")
+                else:
+                    logger.warning("No data received from server.")
+                    
+        except WebSocketDisconnect:
+            logger.warning("Server disconnected")
+            connected_devices.pop(id, None)
+    
+    else:
+        # Check if the server is connected
+        if SERVER_ID not in connected_devices:
+            logger.error("Server is not connected. Cannot proceed.")
+            await websocket.close()
+            return  
+        
+        logger.info(f"Robot connected: {id}")
+        connected_devices[id] = websocket
+        try:
+            while websocket.client_state == WebSocketState.CONNECTED:
+                message = await websocket.receive_text()
+                logger.info(f"{id} sent: {message}")
+                
+                try:
+                    # Assuming the message is JSON formatted
+                    data = json.loads(message)
+                except json.JSONDecodeError:
+                    logger.error("Invalid JSON format")
+                    await websocket.send_text("Invalid JSON format.")
+                    continue
+                
+                if data:
+                    # Forward the message to the server
+                    await connected_devices[SERVER_ID].send_text(message)
+                    logger.info(f"Forwarded message to server: {message}")
+                else:
+                    logger.warning("No data received from robot.")
+                    continue
+        except WebSocketDisconnect:
+            logger.warning(f"{id} disconnected")
+            connected_devices.pop(id, None)
+                    
+            
+    
