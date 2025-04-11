@@ -143,15 +143,23 @@ class ServerWebSocketClient(BaseMQTTHandler):
         self.publish_result(data) # Publish the result to the MQTT broker
         
         logger.info(f"[{thread_name}] Published message: {message}")
+        
+    def execute_main(self, input_data: dict):
+        """
+        Execute the main function of the class.
+        This method should be overridden by child classes.
+
+        Args:
+            input_data (dict): The input data to process.
+
+        Returns:
+            dict: The result of the main function.
+        """
+        self.send_data(input_data)
+        return None
+        
 
 if __name__ == "__main__":
     server_client = ServerWebSocketClient()
     server_client.start_connection()
     server_client.start_mqtt()
-
-    # while True:
-    #     input("Press Enter to send status...\n")
-    #     server_client.send_data({
-    #         "target_robot_id": "bemo-MK1",
-    #         "message": "Hello from the server!",
-    #     })
