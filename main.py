@@ -16,6 +16,7 @@ logger.addHandler(console_handler)
 NAME = "main"
 SUB_TOPIC = "main/main"
 
+# Todo: THREAAADDINGGG
 class Main(BaseMQTTHandler):
     """
     Server is a class for handling the main server functionality.
@@ -119,6 +120,9 @@ class Main(BaseMQTTHandler):
         if module_name == "task_handler":
             logger.info(f"Received task_handler module data")
             logger.info(f"Task handler data: {input_data}")
+            
+        # Todo: DB
+        # Todo: Post-process the data
         
         # Return the result
         return None
