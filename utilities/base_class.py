@@ -52,12 +52,12 @@ class BaseMQTTHandler:
 
         logger.info(f"{self.__name} initialized successfully!")
     
-    def __built_in_run(self, input_data: dict | list):
+    def __built_in_run(self, input_data: dict):
         """
         Executes the main functionality of the class.
 
         Args:
-            input_data (dict | list): The input data to process.
+            input_data (dict): The input data to process.
         """
         start = time.time()  # Start the timer
         try:
@@ -126,39 +126,39 @@ class BaseMQTTHandler:
         logger.info(f"Received message: {input_data_parsed}")
         self.__built_in_run(input_data_parsed)  # Call the main function with the received input data
 
-    def execute_main(self, input_data: dict | list) -> dict | list:
+    def execute_main(self, input_data: dict) -> dict:
         """
         Executes the main function of the class.
         This method should be overridden by child classes.
 
         Args:
-            input_data (dict | list): The input data to process.
+            input_data (dict): The input data to process.
 
         Returns:
-            dict | list: The result of the main function.
+            dict: The result of the main function.
         """
         raise NotImplementedError("This method should be overridden by child classes.")
     
-    def get_result(self) -> dict | list:
+    def get_result(self) -> dict:
         """
         Returns the result of the last executed main function.
 
         Returns:
-            dict | list: The result of the last executed main function.
+            dict: The result of the last executed main function.
         """
         return self._result
     
-    def publish_result(self, result: dict | list, topic: str = None):
+    def publish_result(self, result: dict, topic: str = None):
         """
         Publishes the result to the specified MQTT topic.
 
         Args:
-            result (dict | list): The result to publish.
+            result (dict): The result to publish.
         """
         if not topic:
             topic = self.__pub_topic
 
-        if result is not {}:
+        if result:
             result["module_name"] = self.__name
             str_result = str(result)
             try:
