@@ -99,4 +99,4 @@ class SmartHomeAutomation(BaseMQTTHandler):
 
 if __name__ == "__main__":
     smart_home = SmartHomeAutomation()
-    smart_home.start() 
+    smart_home.start_mqtt() 

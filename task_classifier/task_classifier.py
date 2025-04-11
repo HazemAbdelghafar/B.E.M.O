@@ -91,7 +91,7 @@ class TaskClassifier(BaseMQTTHandler):
             
 if __name__ == "__main__":
     tc = TaskClassifier()
-    tc.start()
+    tc.start_mqtt()
 
 
 

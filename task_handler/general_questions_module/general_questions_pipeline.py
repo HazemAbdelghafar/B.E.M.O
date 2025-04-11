@@ -88,4 +88,4 @@ class GeneralQuestions(BaseMQTTHandler):
 
 if __name__ == "__main__":
     general_questions = GeneralQuestions()
-    general_questions.start()
+    general_questions.start_mqtt()

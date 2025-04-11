@@ -1124,4 +1124,4 @@ class TasksApi(BaseMQTTHandler):
 
 if __name__ == "__main__":
     tasks_api = TasksApi("0")
-    tasks_api.start()
+    tasks_api.start_mqtt()

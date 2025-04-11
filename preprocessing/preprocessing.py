@@ -207,4 +207,4 @@ class PreProcessing(BaseMQTTHandler):
                             
 if __name__ == "__main__": 
     pp = PreProcessing()
-    pp.start()
+    pp.start_mqtt()

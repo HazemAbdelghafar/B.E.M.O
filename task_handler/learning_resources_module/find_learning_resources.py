@@ -838,4 +838,4 @@ Returns:
 
 if __name__ == "__main__":
     FindLearningResources = FindLearningResources()
-    FindLearningResources.start()
+    FindLearningResources.start_mqtt()

@@ -169,7 +169,7 @@ class BaseMQTTHandler:
             
             logger.info(f"Published result to topic '{topic}': {str_result}")
     
-    def start(self):
+    def start_mqtt(self):
         """
         Starts the MQTT client loop.
         """

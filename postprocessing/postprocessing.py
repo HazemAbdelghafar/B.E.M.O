@@ -144,4 +144,4 @@ class PostProcessing(BaseMQTTHandler):
 if __name__ == "__main__":
     logger.info("Starting PostProcessing...")
     pp = PostProcessing()
-    pp.start()
+    pp.start_mqtt()
