@@ -52,13 +52,18 @@ class TaskClassifier(BaseMQTTHandler):
         Returns:
             dict: The result of the classification.
         """
-        prompt = input_data["prompt"] # Get the prompt from the input data
-        prompt = self.preprocess_prompt(prompt) # Preprocess the prompt
-        prediction = self.__model.predict([prompt])[0] # Make a prediction using the model
-        
-        # Get the predicted labels based on the prediction
-        predicted_labels = [self.__labels[i] for i, val in enumerate(prediction) if val == 1]
-        
+        prompt = input_data.get("prompt") # Get the prompt from the input data
+        if not prompt:
+            return {"error": "Prompt not provided", "level": 1}
+        try:
+            prompt = self.preprocess_prompt(prompt) # Preprocess the prompt
+            prediction = self.__model.predict([prompt])[0] # Make a prediction using the model
+            
+            # Get the predicted labels based on the prediction
+            predicted_labels = [self.__labels[i] for i, val in enumerate(prediction) if val == 1]
+        except Exception as e:
+            return {"error": str(e), "level": 2}
+            
         # Return the predicted labels
         return {"predicted_labels": predicted_labels, "preprocessed_prompt": prompt}
         
