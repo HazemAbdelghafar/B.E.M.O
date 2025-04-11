@@ -11,6 +11,34 @@ console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
 
+# send = {
+#         'predicted_labels': ['general'],
+#         'preprocessed_prompt': "what is the average salary for my job in my country?",
+#         'module_name': 'task_classifier'
+#     }
+# send = {
+#         'predicted_labels': ['general'],
+#         'preprocessed_prompt': 'what about tomorrow',
+#         'module_name': 'task_classifier'
+#     }
+# send = {
+#         'predicted_labels': ['smart_home', 'todo', 'general'],
+#         'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
+#         'module_name': 'task_classifier'
+#     }
+# send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
+send = {
+        'predicted_labels': ['others'],
+        'preprocessed_prompt': 'Tell me some jokes about my job',
+        'module_name': 'task_classifier'
+    }
+send = {
+        'predicted_labels': ['others'],
+        'preprocessed_prompt': 'Haha that was funny, tell me another one',
+        'module_name': 'task_classifier'
+    }
+
+
 class GlobalMQTTHandler:
     """
     GlobalMQTTHandler listens on 'main/main' and publishes a list of predefined
@@ -20,7 +48,7 @@ class GlobalMQTTHandler:
     def __init__(self, sub_topic: str = "main/main", name: str = "global_publisher"):
         self._result = {}
 
-        self.__pub_topic = "task_handler/main"
+        self.__pub_topic = "preprocessing/prompt"
         self.__sub_topic = sub_topic
         self.__name = name
         self.__qos = 1
@@ -59,35 +87,7 @@ class GlobalMQTTHandler:
         """
         Returns a predefined list of payloads to be published.
         """
-        return [
-            {
-                "method": "smart_home",
-                "switch": ["switch_1"],
-                "status": ["off"],
-                "module_name": "preprocessing"
-            },
-            # {
-            #     "method": "todo",
-            #     "list_all_tasks": False,
-            #     "object_type": "task",
-            #     "action": "insert",
-            #     "new_task_name": "Schedule doctor appointment",
-            #     "due_date": "2025-04-07T23:00:00",
-            #     "module_name": "preprocessing"
-            # },
-            # {
-            #     "method": "general",
-            #     "query": "What's the weather like on 2025-04-07?",
-            #     "topic": "general",
-            #     "module_name": "preprocessing"
-            # },
-            # {
-            #     "method": "learning_resources",
-            #     "topic": "Deep Learning",
-            #     "specific_resources": ["Courses", "Books"],
-            #     "module_name": "preprocessing"
-            # }
-        ]
+        # return send
 
     def publish_result(self, result: list):
         if result:
