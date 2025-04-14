@@ -78,6 +78,9 @@ class TasksApi(BaseMQTTHandler):
                 logger.error(f"Error processing input data: {e}")
                 result = {"error": str(e), "level": 2}
         
+        if isinstance(result, list):
+            result = {"results": result}
+        
         self.publish_result(result, "task_handler/main")
         
         return None
