@@ -106,7 +106,7 @@ class Main(BaseMQTTHandler):
             self.predicted_labels = predicted_labels
             logger.info(f"Predicted labels: {predicted_labels}")
             
-            self.publish_result({"prompt": self.prompt, "predicted_labels": self.predicted_labels}, topic="preprocessing/prompt")
+            self.publish_result({"prompt": self.prompt, "predicted_labels": self.predicted_labels}, topic="preprocessing/data")
                 
         if module_name == "preprocessing":
             logger.info(f"Received preprocessing module data")
