@@ -26,7 +26,7 @@ logger.addHandler(console_handler)
 
 # Define the name of the module and the topics
 NAME = "preprocessing"
-SUB_TOPIC = "preprocessing/prompt"
+SUB_TOPIC = "preprocessing/data"
 
 LIMITS = {
     "smart_home": 3,
@@ -155,10 +155,18 @@ class PreProcessing(BaseMQTTHandler):
         Returns:
             dict: The result of the classification.
         """
-        
+                
         # Get the prompt and labels from the input data
-        prompt = input_data["prompt"]
-        labels = input_data["predicted_labels"]
+        prompt = input_data.get("prompt")
+        labels = input_data.get("predicted_labels")
+        
+        if not prompt:
+            logger.error("Prompt is missing")
+            return {"error": "Prompt is missing", "level": 2}
+        
+        if not labels:
+            logger.error("Labels are missing")
+            return {"error": "Labels are missing", "level": 2}
                 
         # Initialize the results
         results = []
@@ -203,8 +211,12 @@ class PreProcessing(BaseMQTTHandler):
             self.limit_chat_history(label)
             
             # Publish the result
-            self.publish_result(results[-1])
-                            
+            publish_result = results[-1]
+            if isinstance(publish_result, list):
+                publish_result = publish_result[0]
+            
+            self.publish_result(publish_result)
+
 if __name__ == "__main__": 
     pp = PreProcessing()
     pp.start_mqtt()
