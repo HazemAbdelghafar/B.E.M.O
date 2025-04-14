@@ -76,7 +76,7 @@ class GlobalMQTTHandler:
             "answer": "On April 7, 2025, expect a wet and cold weather with rain in Ohio. Temperatures will be low, and a freeze warning is in effect. The forecast indicates a cold front moving through the region.",
             "topic": "general",
             "time": 5.14,
-            "module_name": "general_questions"
+            "module_name": "general"
         }
     },
     {
