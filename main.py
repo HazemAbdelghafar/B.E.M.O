@@ -95,7 +95,6 @@ class Main(BaseMQTTHandler):
             logger.info(f"Emotions: {emotions}")
             logger.info(f"Robot ID: {robot_id}")
             
-            # self.publish_result({"status": "success", "message": "Data processed successfully", "data": input_data, "target_robot_id": self.robot_id}, topic="server/main") #! Test
             self.publish_result({"prompt": self.prompt}, topic="task_classifier/prompt")
                 
         # Handle the case where module_name is "task_classifier"
@@ -113,9 +112,29 @@ class Main(BaseMQTTHandler):
             logger.info(f"Preprocessed data: {input_data}")
             self.preprocessed_data = [input_data]
 
-            self.publish_result({"preprocessed_data": self.preprocessed_data}, topic="task_handler/main")            
+            method = input_data.get("method")
+            if not method:
+                # Todo: Handle the case where the method is not sent back
+                logger.error("Method is missing")
+                return None
+
+            logger.info(f"Method: {method}")
+
+            if method == "others":
+                response = input_data.get("response")
+                if not response:
+                    # Todo: Handle the case where the response is not sent back
+                    logger.error("Response is missing")
+                    return None
+                
+                logger.info(f"Returning the result to the server")
+                logger.info(f"Response: {response}")
+                self.publish_result({"status": "success", "response": response, "target_robot_id": self.robot_id}, topic="server/main")
+                
+            else:
+                self.publish_result({"preprocessed_data": self.preprocessed_data}, topic="task_handler/main")            
         
-        # Task handler data: {'results': {'query': "What's the weather like on 2025-04-11 in Cairo, Egypt?", 'answer': 'On April 11, 2025, Cairo will have partly cloudy skies with a temperature of 17.3C (63.1F). Winds will come from the WNW at 7.6 mph (12.2 kph). No precipitation is expected.', 'topic': 'general', 'module_name': 'general_questions'}, 'module_name': 'task_handler'}       
+        # Task handler data: {'results': {'query': "What's the weather like on 2025-04-11 in Cairo, Egypt?", 'answer': 'On April 11, 2025, Cairo will have partly cloudy skies with a temperature of 17.3C (63.1F). Winds will come from the WNW at 7.6 mph (12.2 kph). No precipitation is expected.', 'topic': 'general', 'module_name': 'general'}, 'module_name': 'task_handler'}       
  
         if module_name == "task_handler":
             logger.info(f"Received task_handler module data")
