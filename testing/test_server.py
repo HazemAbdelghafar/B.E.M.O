@@ -6,38 +6,11 @@ import logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
 
-
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
+send = {'message': "Hey Robot, Check my tasks for today", 'top_label': 'curiosity', 'top_label_prob': 0.6451504230499268, 'second_top_label': 'neutral', 'second_top_label_prob': 0.32930633425712585, 'Third_top_label': 'confusion', 'Third_top_label_prob': 0.05925249680876732, 'module_name': 'server', "src_robot_id": "bemo-MK1"}
 
-# send = {
-#         'predicted_labels': ['general'],
-#         'preprocessed_prompt': "what is the average salary for my job in my country?",
-#         'module_name': 'task_classifier'
-#     }
-# send = {
-#         'predicted_labels': ['general'],
-#         'preprocessed_prompt': 'what about tomorrow',
-#         'module_name': 'task_classifier'
-#     }
-# send = {
-#         'predicted_labels': ['smart_home', 'todo', 'general'],
-#         'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
-#         'module_name': 'task_classifier'
-#     }
-# send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
-send = {
-        'predicted_labels': ['others'],
-        'preprocessed_prompt': 'Tell me some jokes about my job',
-        'module_name': 'task_classifier'
-    }
-send = {
-        'predicted_labels': ['others'],
-        'preprocessed_prompt': 'Haha that was funny, tell me another one',
-        'module_name': 'task_classifier'
-    }
-send = {'message': "hey robot, what's the weather like today?", 'top_label': 'curiosity', 'top_label_prob': 0.6451504230499268, 'second_top_label': 'neutral', 'second_top_label_prob': 0.32930633425712585, 'Third_top_label': 'confusion', 'Third_top_label_prob': 0.05925249680876732, 'module_name': 'server', "src_robot_id": "bemo-MK1"}
 class GlobalMQTTHandler:
     def __init__(self, sub_topic: str = "server/main", name: str = "server"):
         self._result = {}
