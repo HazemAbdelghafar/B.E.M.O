@@ -50,7 +50,7 @@ class TaskHandler(BaseMQTTHandler):
                 if method == "smart_home":
                     topic = "task_handler/smart_home"
                 elif method == "todo":
-                    topic = "task_handler/tasks_api"
+                    topic = "task_handler/todo"
                 elif method == "general":
                     topic = "task_handler/general"
                 elif method == "learning_resources":
@@ -65,15 +65,8 @@ class TaskHandler(BaseMQTTHandler):
         else:
             # if input data is not a list, send it to the main topic
             logger.info(f"Processing single task")
-            
-            result = input_data.get("results")
-            
-            if result:
-                result = ({"results": result})
-            else:
-                result = {"results": input_data}
-                
-            self.publish_result(result)
+                            
+            self.publish_result({"results": input_data})
              
         return None
 
