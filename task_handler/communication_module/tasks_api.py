@@ -50,7 +50,7 @@ class TasksApi(BaseMQTTHandler):
             None
         """
         # Initialize BaseMQTTHandler with MQTT topics
-        super().__init__(sub_topic="task_handler/tasks_api", name="tasks_api")
+        super().__init__(sub_topic="task_handler/todo", name="todo")
 
         self._creds = init_user_google(user_id)
         self._service = build("tasks", "v1", credentials=self._creds)
@@ -79,7 +79,7 @@ class TasksApi(BaseMQTTHandler):
                 result = {"error": str(e), "level": 2}
         
         if isinstance(result, list):
-            result = {"results": result}
+            result = {"result_list": result}
         
         self.publish_result(result, "task_handler/main")
         
