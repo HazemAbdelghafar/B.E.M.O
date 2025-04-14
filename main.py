@@ -34,6 +34,7 @@ class Main(BaseMQTTHandler):
         self.prompt = ""
         self.predicted_labels = []
         self.preprocessed_data = []
+        self.response = ""
     
     def clean_emotions(self, emotions: dict) -> dict:
         # If both the key and value are empty, remove the key from the dictionary
@@ -70,7 +71,7 @@ class Main(BaseMQTTHandler):
         
         # Handle the case where module_name is "server"
         if module_name == "server":
-            logger.info(f"Received server module data")
+            logger.info("Received server module data")
             prompt = input_data.get("message")
             robot_id = input_data.get("src_robot_id")
             emotions = {
@@ -99,7 +100,7 @@ class Main(BaseMQTTHandler):
                 
         # Handle the case where module_name is "task_classifier"
         if module_name == "task_classifier":
-            logger.info(f"Received task_classifier module data")
+            logger.info("Received task_classifier module data")
             
             predicted_labels = input_data.get("predicted_labels")
             self.predicted_labels = predicted_labels
@@ -108,7 +109,7 @@ class Main(BaseMQTTHandler):
             self.publish_result({"prompt": self.prompt, "predicted_labels": self.predicted_labels}, topic="preprocessing/data")
                 
         if module_name == "preprocessing":
-            logger.info(f"Received preprocessing module data")
+            logger.info("Received preprocessing module data")
             logger.info(f"Preprocessed data: {input_data}")
             self.preprocessed_data = [input_data]
 
@@ -121,23 +122,30 @@ class Main(BaseMQTTHandler):
             logger.info(f"Method: {method}")
 
             if method == "others":
-                response = input_data.get("response")
-                if not response:
+                self.response = input_data.get("response")
+                if not self.response:
                     # Todo: Handle the case where the response is not sent back
-                    logger.error("Response is missing")
+                    logger.error("Response is missing in the others method")
                     return None
                 
-                logger.info(f"Returning the result to the server")
-                logger.info(f"Response: {response}")
-                self.publish_result({"status": "success", "response": response, "target_robot_id": self.robot_id}, topic="server/main")
-                
+                logger.info("Returning the result to the server")
+                logger.info(f"Response: {self.response}")
+                self.publish_result({"status": "success", "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
+            
+            elif method == "learning_resource":
+                self.response = input_data.get("model_output")
+                if not self.response:
+                    logger.error("Response is missing in the learning_resource method")
+                    self.publish_result({"preprocessed_data": self.preprocessed_data}, topic="task_handler/main") 
+                else:
+                    logger.info("Returning the result to the server")
+                    self.publish_result({"status": "success", "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
+            
             else:
                 self.publish_result({"preprocessed_data": self.preprocessed_data}, topic="task_handler/main")            
-        
-        # Task handler data: {'results': {'query': "What's the weather like on 2025-04-11 in Cairo, Egypt?", 'answer': 'On April 11, 2025, Cairo will have partly cloudy skies with a temperature of 17.3C (63.1F). Winds will come from the WNW at 7.6 mph (12.2 kph). No precipitation is expected.', 'topic': 'general', 'module_name': 'general'}, 'module_name': 'task_handler'}       
- 
+         
         if module_name == "task_handler":
-            logger.info(f"Received task_handler module data")
+            logger.info("Received task_handler module data")
             logger.info(f"Task handler data: {input_data}")
             
         # Todo: DB
