@@ -2,9 +2,6 @@ from dotenv import dotenv_values, find_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables.base import RunnableSerializable
-from langchain_core.output_parsers import JsonOutputParser
-import json
-from ast import literal_eval
 import os
 from datetime import datetime
 
@@ -50,7 +47,6 @@ class PostProcessing(BaseMQTTHandler):
             timeout=None,
             max_retries=2,
         )
-        self.__output_parser = JsonOutputParser()
         self.__system_prompts = self.__initialize_prompts()
         self.__chains = self.__initialize_chains()
         
@@ -88,23 +84,7 @@ class PostProcessing(BaseMQTTHandler):
             initialized_chains[key] = value | self.__llm
         
         return initialized_chains
-    
-    def clean_json(self, json_str: str) -> str:
-        """
-        Cleans the JSON string.
         
-        Args:
-            json_str (str): The JSON string to clean.
-        
-        Returns:
-            str: The cleaned JSON string.
-        """
-                
-        # Clean the JSON string
-        json_str = json_str.replace("```json", "").replace("```", "").strip()
-            
-        return json_str                    
-    
     def execute_main(self, input_data: dict) -> dict:
         """
         Executes the main functionality of the class.
@@ -117,17 +97,22 @@ class PostProcessing(BaseMQTTHandler):
         """
         
         # Get the prompt and labels from the input data
-        input_results = input_data.get("results")
+        task_output = input_data.get("results")
+        prompt = input_data.get("prompt")
+        emotions = input_data.get("emotions")
         
-        if not input_results:
+        if not task_output:
             logger.error("Input results are missing")
             return {"error": "Input results are missing", "level": 2}
-        if not isinstance(input_results, dict):
+        if not isinstance(task_output, dict):
             logger.error("Input results are not a dictionary")
             return {"error": "Input results are not a dictionary", "level": 2}
         
+        if not prompt:
+            logger.error("Prompt is missing")
+            return {"error": "Prompt is missing", "level": 2}
         
-        module_name = input_results.get("module_name")
+        module_name = task_output.get("module_name")
         
         if not module_name:
             logger.error("Module name is missing")
@@ -139,7 +124,7 @@ class PostProcessing(BaseMQTTHandler):
         result = {}
         
         try:
-            response = self.__chains[module_name].invoke({"prompt": input_results, "current_time": datetime.now()})
+            response = self.__chains[module_name].invoke({"user_query": prompt, "task_output": task_output, "current_time": datetime.now(), "user_emotions": emotions})
         except Exception as e:
             logger.error(f"Error: {e}")
             response = None
@@ -148,28 +133,40 @@ class PostProcessing(BaseMQTTHandler):
         if response is None:
             return result
 
-        error = ""
         try: 
-            result = self.__output_parser.parse(response.content)
+            result = response.content
         except Exception as e:
             logger.error(f"Error: {e}")
-            error += str(e) + " "
-            cleaned_json = self.clean_json(response.content)
-            try:
-                result = literal_eval(cleaned_json)
-            except Exception as e:
-                logger.error(f"Error: {e}")
-                error += str(e) + " "
-                try:
-                    result = json.loads(cleaned_json)
-                except Exception as e:
-                    logger.error(f"Error: {e}")
-                    error += str(e) + " "
-                    result = {"error": error, "level": 2, "method": module_name}
+            result = {"error": str(e), "level": 2, "method": module_name}
         
-                    
-        # Publish the result        
-        return result
+        result = self.clean_output(result)
+        
+        # Publish the result
+        return {
+            "output": result
+        }
+        
+    def clean_output(self, output: str) -> str:
+        """
+        Cleans the output string.
+        
+        Args:
+            output (str): The output string to clean.
+        
+        Returns:
+            str: The cleaned output string.
+        """
+        
+        # Remove extra spaces
+        output = " ".join(output.split())
+        
+        # Remove new lines
+        output = output.replace("\n", "")
+        
+        # Remove extra spaces from the beginning and end
+        output = output.strip()
+        
+        return output
                             
 if __name__ == "__main__": 
     pp = PostProcessing()
