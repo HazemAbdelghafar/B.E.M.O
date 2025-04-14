@@ -1,147 +1,176 @@
-import logging
+from dotenv import dotenv_values, find_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables.base import RunnableSerializable
-from dotenv import dotenv_values, find_dotenv
+from langchain_core.output_parsers import JsonOutputParser
+import json
+from ast import literal_eval
 import os
-import random
-import time
+from datetime import datetime
+
 import sys
 from pathlib import Path
+import logging
 
-# Configure logging
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    format='%(asctime)s %(filename)s %(levelname)s: %(message)s',
-    datefmt='%m/%d/%Y %I:%M:%S %p',
-    filename='./logging.log',
-    encoding='utf-8',
-    level=logging.DEBUG
-)
-console_handler = logging.StreamHandler()
-console_handler.setFormatter(logging.Formatter('%(asctime)s %(filename)s %(levelname)s: %(message)s', '%m/%d/%Y %I:%M:%S %p'))
-logger.addHandler(console_handler)
 
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from utilities import BaseMQTTHandler, POST_SYSTEM_PROMPT, ERROR_RESPONSES
+from utilities import BaseMQTTHandler, POST_SYSTEM_PROMPT
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+
+
+console_handler = logging.StreamHandler()
+logger.addHandler(console_handler)
+
+# Define the name of the module and the topics
+NAME = "postprocessing"
+SUB_TOPIC = "postprocessing/data"
 
 class PostProcessing(BaseMQTTHandler):
     """
-    A class to postprocess the result of a task into a natural, engaging response.
+    TaskClassifier is a class for classifying tasks based on a given prompt.
     """
-    def __init__(self, sub_topic: str = "default_topic", name: str = "PostProcessing") -> None:
+    
+    def __init__(self):
         """
-        Initialize the Postprocessing class.
-        
-        Args:
-            sub_topic (str): The subscription topic for the MQTT client.
-            name (str): The name of the handler.
-        
-        Returns:
-            None
+        Initialize the TaskClassifier object.
         """
-        super().__init__(sub_topic=sub_topic, name=name)  # Pass required arguments to the parent class
-        self.name = name  # Explicitly set the name attribute
-        random.seed(time.time())
+        
+        # Initialize the BaseMQTTHandler object
+        super().__init__(SUB_TOPIC, NAME)
+    
+        # Initialize the ChatGoogleGenerativeAI object    
         os.environ["GOOGLE_API_KEY"] = dotenv_values(find_dotenv())["GEMINI_API_KEY_TEST"] #! Test
-        self.llm = ChatGoogleGenerativeAI(
+        self.__llm = ChatGoogleGenerativeAI(
             model="gemini-1.5-flash",
             temperature=0.9,
             max_tokens=None,
             timeout=None,
             max_retries=2,
         )
-        self.prompts = self._init_prompt()
-        self.chain = self._init_chain()
-        self.tasks = [key for key in POST_SYSTEM_PROMPT.keys()]
-        logger.info("PostProcessing initialized successfully.")
-
-    def _init_prompt(self) -> dict:
-        """
-        Initialize the prompt for the task.
+        self.__output_parser = JsonOutputParser()
+        self.__system_prompts = self.__initialize_prompts()
+        self.__chains = self.__initialize_chains()
         
-        Args:
-            None
-            
-        Returns:
-            dict: A dictionary of task-specific prompts.
+                                        
+    def __initialize_prompts(self) -> dict[str, PromptTemplate]:
         """
+        Initializes the prompts.
+        
+        Returns:
+            dict[str, PromptTemplate]: The initialized prompts.
+        """
+        
+        # Initialize the prompts
         initialized_prompts = {}
-        for task, prompt in POST_SYSTEM_PROMPT.items():
-            initialized_prompts[task] = PromptTemplate.from_template(prompt)
-        logger.info("Prompts initialized successfully.")
-        return initialized_prompts
-            
-    def _init_chain(self) -> RunnableSerializable:
-        """
-        Initialize the chain for the task.
         
-        Args:
-            None
+        # Add the system prompts to the initialized prompts
+        for key, value in POST_SYSTEM_PROMPT.items():
+            initialized_prompts[key] = PromptTemplate.from_template(value)
+                
+        return initialized_prompts
+    
+    def __initialize_chains(self) -> dict[str, RunnableSerializable]:
+        """
+        Initializes the chains.
         
         Returns:
-            RunnableSerializable: The chain for the task.
+            dict[str, RunnableSerializable]: The initialized chains.
         """
-        logger.info("Chain initialized successfully.")
-        return self.prompts | self.llm
-
+        
+        # Initialize the chains
+        initialized_chains = {}
+        
+        # Add the language model to the prompts
+        for key, value in self.__system_prompts.items():
+            initialized_chains[key] = value | self.__llm
+        
+        return initialized_chains
+    
+    def clean_json(self, json_str: str) -> str:
+        """
+        Cleans the JSON string.
+        
+        Args:
+            json_str (str): The JSON string to clean.
+        
+        Returns:
+            str: The cleaned JSON string.
+        """
+                
+        # Clean the JSON string
+        json_str = json_str.replace("```json", "").replace("```", "").strip()
+            
+        return json_str                    
+    
     def execute_main(self, input_data: dict) -> dict:
         """
-        Executes the main functionality of the PostProcessing class.
+        Executes the main functionality of the class.
         
         Args:
-            input_data (dict): The input data to process, containing task_result, user_query, and task_name.
+            input_data (dict): The input data to process.
         
         Returns:
-            dict: The result of the postprocessing.
+            dict: The result of the classification.
         """
-        task_result = input_data.get("task_result", "")
-        user_query = input_data.get("user_query", "")
-        task_name = input_data.get("task_name", "")
-
-        logger.info(f"Executing main with task_name: {task_name}, user_query: {user_query}, task_result: {task_result}")
         
-        # Initialize the result
-        result = {"task_name": task_name, "response": "", "error": ""}
-
-        # Validate inputs
-        if task_name not in self.tasks:
-            error_message = f"Task name '{task_name}' not found in predefined tasks."
-            logger.error(error_message)
-            result["error"] = error_message
-            return result
+        # Get the prompt and labels from the input data
+        input_results = input_data.get("results")
         
-        if not user_query or not task_result or not task_name:
-            error_message = "One or more inputs are empty."
-            logger.error(error_message)
-            result["error"] = error_message
-            return result
-
-        # Process the input
+        if not input_results:
+            logger.error("Input results are missing")
+            return {"error": "Input results are missing", "level": 2}
+        if not isinstance(input_results, dict):
+            logger.error("Input results are not a dictionary")
+            return {"error": "Input results are not a dictionary", "level": 2}
+        
+        
+        module_name = input_results.get("module_name")
+        
+        if not module_name:
+            logger.error("Module name is missing")
+            return {"error": "Module name is missing", "level": 2}
+        
+        logger.info(f"Module name: {module_name}")        
+        
+        response = None
+        result = {}
+        
         try:
-            response = self.chain.invoke(
-                input={
-                    "task_result": task_result,
-                    "user_query": user_query,
-                    "task_name": task_name
-                }
-            )
-            try:
-                result["response"] = response.content.strip()
-                logger.info(f"Generated response: {result['response']}")
-            except Exception as e:
-                error_message = f"Error processing response content: {e}"
-                logger.error(error_message)
-                result["error"] = error_message
+            response = self.__chains[module_name].invoke({"prompt": input_results, "current_time": datetime.now()})
         except Exception as e:
-            error_message = f"Error invoking chain: {e}"
-            logger.error(error_message)
-            result["error"] = error_message
+            logger.error(f"Error: {e}")
+            response = None
+            result = {"error": str(e), "level": 2, "method": module_name}
 
+        if response is None:
+            return result
+
+        error = ""
+        try: 
+            result = self.__output_parser.parse(response.content)
+        except Exception as e:
+            logger.error(f"Error: {e}")
+            error += str(e) + " "
+            cleaned_json = self.clean_json(response.content)
+            try:
+                result = literal_eval(cleaned_json)
+            except Exception as e:
+                logger.error(f"Error: {e}")
+                error += str(e) + " "
+                try:
+                    result = json.loads(cleaned_json)
+                except Exception as e:
+                    logger.error(f"Error: {e}")
+                    error += str(e) + " "
+                    result = {"error": error, "level": 2, "method": module_name}
+        
+                    
+        # Publish the result        
         return result
-
-if __name__ == "__main__":
-    logger.info("Starting PostProcessing...")
+                            
+if __name__ == "__main__": 
     pp = PostProcessing()
     pp.start_mqtt()
