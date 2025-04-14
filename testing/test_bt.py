@@ -66,7 +66,7 @@ class GlobalMQTTHandler:
             "name": "Schedule Doctor Appointment",
             "last_updated": "2025-04-08 05:09:39",
             "last_updated_relative": "2 seconds ago",
-            "module_name": "tasks_api"
+            "module_name": "todo"
         }
     },
     {
