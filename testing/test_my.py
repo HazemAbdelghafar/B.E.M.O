@@ -13,32 +13,46 @@ logger.addHandler(console_handler)
 
 # send = {
 #         'predicted_labels': ['general'],
-#         'preprocessed_prompt': "what is the average salary for my job in my country?",
+#         'prompt': "what is the average salary for my job in my country?",
 #         'module_name': 'task_classifier'
 #     }
 # send = {
 #         'predicted_labels': ['general'],
-#         'preprocessed_prompt': 'what about tomorrow',
+#         'prompt': 'what about tomorrow',
 #         'module_name': 'task_classifier'
 #     }
 # send = {
 #         'predicted_labels': ['smart_home', 'todo', 'general'],
-#         'preprocessed_prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
+#         'prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
 #         'module_name': 'task_classifier'
 #     }
 # send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
+# send = {
+#         'predicted_labels': ['others'],
+#         'prompt': 'Tell me some jokes about my job',
+#         'module_name': 'task_classifier'
+#     }
+# send = {
+#         'predicted_labels': ['others'],
+#         'prompt': 'Haha that was funny, tell me another one',
+#         'module_name': 'task_classifier'
+#     }
+# send = {
+#         'predicted_labels': ['learning_resources'],
+#         'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books',
+#         'module_name': 'task_classifier'
+#     }
+
+# send = {
+#         'predicted_labels': ['learning_resources', 'todo'],
+#         'prompt': 'Provide me with some learning resources about arabic language and schedule a doctor appointment at 11 pm',
+#         'module_name': 'task_classifier'
+#     }
 send = {
-        'predicted_labels': ['others'],
-        'preprocessed_prompt': 'Tell me some jokes about my job',
+        'predicted_labels': ['todo'],
+        'prompt': 'Schedule a doctor appointment at 11 pm',
         'module_name': 'task_classifier'
     }
-send = {
-        'predicted_labels': ['others'],
-        'preprocessed_prompt': 'Haha that was funny, tell me another one',
-        'module_name': 'task_classifier'
-    }
-
-
 class GlobalMQTTHandler:
     """
     GlobalMQTTHandler listens on 'main/main' and publishes a list of predefined
@@ -48,7 +62,7 @@ class GlobalMQTTHandler:
     def __init__(self, sub_topic: str = "main/main", name: str = "global_publisher"):
         self._result = {}
 
-        self.__pub_topic = "preprocessing/prompt"
+        self.__pub_topic = "preprocessing/data"
         self.__sub_topic = sub_topic
         self.__name = name
         self.__qos = 1
