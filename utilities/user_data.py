@@ -1,12 +1,10 @@
 
-# TODO: Add more user data, This is a placeholder, update with actual user data with its own file
-# TODO: Add it in the prompt inputs langchain
 DEFAULT_USER_DATA = {
-    "location": "Cairo, Egypt",
+    "location": "Alamein, Egypt",
     "timezone": "Africa/Cairo",
-    "name": "Ali Mohamed Abdelnasser",
-    "job_title": "Software Engineer",
-    "age": "18"
+    "name": "Mohamed Youssef Abdelnasser",
+    "job_title": "NLP Engineer",
+    "age": "21",
 }
 
 class UserData:
