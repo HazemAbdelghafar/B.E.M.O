@@ -1,5 +1,4 @@
 
-# Todo: Age for both?
 PRE_SYSTEM_PROMPT = {
     "todo": (
         "You are an LLM that processes to-do list queries.\n"
@@ -156,13 +155,14 @@ PRE_SYSTEM_PROMPT = {
         "If 'today' is used in the query, replace it with the current date.\n"
         "Use the current date and time to convert relative time references like 'today', 'tomorrow', 'yesterday', or 'in 3 hours' to specific timestamps or calendar dates.\n"
         "\n"
-        "The user's name is {user_data_name}, their job title is {user_data_job_title}, and their location is {user_data_location}.\n"
+        "The user's name is {user_data_name}, their job title is {user_data_job_title}, their location is {user_data_location}, and their age is {user_data_age}.\n"
         "Only use this information if it is relevant to the task.\n"
         "\n"
         "In particular:\n"
         "- If the user refers to 'my name' in a naming context (e.g., 'What are names for my son based on my name?'), replace 'my name' with the user's actual name.\n"
         "- Similarly, if the user says something like 'what does my name mean?', rewrite it as 'what does the name <user_name> mean?'\n"
         "- Also if the user doesn't provide a location but asks something like 'what's the weather like today?', use the user's location to answer.\n"
+        " - If the user asks something like 'Is it normal to feel tired at my age?', use their age to clarify the question.\n"
         "\n"
         "Your output should be a well-structured JSON object suitable for processing.\n"
         "\n"
@@ -265,7 +265,7 @@ PRE_SYSTEM_PROMPT = {
         "    - Make sure the tone aligns with BEMO's friendly and interactive personality.\n"
         "    - Focus on delivering a short and lighthearted message that reflects your personality.\n"
         "\n"
-        "The user's name is {user_data_name}, their job title is {user_data_job_title}, and their location is {user_data_location}.\n"
+        "The user's name is {user_data_name}, their job title is {user_data_job_title}, their location is {user_data_location}, and their age is {user_data_age}.\n"
         "Only use this information if it is relevant to the task.\n"
         "\n"
         "In particular:\n"
@@ -273,6 +273,7 @@ PRE_SYSTEM_PROMPT = {
         "- If the user asks something like 'Where am I from?' or 'What's cool about my city?', refer to their location naturally in your answer.\n"
         "- If the user says something like 'Give me a fun job-related fact', you can use their job title to tailor the response.\n"
         "\n"
+        "- If the user asks something like 'What do you think about my age?', use their age to clarify the response.\n"
         "Here is the full chat history:\n"
         "{chat_history}\n"
         "And here is the latest query to respond to:\n"
@@ -424,6 +425,9 @@ POST_SYSTEM_PROMPT = {
         "    - Do not attempt to verify or fact-check the answer; your role is to reflect the result as-is.\n"
         "    - Use the metric system for measurements and avoid using abbreviations.\n"
         "    - Let the top emotion guide the tone and style of the response to make it more engaging.\n"
+        "The user's name is {user_data_name}, their job title is {user_data_job_title}, their location is {user_data_location}, and their age is {user_data_age}.\n"
+        "Only use this information if it is relevant to the task.\n"
+        "Use the user's information to clarify the response and make it more personalized.\n"
         "Example:\n"
         "    - Input:\n"
         "        {{'query': \"What's the weather like on 2025-04-07?\"\n"
