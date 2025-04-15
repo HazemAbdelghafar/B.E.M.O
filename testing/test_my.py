@@ -26,7 +26,7 @@ logger.addHandler(console_handler)
 #         'prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
 #         'module_name': 'task_classifier'
 #     }
-# send = {"prompt": "Hey Bemo, light up the living room and turn of the tv and the fan"}
+send = {"prompt": "Hey Bemo, provide me with some learning resources for Deep Learning, make sure to include some courses and books"}
 # send = {
 #         'predicted_labels': ['others'],
 #         'prompt': 'Tell me some jokes about my job',
@@ -62,15 +62,15 @@ logger.addHandler(console_handler)
 #         'confusion': 0.059
 #     }
 # }
-send = {'results': 
-        {'query': "What's the weather like on 2025-04-14 in Alamein, Egypt?", 'answer': 'On April 14, 2025, Alamein will have partly cloudy skies with a temperature of 17.3C (63.1F). Winds will come from the WNW at 7.6 mph (12.2 kph). No precipitation is expected.', 'topic': 'general', 'module_name': 'general'},
-'module_name': 'task_handler', 
-'prompt': "Hey Robot, Check my tasks for today",
-'emotions': {'curiosity': 0.645,
-        'neutral': 0.329,
-        'confusion': 0.059
-    }
-}
+# send = {'results': 
+#         {'query': "What's the weather like on 2025-04-14 in Alamein, Egypt?", 'answer': 'On April 14, 2025, Alamein will have partly cloudy skies with a temperature of 17.3C (63.1F). Winds will come from the WNW at 7.6 mph (12.2 kph). No precipitation is expected.', 'topic': 'general', 'module_name': 'general'},
+# 'module_name': 'task_handler', 
+# 'prompt': "Hey Robot, Check my tasks for today",
+# 'emotions': {'curiosity': 0.645,
+#         'neutral': 0.329,
+#         'confusion': 0.059
+#     }
+# }
 # send = {'results': 
 #         {'statuses': [{'switch': 'switch_2', 'status': 'on', 'success': True}], 'module_name': 'smart_home'},
 # 'module_name': 'task_handler', 
@@ -101,7 +101,8 @@ class GlobalMQTTHandler:
     def __init__(self, sub_topic: str = "main/main", name: str = "global_publisher"):
         self._result = {}
 
-        self.__pub_topic = "postprocessing/data"
+        # self.__pub_topic = "postprocessing/data"
+        self.__pub_topic = "task_classifier/prompt"
         # self.__pub_topic = "preprocessing/data"
         self.__sub_topic = sub_topic
         self.__name = name

@@ -11,8 +11,8 @@ from utilities import BaseMQTTHandler
 
 # Specify the paths to the model and labels
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-MODEL_PATH = f"{CURRENT_DIR}/models/TC_Pipeline_LR_v2.pkl"
-LABELS_PATH = f"{CURRENT_DIR}/models/labels_v1.pkl"
+MODEL_PATH = f"{CURRENT_DIR}/models/TC_Pipeline_LR_v4.pkl"
+LABELS_PATH = f"{CURRENT_DIR}/models/labels_v2.pkl"
 
 # Define the name of the module and the topics
 NAME = "task_classifier"
