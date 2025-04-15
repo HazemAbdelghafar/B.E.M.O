@@ -35,6 +35,7 @@ class Main(BaseMQTTHandler):
         self.predicted_labels = []
         self.preprocessed_data = []
         self.response = ""
+        self.task_results = {}
     
     def clean_emotions(self, emotions: dict) -> dict:
         # If both the key and value are empty, remove the key from the dictionary
@@ -128,7 +129,7 @@ class Main(BaseMQTTHandler):
                     logger.error("Response is missing in the others method")
                     return None
                 
-                logger.info("Returning the result to the server")
+                logger.info("Returning the others method result to the server")
                 logger.info(f"Response: {self.response}")
                 self.publish_result({"status": "success", "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
             
@@ -138,20 +139,38 @@ class Main(BaseMQTTHandler):
                     logger.error("Response is missing in the learning_resource method")
                     self.publish_result({"preprocessed_data": self.preprocessed_data}, topic="task_handler/main") 
                 else:
-                    logger.info("Returning the result to the server")
+                    logger.info("Returning the learning_resources method result to the server")
                     self.publish_result({"status": "success", "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
             
             else:
                 self.publish_result({"preprocessed_data": self.preprocessed_data}, topic="task_handler/main")            
-         
+        
+        # Handle the case where module_name is "task_handler"
         if module_name == "task_handler":
             logger.info("Received task_handler module data")
-            logger.info(f"Task handler data: {input_data}")
+            self.task_results = input_data.get("results")
+            if not self.task_results:
+                # Todo: Handle the case where task_results is not sent back
+                logger.error("Task results are missing")
+                return None
+            logger.info(f"Task results: {self.task_results}")
+            
+            self.publish_result({"results": self.task_results, "prompt": self.prompt, "emotions": self.emotions}, topic="postprocessing/data")
+
+        # Handle the case where module_name is "postprocessing"
+        if module_name == "postprocessing":
+            logger.info("Received preprocessing module data")
+            self.response = input_data.get("output")
+            if not self.response:
+                # Todo: Handle the case where the response is not sent back
+                logger.error("Response is missing in the preprocessing method")
+                return None
+            logger.info("Returning the preprocessing method result to the server")
+            logger.info(f"Response: {self.response}")
+            self.publish_result({"status": "success", "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
             
         # Todo: DB
-        # Todo: Post-process the data
         
-        # Return the result
         return None
     
 if __name__ == "__main__":
