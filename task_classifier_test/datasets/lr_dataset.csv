@@ -1,0 +1,148 @@
+prompt,general,smart_home,todo,mail,learning_resources
+"Find a good book on deep learning.",0,0,0,0,1
+"Suggest beginner resources to learn Python.",0,0,0,0,1
+"Are there any YouTube videos about computer vision?",0,0,0,0,1
+"I need a paper about reinforcement learning.",0,0,0,0,1
+"Show me tutorials for building a chatbot.",0,0,0,0,1
+"What’s the best way to start learning Arabic?",0,0,0,0,1
+"Recommend a course on data structures.",0,0,0,0,1
+"Find me a research paper on NLP.",0,0,0,0,1
+"Where can I learn about transformers in AI?",0,0,0,0,1
+"Suggest an article about quantum computing.",0,0,0,0,1
+"Any books that explain GANs?",0,0,0,0,1
+"Where can I find video lectures on statistics?",0,0,0,0,1
+"Suggest a paper comparing BERT and GPT.",0,0,0,0,1
+"I want to study computer networks, help me get started.",0,0,0,0,1
+"Link me to a beginner tutorial on React.",0,0,0,0,1
+"How can I learn prompt engineering?",0,0,0,0,1
+"Show me a roadmap for learning cyber security.",0,0,0,0,1
+"Can you explain what reinforcement learning is and also find me a video that teaches it?",1,0,0,0,1
+"What's the difference between AI and ML? Also, give me a good beginner resource to learn more.",1,0,0,0,1
+"How do transformers work in NLP? And recommend a video I can watch tonight.",1,0,0,0,1
+"Tell me what a neural network is, and send me a tutorial to learn about it.",1,0,0,0,1
+"Can you give me a simple explanation of LLMs and a great YouTube intro?",1,0,0,0,1
+"Teach me what a convolutional neural network is, and find a course I can take.",1,0,0,0,1
+"Explain what a loss function is and suggest a lecture that goes into detail.",1,0,0,0,1
+"How do search algorithms work? Also, recommend a book that teaches them.",1,0,0,0,1
+"What does backpropagation mean? Give me an article or video that explains it.",1,0,0,0,1
+"What's transfer learning? And where can I study it online?",1,0,0,0,1
+"Give me an overview of machine translation and a resource to start learning.",1,0,0,0,1
+"Can you explain prompt engineering and show me a beginner's guide?",1,0,0,0,1
+"What is overfitting? And can you link me to a tutorial?",1,0,0,0,1
+"Tell me what deep reinforcement learning is and where to study it.",1,0,0,0,1
+"How do object detection models work? Give me a related course.",1,0,0,0,1
+"Can you summarize what 'attention' means in neural networks and suggest a blog post?",1,0,0,0,1
+"Explain unsupervised learning and show me a video walkthrough.",1,0,0,0,1
+"Tell me about YOLO models and give me a demo or course.",1,0,0,0,1
+"What is data augmentation? Find a video that shows examples.",1,0,0,0,1
+"Help me understand RNNs and point me to a great learning series.",1,0,0,0,1
+"Add 'watch transformer tutorial' to my tasks and also recommend a good one.",0,0,1,0,1
+"Remind me to study reinforcement learning and suggest a great video too.",0,0,1,0,1
+"Create a task to read about CNNs and find me a beginner's guide.",0,0,1,0,1
+"Schedule time to learn about attention mechanisms and find a course.",0,0,1,0,1
+"Add 'review backpropagation notes' to my to-do list and show a related video.",0,0,1,0,1
+"Make a task to study LSTM networks and suggest a resource.",0,0,1,0,1
+"Set a reminder to finish the PyTorch course and recommend another one.",0,0,1,0,1
+"Put 'complete NLP workshop' on my list and find similar learning material.",0,0,1,0,1
+"Remind me to watch the GAN lecture and find me a better explanation video.",0,0,1,0,1
+"Add a note to explore deep learning basics and give me a course for it.",0,0,1,0,1
+"Set a task to read about data preprocessing and also show a video guide.",0,0,1,0,1
+"Make a study goal to understand tokenization and point me to resources.",0,0,1,0,1
+"Schedule 'learn SQL basics' and find me the best beginner video.",0,0,1,0,1
+"Create a learning task about KNN and show me an article to go with it.",0,0,1,0,1
+"Add 'practice classification models' to my list and find a hands-on guide.",0,0,1,0,1
+"Include 'read about word embeddings' in my tasks and suggest a video.",0,0,1,0,1
+"Remind me to study evaluation metrics and send a tutorial my way.",0,0,1,0,1
+"Set a task to learn about APIs and find me a learning playlist.",0,0,1,0,1
+"Make time to go through a machine learning crash course and find one for me.",0,0,1,0,1
+"Add 'complete prompt engineering notes' and link me to a helpful article.",0,0,1,0,1
+"Send me a tutorial on computer vision and also email a list of books.",0,0,0,1,1
+"Email me the deep learning course you found and share the GitHub repo too.",0,0,0,1,1
+"Find a paper on transformers and send it to my inbox.",0,0,0,1,1
+"Can you email the lecture slides on LSTMs and include a summary video?",0,0,0,1,1
+"Forward the GAN tutorial and also mail me the full curriculum.",0,0,0,1,1
+"Send me the resource on prompt engineering and email the cheatsheet too.",0,0,0,1,1
+"Find a list of AI podcasts and email the best three.",0,0,0,1,1
+"Mail me the reading materials for that PyTorch workshop.",0,0,0,1,1
+"Email me a playlist about NLP and send any related blogs too.",0,0,0,1,1
+"Send the link to the statistics course and email the notes with it.",0,0,0,1,1
+"Mail the PDF guide on ML pipelines and send a short course video too.",0,0,0,1,1
+"Forward the data preprocessing article and a visual summary.",0,0,0,1,1
+"Send a link to the upcoming ML webinar and email the slides afterward.",0,0,0,1,1
+"Mail me a comparison of BERT vs GPT and link a review video.",0,0,0,1,1
+"Email the course on smart home AI and attach a setup guide.",0,0,0,1,1
+"Send me three tutorials on model evaluation and mail the best one.",0,0,0,1,1
+"Can you mail the cheat sheet for Keras and add a training video?",0,0,0,1,1
+"Email me a breakdown of supervised learning with video links.",0,0,0,1,1
+"Send a newsletter on ML trends and include a beginner's course link.",0,0,0,1,1
+"Mail a set of lessons for learning APIs and share a mini project guide.",0,0,0,1,1
+"Find a tutorial on smart home automation and explain how voice control works.",0,1,0,0,1
+"Show me how to integrate Alexa into smart lights and share a beginner course.",0,1,0,0,1
+"Give me a video on using Arduino for home sensors and tell me how it works.",0,1,0,0,1
+"Explain what Home Assistant is and send me a guide to set it up.",0,1,0,0,1
+"Show me a course on smart plugs and how to automate schedules.",0,1,0,0,1
+"Help me learn to control curtains with IoT and share a project video.",0,1,0,0,1
+"Find a tutorial on building a smart thermostat and describe how it works.",0,1,0,0,1
+"Tell me how to automate appliances and give me a good learning playlist.",0,1,0,0,1
+"Show me how to use MQTT for smart devices and recommend a course.",0,1,0,0,1
+"Explain Zigbee networks and send a YouTube video that teaches them.",0,1,0,0,1
+"Give me instructions on smart motion sensors and point me to a good tutorial.",0,1,0,0,1
+"I want to learn to create a smart mirror—find a beginner guide for it.",0,1,0,0,1
+"Teach me how to build a smart garden system and show a course.",0,1,0,0,1
+"Send me a blog and course about voice-controlled lighting systems.",0,1,0,0,1
+"Recommend learning resources to set up automated alarms at home.",0,1,0,0,1
+"Where can I learn about secure IoT setups for smart homes?",0,1,0,0,1
+"Find a course on smart door lock programming and automation.",0,1,0,0,1
+"Teach me how to use Node-RED with my smart switches.",0,1,0,0,1
+"Show me a step-by-step guide for smart security cameras.",0,1,0,0,1
+"Send me a tutorial for setting up a voice-controlled home dashboard.",0,1,0,0,1
+"Can you explain what a transformer model is, remind me to finish the tutorial, and email me the course materials?",1,0,1,1,1
+"Tell me how smart homes use AI, create a task to research Zigbee, and send me a link to a good article.",1,1,1,0,1
+"What's the latest in AI hardware, schedule time to read about it, and forward me that recent whitepaper?",1,0,1,1,1
+"Explain how deep learning powers smart cameras, add a reminder to study YOLO, and send a related video.",1,1,1,0,1
+"How do LLMs like ChatGPT work, send me a tutorial, and set a task to review it later?",1,0,1,1,1
+"What's object detection, add it to my study list, and email me a good beginner's guide?",1,0,1,1,1
+"Summarize how attention mechanisms function, remind me to practice them, and share a course I can follow.",1,0,1,0,1
+"Teach me about natural language inference, send me resources, and also create a study task for it.",1,0,1,1,1
+"How do smart thermostats learn preferences, add a task to study it, and share a video guide?",1,1,1,0,1
+"Explain what a GAN is, remind me to finish my GAN notes, and email me a GitHub repo that shows examples.",1,0,1,1,1
+"Help me understand autonomous systems, add it to my task list, and send a paper explaining it.",1,0,1,1,1
+"Describe convolution in image processing, find a tutorial, and forward it to me by email.",1,0,0,1,1
+"Show me how to use APIs for smart home apps, make a task to explore them, and send a quick-start video.",0,1,1,1,1
+"Tell me about zero-shot learning, remind me to look at HuggingFace docs, and share an intro course.",1,0,1,0,1
+"Summarize the differences between CNN and RNN, add both to my to-do list, and share a course to compare them.",1,0,1,0,1
+"What is transfer learning, create a task to explore use cases, and email me a course with examples?",1,0,1,1,1
+"Find me a resource on voice assistants, remind me to check my smart home settings, and send the course via email.",1,1,0,1,1
+"How can I build a chatbot, add it to my tasks, and send me a tutorial video and sample code.",1,0,1,1,1
+"Explain smart home integration, schedule time to study it, and email me any books on the topic.",1,1,1,1,1
+"Tell me how AI improves energy efficiency at home, create a task to research it, and share the learning materials.",1,1,1,0,1
+"Can you tell me how reinforcement learning works, remind me to read about Q-learning, send me the research paper, and email me when you do?",1,0,1,1,1
+"What's the weather today, turn off the kitchen lights, add a task to refill the water bottle, and send me a hydration tracker tutorial?",1,1,1,1,1
+"Tell me about BLE vs WiFi in smart homes, schedule research time, and send me an article explaining both.",1,1,1,0,1
+"Explain multi-modal learning, add it to my to-do list, and share a video lecture on the topic.",1,0,1,0,1
+"How do I automate my curtains, create a task to research motors, and email a list of required items?",0,1,1,1,1
+"Summarize the latest AI conference trends, remind me to follow up, and send me a list of keynote videos.",1,0,1,1,1
+"Give me a fun fact, turn off the smart fan, add a reminder to reset it later, and email the troubleshooting guide.",1,1,1,1,0
+"Teach me how edge computing works, set up a study plan, and forward me an online workshop link.",1,0,1,1,1
+"Who won the basketball game, dim the living room lights, and email me a link to the highlights?",1,1,0,1,0
+"What is federated learning, remind me to read about it later, and email me a simple explanation?",1,0,1,1,1
+"Tell me the capital of Brazil, add a reminder to check travel plans, and email me the embassy link.",1,0,1,1,0
+"How can I set up voice recognition at home, create a task to install it, and share an online course?",1,1,1,0,1
+"What's meta-learning, remind me to explore it, and send me a video explaining the concept?",1,0,1,0,1
+"Explain the concept of embeddings, add a note to practice them, and email a course link.",1,0,1,1,1
+"Tell me about smart fridges, add a task to organize fridge items, and send me a smart kitchen guide.",1,1,1,0,1
+"How does Alexa detect wake words, create a task to study wake word detection, and share a research paper?",1,1,1,0,1
+"What's a positional encoder in transformers, add it to my study list, and send a paper explaining it?",1,0,1,1,1
+"How do I send an automatic report via email, create a task to build the script, and share a tutorial?",0,0,1,1,1
+"Tell me a joke, set a reminder to clean the living room, and email me a productivity playlist.",1,0,1,1,0
+"What's a good book for learning RNNs, add it to my reading list, and send me the download link?",1,0,1,1,1
+"Show me how to connect my smart plugs, remind me to buy a new one, and email a quickstart guide.",0,1,1,1,1
+"Give me the latest on generative AI, schedule time to watch a talk, and send the Zoom link to my email.",1,0,1,1,1
+"Teach me how transformers handle context, create a task to summarize it, and share a deep dive article.",1,0,1,0,1
+"What's the difference between ReLU and Sigmoid, add a task to implement both, and email sample code.",1,0,1,1,1
+"Tell me about smart home security, add it to my to-do list, and send a beginner’s guide video.",1,1,1,0,1
+"Summarize attention mechanisms, create a task to build a mini-project, and email reference materials.",1,0,1,1,1
+"How do smart bulbs work, remind me to turn them off at night, and send me their manual?",0,1,1,1,0
+"Help me explore few-shot learning, add it to my task list, and share papers about it.",1,0,1,0,1
+"Tell me a motivational quote, switch on the heater, remind me to sleep early, and send me a sleep study.",1,1,1,1,1
+"What’s new in OpenAI’s API, add a task to integrate it, and email me the changelog?",1,0,1,1,1

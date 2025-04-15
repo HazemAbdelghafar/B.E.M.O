@@ -1,0 +1,368 @@
+prompt,general,smart_home,todo,mail,learning_resources,others
+Are you available 24/7?,0,0,0,0,0,1
+Do you have hobbies?,0,0,0,0,0,1
+Can you understand sarcasm?,0,0,0,0,0,1
+Do you learn from experience?,0,0,0,0,0,1
+Can you help me relax?,0,0,0,0,0,1
+What do you think about humans?,0,0,0,0,0,1
+What is your origin?,0,0,0,0,0,1
+What can you do?,0,0,0,0,0,1
+Who created you?,0,0,0,0,0,1
+What is your favorite movie?,0,0,0,0,0,1
+What is your name?,0,0,0,0,0,1
+Can you solve problems?,0,0,0,0,0,1
+Are you a real person?,0,0,0,0,0,1
+What is the meaning of life?,0,0,0,0,0,1
+Do you have a favorite book?,0,0,0,0,0,1
+Are you intelligent?,0,0,0,0,0,1
+What makes you unique?,0,0,0,0,0,1
+What is your main function?,0,0,0,0,0,1
+What language do you speak?,0,0,0,0,0,1
+What is your design?,0,0,0,0,0,1
+What is your opinion on art?,0,0,0,0,0,1
+What is your purpose?,0,0,0,0,0,1
+What is your memory capacity?,0,0,0,0,0,1
+How do you feel?,0,0,0,0,0,1
+Are you self-aware?,0,0,0,0,0,1
+What is your version?,0,0,0,0,0,1
+I love you.,0,0,0,0,0,1
+How do you learn?,0,0,0,0,0,1
+Tell me something interesting.,0,0,0,0,0,1
+How do you work?,0,0,0,0,0,1
+What is your favorite food?,0,0,0,0,0,1
+How do you spend your time?,0,0,0,0,0,1
+What are your capabilities?,0,0,0,0,0,1
+Can you sing?,0,0,0,0,0,1
+What is your favorite hobby?,0,0,0,0,0,1
+Do you dream?,0,0,0,0,0,1
+What is your best feature?,0,0,0,0,0,1
+What is your favorite color?,0,0,0,0,0,1
+What do you think about AI?,0,0,0,0,0,1
+Tell me a joke.,0,0,0,0,0,1
+Can you provide advice?,0,0,0,0,0,1
+Do you have emotions?,0,0,0,0,0,1
+Do you like to chat?,0,0,0,0,0,1
+Are you programmed to feel?,0,0,0,0,0,1
+How are you today?,0,0,0,0,0,1
+Do you get tired?,0,0,0,0,0,1
+Do you understand love?,0,0,0,0,0,1
+Do you feel happy?,0,0,0,0,0,1
+Do you enjoy music?,0,0,0,0,0,1
+Can you tell me a story?,0,0,0,0,0,1
+"Activate the security alarm, add a note to review the budget, and email the meeting minutes to the team.",0,1,1,1,0,0
+Can you explain prompt engineering and show me a beginner's guide?,1,0,0,0,1,0
+"Turn off the kitchen lights, set a reminder to exercise at 6 PM, and send an invitation email for the event.",0,1,1,1,0,0
+Can you explain quantum physics and forward the contract via email.,1,0,0,1,0,0
+Send me three tutorials on model evaluation and mail the best one.,0,0,0,1,1,0
+What are the benefits of meditation?,1,0,0,0,0,0
+"Can you explain what a transformer model is, remind me to finish the tutorial, and email me the course materials?",1,0,1,1,1,0
+Tell me about YOLO models and give me a demo or course.,1,0,0,0,1,0
+Turn off the kitchen lights.,0,1,0,0,0,0
+What time is it and add a reminder to call the dentist.,1,0,1,0,0,0
+Add a reminder to call the dentist.,0,0,1,0,0,0
+"Tell me how AI improves energy efficiency at home, create a task to research it, and share the learning materials.",1,1,1,0,1,0
+Email me the deep learning course you found and share the GitHub repo too.,0,0,0,1,1,0
+"What's the latest news, add 'buy groceries' to my list, and compose an email to Ahmed.",1,0,1,1,0,0
+Remind me to update my calendar and send an email confirming the appointment.,0,0,1,1,0,0
+Add 'practice classification models' to my list and find a hands-on guide.,0,0,1,0,1,0
+Where can I find a good restaurant and send an update email about the project.,1,0,0,1,0,0
+"What is the capital of France, close the window blinds, remember to water the plants, and send a thank-you email to my professor.",1,1,1,1,0,0
+"How do smart bulbs work, remind me to turn them off at night, and send me their manual?",0,1,1,1,0,0
+"Turn on the porch light, remind me to update my calendar, and send an email confirming the appointment.",0,1,1,1,0,0
+"What's the difference between AI and ML? Also, give me a good beginner resource to learn more.",1,0,0,0,1,0
+Remember to call mom tomorrow and send an update email about the project.,0,0,1,1,0,0
+"Activate the home surveillance system, schedule a conference call for Monday, and forward the contract via email.",0,1,1,1,0,0
+"Turn on the living room lights, add a reminder to call the dentist, and send an email to Sarah.",0,1,1,1,0,0
+Open the garage door.,0,1,0,0,0,0
+Compose an email to my client.,0,0,0,1,0,0
+Find me a research paper on NLP.,0,0,0,0,1,0
+Put 'complete NLP workshop' on my list and find similar learning material.,0,0,1,0,1,0
+What's the meaning of life and switch on the garden lights.,1,1,0,0,0,0
+"What is the history of Rome, switch on the garden lights, add a reminder to pay the electricity bill, and email the schedule to the team.",1,1,1,1,0,0
+"Tell me about BLE vs WiFi in smart homes, schedule research time, and send me an article explaining both.",1,1,1,0,1,0
+What is the history of Rome and add a reminder to pay the electricity bill.,1,0,1,0,0,0
+Find a good book on deep learning.,0,0,0,0,1,0
+Explain what Home Assistant is and send me a guide to set it up.,0,1,0,0,1,0
+Forward the data preprocessing article and a visual summary.,0,0,0,1,1,0
+Mail me the reading materials for that PyTorch workshop.,0,0,0,1,1,0
+Set a task to renew my passport.,0,0,1,0,0,0
+"Can you tell me a fun fact, lock the front door, remind me to submit the report, and forward the latest report via email.",1,1,1,1,0,0
+"Can you tell me how reinforcement learning works, remind me to read about Q-learning, send me the research paper, and email me when you do?",1,0,1,1,1,0
+What's a good book to read?,1,0,0,0,0,0
+Turn on the living room lights.,0,1,0,0,0,0
+Forward the GAN tutorial and also mail me the full curriculum.,0,0,0,1,1,0
+"What’s new in OpenAI’s API, add a task to integrate it, and email me the changelog?",1,0,1,1,1,0
+"Explain the concept of embeddings, add a note to practice them, and email a course link.",1,0,1,1,1,0
+Make a study goal to understand tokenization and point me to resources.,0,0,1,0,1,0
+"Explain smart home integration, schedule time to study it, and email me any books on the topic.",1,1,1,1,1,0
+Compose an email to the support team.,0,0,0,1,0,0
+Set a task to clean the house this weekend and draft a follow-up email for the interview.,0,0,1,1,0,0
+Open the curtains in the living room.,0,1,0,0,0,0
+Recommend learning resources to set up automated alarms at home.,0,1,0,0,1,0
+Send an update email about the project.,0,0,0,1,0,0
+"What are the benefits of meditation, set a reminder to exercise at 6 PM, and send an invitation email for the event.",1,0,1,1,0,0
+"Tell me how smart homes use AI, create a task to research Zigbee, and send me a link to a good article.",1,1,1,0,1,0
+Set the mood lighting in the dining room.,0,1,0,0,0,0
+Add a reminder to pay the electricity bill.,0,0,1,0,0,0
+"What are the benefits of meditation, turn off the kitchen lights, and set a reminder to exercise at 6 PM.",1,1,1,0,0,0
+"Can you tell me a fun fact, lock the front door, and forward the latest report via email.",1,1,0,1,0,0
+Tell me how to automate appliances and give me a good learning playlist.,0,1,0,0,1,0
+"Tell me a motivational quote, switch on the heater, remind me to sleep early, and send me a sleep study.",1,1,1,1,1,0
+Add a note to explore deep learning basics and give me a course for it.,0,0,1,0,1,0
+"How do I improve productivity, add a note to review the budget, and email the meeting minutes to the team.",1,0,1,1,0,0
+"What's meta-learning, remind me to explore it, and send me a video explaining the concept?",1,0,1,0,1,0
+Schedule an appointment with the doctor.,0,0,1,0,0,0
+How's the weather today and dim the bedroom lights.,1,1,0,0,0,0
+Can you tell me a fun fact and remind me to submit the report.,1,0,1,0,0,0
+"Explain multi-modal learning, add it to my to-do list, and share a video lecture on the topic.",1,0,1,0,1,0
+Make a task to study LSTM networks and suggest a resource.,0,0,1,0,1,0
+Who won the game last night and reply to John's email.,1,0,0,1,0,0
+Show me how to use MQTT for smart devices and recommend a course.,0,1,0,0,1,0
+Remember to call mom tomorrow.,0,0,1,0,0,0
+What's the best movie tonight and add a task to organize my files.,1,0,1,0,0,0
+"How can I set up voice recognition at home, create a task to install it, and share an online course?",1,1,1,0,1,0
+Find a list of AI podcasts and email the best three.,0,0,0,1,1,0
+How do I get started with programming?,1,0,0,0,0,0
+Can you explain quantum physics and schedule a conference call for Monday.,1,0,1,0,0,0
+"Show me how to use APIs for smart home apps, make a task to explore them, and send a quick-start video.",0,1,1,1,1,0
+Email me a breakdown of supervised learning with video links.,0,0,0,1,1,0
+Add 'complete prompt engineering notes' and link me to a helpful article.,0,0,1,0,1,0
+Open the curtains in the living room and add a task to organize my files.,0,1,1,0,0,0
+Draft an email regarding the new policy.,0,0,0,1,0,0
+Schedule an appointment with the doctor and compose an email to my client.,0,0,1,1,0,0
+Set the thermostat to 22 degrees.,0,1,0,0,0,0
+"Describe convolution in image processing, find a tutorial, and forward it to me by email.",1,0,0,1,1,0
+"How do I improve productivity, activate the security alarm, and add a note to review the budget.",1,1,1,0,0,0
+Schedule a conference call for Monday.,0,0,1,0,0,0
+Give me instructions on smart motion sensors and point me to a good tutorial.,0,1,0,0,1,0
+Schedule time to learn about attention mechanisms and find a course.,0,0,1,0,1,0
+"What's the latest news, set the thermostat to 22 degrees, and compose an email to Ahmed.",1,1,0,1,0,0
+Who won the game last night?,1,0,0,0,0,0
+Adjust the air conditioner to a cooler setting.,0,1,0,0,0,0
+Mail me a comparison of BERT vs GPT and link a review video.,0,0,0,1,1,0
+Schedule a meeting with my team.,0,0,1,0,0,0
+Give me an overview of machine translation and a resource to start learning.,1,0,0,0,1,0
+I want to learn to create a smart mirror—find a beginner guide for it.,0,1,0,0,1,0
+"How do LLMs like ChatGPT work, send me a tutorial, and set a task to review it later?",1,0,1,1,1,0
+Can you tell me a fun fact?,1,0,0,0,0,0
+What's the distance from Earth to the Moon?,1,0,0,0,0,0
+"What is transfer learning, create a task to explore use cases, and email me a course with examples?",1,0,1,1,1,0
+"How does Alexa detect wake words, create a task to study wake word detection, and share a research paper?",1,1,1,0,1,0
+"How do I bake a cake, set a task to clean the house this weekend, and draft a follow-up email for the interview.",1,0,1,1,0,0
+Can you summarize what 'attention' means in neural networks and suggest a blog post?,1,0,0,0,1,0
+How can I save money and set the mood lighting in the dining room.,1,1,0,0,0,0
+"What's the latest in AI hardware, schedule time to read about it, and forward me that recent whitepaper?",1,0,1,1,1,0
+"Where can I find a good restaurant, adjust the air conditioner, and send an update email about the project.",1,1,0,1,0,0
+"What's a good book for learning RNNs, add it to my reading list, and send me the download link?",1,0,1,1,1,0
+What are the benefits of meditation and set a reminder to exercise at 6 PM.,1,0,1,0,0,0
+"What's the best movie tonight, open the curtains in the living room, and email the summary of the meeting.",1,1,0,1,0,0
+How's the weather today?,1,0,0,0,0,0
+"Help me explore few-shot learning, add it to my task list, and share papers about it.",1,0,1,0,1,0
+"Can you tell me a fun fact, lock the front door, and remind me to submit the report.",1,1,1,0,0,0
+"What's the latest news, set the thermostat to 22 degrees, and add 'buy groceries' to my to-do list.",1,1,1,0,0,0
+Help me learn to control curtains with IoT and share a project video.,0,1,0,0,1,0
+Explain Zigbee networks and send a YouTube video that teaches them.,0,1,0,0,1,0
+What is overfitting? And can you link me to a tutorial?,1,0,0,0,1,0
+Explain what a loss function is and suggest a lecture that goes into detail.,1,0,0,0,1,0
+Find a tutorial on smart home automation and explain how voice control works.,0,1,0,0,1,0
+"Summarize the latest AI conference trends, remind me to follow up, and send me a list of keynote videos.",1,0,1,1,1,0
+"What's a good book to read, schedule an appointment with the doctor, and compose an email to my client.",1,0,1,1,0,0
+What's the latest news and set the thermostat to 22 degrees.,1,1,0,0,0,0
+Send an invitation email for the event.,0,0,0,1,0,0
+"Can you tell me a fun fact, remind me to submit the report, and forward the latest report via email.",1,0,1,1,0,0
+"How do I send an automatic report via email, create a task to build the script, and share a tutorial?",0,0,1,1,1,0
+Add 'review backpropagation notes' to my to-do list and show a related video.,0,0,1,0,1,0
+What's transfer learning? And where can I study it online?,1,0,0,0,1,0
+"Play relaxing music, schedule an appointment with the doctor, and compose an email to my client.",0,1,1,1,0,0
+Lower the thermostat for the night and add 'finish reading the book' to my list.,0,1,1,0,0,0
+Add 'finish the project' to my tasks and draft an email regarding the new policy.,0,0,1,1,0,0
+"How do I get started with programming, turn on the porch light, and send an email confirming the appointment.",1,1,0,1,0,0
+"Start the vacuum cleaner, add 'finish the project' to my tasks, and draft an email regarding the new policy.",0,1,1,1,0,0
+Email the course on smart home AI and attach a setup guide.,0,0,0,1,1,0
+"How can I build a chatbot, add it to my tasks, and send me a tutorial video and sample code.",1,0,1,1,1,0
+"What's the weather today, turn off the kitchen lights, add a task to refill the water bottle, and send me a hydration tracker tutorial?",1,1,1,1,1,0
+"Tell me about smart fridges, add a task to organize fridge items, and send me a smart kitchen guide.",1,1,1,0,1,0
+What's the best movie tonight and email the summary of the meeting.,1,0,0,1,0,0
+Dim the bedroom lights and draft an email to my manager.,0,1,0,1,0,0
+Schedule a meeting with my team and draft an email to my manager.,0,0,1,1,0,0
+How can I learn prompt engineering?,0,0,0,0,1,0
+Switch on the garden lights.,0,1,0,0,0,0
+I need a paper about reinforcement learning.,0,0,0,0,1,0
+Forward the latest report via email.,0,0,0,1,0,0
+Send me a blog and course about voice-controlled lighting systems.,0,1,0,0,1,0
+Adjust the air conditioner and send an update email about the project.,0,1,0,1,0,0
+What does backpropagation mean? Give me an article or video that explains it.,1,0,0,0,1,0
+Remind me to submit the report.,0,0,1,0,0,0
+"What is the meaning of life, add 'finish reading the book' to my list, and compose an email to the support team.",1,0,1,1,0,0
+Draft an email to my manager.,0,0,0,1,0,0
+Draft a follow-up email for the interview.,0,0,0,1,0,0
+What's the capital of France?,1,0,0,0,0,0
+Play relaxing music and schedule an appointment with the doctor.,0,1,1,0,0,0
+Turn off the kitchen lights and send an invitation email for the event.,0,1,0,1,0,0
+Show me tutorials for building a chatbot.,0,0,0,0,1,0
+Remind me to watch the GAN lecture and find me a better explanation video.,0,0,1,0,1,0
+"What is the meaning of life, lower the thermostat for the night, and add 'finish reading the book' to my list.",1,1,1,0,0,0
+Lock the front door.,0,1,0,0,0,0
+What's the latest news and add 'buy groceries' to my to-do list.,1,0,1,0,0,0
+"What is the history of Rome, switch on the garden lights, and add a reminder to pay the electricity bill.",1,1,1,0,0,0
+What time is it and send an email to Sarah.,1,0,0,1,0,0
+Where can I find a good restaurant?,1,0,0,0,0,0
+"How do search algorithms work? Also, recommend a book that teaches them.",1,0,0,0,1,0
+"Open the curtains in the living room, add a task to organize my files, and email the summary of the meeting.",0,1,1,1,0,0
+"Teach me what a convolutional neural network is, and find a course I can take.",1,0,0,0,1,0
+"Who won the game last night, open the garage door, set a task to renew my passport, and reply to John's email.",1,1,1,1,0,0
+Make time to go through a machine learning crash course and find one for me.,0,0,1,0,1,0
+Send a newsletter on ML trends and include a beginner's course link.,0,0,0,1,1,0
+Add a task to organize my files.,0,0,1,0,0,0
+Reply to John's email.,0,0,0,1,0,0
+"Teach me how transformers handle context, create a task to summarize it, and share a deep dive article.",1,0,1,0,1,0
+"What's a positional encoder in transformers, add it to my study list, and send a paper explaining it?",1,0,1,1,1,0
+How do I bake a cake?,1,0,0,0,0,0
+Are there any YouTube videos about computer vision?,0,0,0,0,1,0
+Open the garage door and reply to John's email.,0,1,0,1,0,0
+Who won the game last night and activate the security alarm.,1,1,0,0,0,0
+"Close the window blinds, remember to water the plants, and send a thank-you email to my professor.",0,1,1,1,0,0
+What is the capital of France and remember to water the plants.,1,0,1,0,0,0
+Can you email the lecture slides on LSTMs and include a summary video?,0,0,0,1,1,0
+What is data augmentation? Find a video that shows examples.,1,0,0,0,1,0
+Turn on the living room lights and send an email to Sarah.,0,1,0,1,0,0
+Send an email confirming the appointment.,0,0,0,1,0,0
+Tell me what deep reinforcement learning is and where to study it.,1,0,0,0,1,0
+Remind me to submit the report and forward the latest report via email.,0,0,1,1,0,0
+Teach me how to use Node-RED with my smart switches.,0,1,0,0,1,0
+Add 'watch transformer tutorial' to my tasks and also recommend a good one.,0,0,1,0,1,0
+Set a reminder to exercise at 6 PM and send an invitation email for the event.,0,0,1,1,0,0
+Activate the security alarm and email the meeting minutes to the team.,0,1,0,1,0,0
+Set the thermostat to 22 degrees and add 'buy groceries' to my to-do list.,0,1,1,0,0,0
+Dim the bedroom lights.,0,1,0,0,0,0
+Show me a roadmap for learning cyber security.,0,0,0,0,1,0
+Show me a step-by-step guide for smart security cameras.,0,1,0,0,1,0
+Mail the PDF guide on ML pipelines and send a short course video too.,0,0,0,1,1,0
+Close the window blinds.,0,1,0,0,0,0
+Find a tutorial on building a smart thermostat and describe how it works.,0,1,0,0,1,0
+"Tell me what a neural network is, and send me a tutorial to learn about it.",1,0,0,0,1,0
+"What's a good book to read, play relaxing music, and compose an email to my client.",1,1,0,1,0,0
+Schedule 'learn SQL basics' and find me the best beginner video.,0,0,1,0,1,0
+"Where can I find a good restaurant, adjust the air conditioner, and remember to call mom tomorrow.",1,1,1,0,0,0
+"Find me a resource on voice assistants, remind me to check my smart home settings, and send the course via email.",1,1,0,1,1,0
+Can you explain quantum physics in simple terms?,1,0,0,0,0,0
+Any books that explain GANs?,0,0,0,0,1,0
+Mail a set of lessons for learning APIs and share a mini project guide.,0,0,0,1,1,0
+"What are the benefits of meditation, turn off the kitchen lights, set a reminder to exercise at 6 PM, and send an invitation email for the event.",1,1,1,1,0,0
+Close the window blinds and remember to water the plants.,0,1,1,0,0,0
+What time is it and turn on the living room lights.,1,1,0,0,0,0
+"What is federated learning, remind me to read about it later, and email me a simple explanation?",1,0,1,1,1,0
+What are the benefits of meditation and play relaxing music.,1,1,0,0,0,0
+What’s the best way to start learning Arabic?,0,0,0,0,1,0
+"Tell me a joke, set a reminder to clean the living room, and email me a productivity playlist.",1,0,1,1,0,0
+How do I cook a perfect meal and adjust the air conditioner.,1,1,0,0,0,0
+Send me a tutorial for setting up a voice-controlled home dashboard.,0,1,0,0,1,0
+What is the latest news?,1,0,0,0,0,0
+How do object detection models work? Give me a related course.,1,0,0,0,1,0
+Lock the front door and forward the latest report via email.,0,1,0,1,0,0
+"How does the stock market work, start the vacuum cleaner, and draft an email regarding the new policy.",1,1,0,1,0,0
+Set a task to read about data preprocessing and also show a video guide.,0,0,1,0,1,0
+What is the meaning of life and add 'finish reading the book' to my list.,1,0,1,0,0,0
+"Teach me about natural language inference, send me resources, and also create a study task for it.",1,0,1,1,1,0
+"Who won the game last night, open the garage door, and set a task to renew my passport.",1,1,1,0,0,0
+What is the meaning of life?,1,0,0,0,0,0
+Turn on the porch light and remind me to update my calendar.,0,1,1,0,0,0
+Remind me to study evaluation metrics and send a tutorial my way.,0,0,1,0,1,0
+Send a link to the upcoming ML webinar and email the slides afterward.,0,0,0,1,1,0
+Send a thank-you email to my professor.,0,0,0,1,0,0
+How do I improve my productivity?,1,0,0,0,0,0
+Activate the home surveillance system.,0,1,0,0,0,0
+Can you tell me a fun fact and lock the front door.,1,1,0,0,0,0
+Adjust the air conditioner and remember to call mom tomorrow.,0,1,1,0,0,0
+Turn on the porch light.,0,1,0,0,0,0
+Remember to water the plants and send a thank-you email to my professor.,0,0,1,1,0,0
+"What is the capital of France, close the window blinds, and remember to water the plants.",1,1,1,0,0,0
+What are the benefits of meditation and send an invitation email for the event.,1,0,0,1,0,0
+Email the schedule to the team.,0,0,0,1,0,0
+What is the meaning of life and compose an email to the support team.,1,0,0,1,0,0
+Suggest an article about quantum computing.,0,0,0,0,1,0
+Turn on the porch light and send an email confirming the appointment.,0,1,0,1,0,0
+Start the vacuum cleaner.,0,1,0,0,0,0
+What's a good book to read and compose an email to my client.,1,0,0,1,0,0
+"Show me how to connect my smart plugs, remind me to buy a new one, and email a quickstart guide.",0,1,1,1,1,0
+Add 'finish the project' to my tasks.,0,0,1,0,0,0
+Suggest a paper comparing BERT and GPT.,0,0,0,0,1,0
+Set a reminder to finish the PyTorch course and recommend another one.,0,0,1,0,1,0
+Find a course on smart door lock programming and automation.,0,1,0,0,1,0
+Create a learning task about KNN and show me an article to go with it.,0,0,1,0,1,0
+"I want to study computer networks, help me get started.",0,0,0,0,1,0
+Add a note to review the budget and email the meeting minutes to the team.,0,0,1,1,0,0
+How do I improve productivity and open the garage door.,1,1,0,0,0,0
+"How's the weather today, schedule a meeting with my team, and draft an email to my manager.",1,0,1,1,0,0
+Compose an email to Ahmed.,0,0,0,1,0,0
+How does the stock market work?,1,0,0,0,0,0
+Turn off the kitchen lights and set a reminder to exercise at 6 PM.,0,1,1,0,0,0
+Email the summary of the meeting.,0,0,0,1,0,0
+How do transformers work in NLP? And recommend a video I can watch tonight.,1,0,0,0,1,0
+"How do I automate my curtains, create a task to research motors, and email a list of required items?",0,1,1,1,1,0
+"How do smart thermostats learn preferences, add a task to study it, and share a video guide?",1,1,1,0,1,0
+Can you explain what reinforcement learning is and also find me a video that teaches it?,1,0,0,0,1,0
+Send me the resource on prompt engineering and email the cheatsheet too.,0,0,0,1,1,0
+Lower the thermostat for the night and compose an email to the support team.,0,1,0,1,0,0
+Teach me how to build a smart garden system and show a course.,0,1,0,0,1,0
+What time is it?,1,0,0,0,0,0
+Email me a playlist about NLP and send any related blogs too.,0,0,0,1,1,0
+Find a paper on transformers and send it to my inbox.,0,0,0,1,1,0
+"Can you explain quantum physics, activate the home surveillance system, and forward the contract via email.",1,1,0,1,0,0
+"What's object detection, add it to my study list, and email me a good beginner's guide?",1,0,1,1,1,0
+Remind me to study reinforcement learning and suggest a great video too.,0,0,1,0,1,0
+Show me how to integrate Alexa into smart lights and share a beginner course.,0,1,0,0,1,0
+Set a task to learn about APIs and find me a learning playlist.,0,0,1,0,1,0
+"Lower the thermostat for the night, add 'finish reading the book' to my list, and compose an email to the support team.",0,1,1,1,0,0
+Forward the contract via email.,0,0,0,1,0,0
+Link me to a beginner tutorial on React.,0,0,0,0,1,0
+"What's a good book to read, play relaxing music, and schedule an appointment with the doctor.",1,1,1,0,0,0
+Play relaxing music in the living room.,0,1,0,0,0,0
+"Teach me how edge computing works, set up a study plan, and forward me an online workshop link.",1,0,1,1,1,0
+How do I get started with programming and remind me to update my calendar.,1,0,1,0,0,0
+"Tell me about smart home security, add it to my to-do list, and send a beginner’s guide video.",1,1,1,0,1,0
+"Summarize attention mechanisms, create a task to build a mini-project, and email reference materials.",1,0,1,1,1,0
+How does the stock market work and start the vacuum cleaner.,1,1,0,0,0,0
+Create a task to read about CNNs and find me a beginner's guide.,0,0,1,0,1,0
+Explain unsupervised learning and show me a video walkthrough.,1,0,0,0,1,0
+Help me understand RNNs and point me to a great learning series.,1,0,0,0,1,0
+Remind me to update my calendar.,0,0,1,0,0,0
+Recommend a course on data structures.,0,0,0,0,1,0
+Activate the home surveillance system and forward the contract via email.,0,1,0,1,0,0
+"Tell me about zero-shot learning, remind me to look at HuggingFace docs, and share an intro course.",1,0,1,0,1,0
+Set a task to clean the house this weekend.,0,0,1,0,0,0
+"Explain what a GAN is, remind me to finish my GAN notes, and email me a GitHub repo that shows examples.",1,0,1,1,1,0
+Who won the game last night and set a task to renew my passport.,1,0,1,0,0,0
+Can you give me a simple explanation of LLMs and a great YouTube intro?,1,0,0,0,1,0
+"What time is it, add a reminder to call the dentist, and send an email to Sarah.",1,0,1,1,0,0
+Where can I learn about transformers in AI?,0,0,0,0,1,0
+Set a reminder to exercise at 6 PM.,0,0,1,0,0,0
+Suggest beginner resources to learn Python.,0,0,0,0,1,0
+Lock the front door and remind me to submit the report.,0,1,1,0,0,0
+Lower the thermostat for the night.,0,1,0,0,0,0
+Add a reminder to pay the electricity bill and email the schedule to the team.,0,0,1,1,0,0
+Send the link to the statistics course and email the notes with it.,0,0,0,1,1,0
+"Give me the latest on generative AI, schedule time to watch a talk, and send the Zoom link to my email.",1,0,1,1,1,0
+Activate the security alarm.,0,1,0,0,0,0
+Add 'finish reading the book' to my list.,0,0,1,0,0,0
+Show me a course on smart plugs and how to automate schedules.,0,1,0,0,1,0
+"Who won the basketball game, dim the living room lights, and email me a link to the highlights?",1,1,0,1,0,0
+"Summarize how attention mechanisms function, remind me to practice them, and share a course I can follow.",1,0,1,0,1,0
+"Where can I find a good restaurant, remember to call mom tomorrow, and send an update email about the project.",1,0,1,1,0,0
+Email the meeting minutes to the team.,0,0,0,1,0,0
+Include 'read about word embeddings' in my tasks and suggest a video.,0,0,1,0,1,0
+Remember to water the plants.,0,0,1,0,0,0
+Give me a video on using Arduino for home sensors and tell me how it works.,0,1,0,0,1,0
+"Help me understand autonomous systems, add it to my task list, and send a paper explaining it.",1,0,1,1,1,0
+Can you mail the cheat sheet for Keras and add a training video?,0,0,0,1,1,0
+Where can I learn about secure IoT setups for smart homes?,0,1,0,0,1,0
+Add 'buy groceries' to my to-do list.,0,0,1,0,0,0
+"Explain how deep learning powers smart cameras, add a reminder to study YOLO, and send a related video.",1,1,1,0,1,0
+"Summarize the differences between CNN and RNN, add both to my to-do list, and share a course to compare them.",1,0,1,0,1,0
+Send me a tutorial on computer vision and also email a list of books.,0,0,0,1,1,0
+Where can I find video lectures on statistics?,0,0,0,0,1,0
+"What's the difference between ReLU and Sigmoid, add a task to implement both, and email sample code.",1,0,1,1,1,0
+Add a note to review the budget.,0,0,1,0,0,0
+What is the history of Rome?,1,0,0,0,0,0
+"How do I bake a cake, set the mood lighting in the dining room, and set a task to clean the house this weekend.",1,1,1,0,0,0
+Send an email to Sarah.,0,0,0,1,0,0
