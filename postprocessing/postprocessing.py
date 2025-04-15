@@ -12,7 +12,7 @@ import logging
 
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from utilities import BaseMQTTHandler, POST_SYSTEM_PROMPT
+from utilities import BaseMQTTHandler, POST_SYSTEM_PROMPT, SwitchMapping, UserData
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
@@ -49,6 +49,8 @@ class PostProcessing(BaseMQTTHandler):
         )
         self.__system_prompts = self.__initialize_prompts()
         self.__chains = self.__initialize_chains()
+        self.__switch_mapping = SwitchMapping().get_all_mappings()
+        self.__user_data = UserData().get_all_user_data()
         
                                         
     def __initialize_prompts(self) -> dict[str, PromptTemplate]:
@@ -124,7 +126,7 @@ class PostProcessing(BaseMQTTHandler):
         result = {}
         
         try:
-            response = self.__chains[module_name].invoke({"user_query": prompt, "task_output": task_output, "current_time": datetime.now(), "user_emotions": emotions})
+            response = self.__chains[module_name].invoke({"user_query": prompt, "task_output": task_output, "current_time": datetime.now(), "user_emotions": emotions, "switch_mapping": self.__switch_mapping, "user_data_name": self.__user_data['name'], "user_data_job_title": self.__user_data['job_title'], "user_data_location": self.__user_data['location'], "user_data_age": self.__user_data['age']})
         except Exception as e:
             logger.error(f"Error: {e}")
             response = None
