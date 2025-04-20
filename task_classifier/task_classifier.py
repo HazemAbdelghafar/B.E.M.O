@@ -18,7 +18,6 @@ LABELS_PATH = f"{CURRENT_DIR}/models/labels_v2.pkl"
 NAME = "task_classifier"
 SUB_TOPIC = "task_classifier/prompt"
 
-# TODO: Add learning resources
 class TaskClassifier(BaseMQTTHandler):
     """
     TaskClassifier is a class for classifying tasks based on a given prompt.
@@ -35,7 +34,9 @@ class TaskClassifier(BaseMQTTHandler):
         # Load the model and labels
         self.__model = pickle.load(open(MODEL_PATH, "rb"))
         self.__labels = pickle.load(open(LABELS_PATH, "rb"))
-        self._bemo_strings = [
+        
+        # Todo: Define the list of bemo strings
+        self.__name_strings = [
             "bemo", "bmo", "bimo", "vemo", "vimo", "vmo", 
             "nemo", "kemo", "bbmo", "moo", "bemoo", "bemu", 
             "beemo", "temo"
@@ -85,7 +86,7 @@ class TaskClassifier(BaseMQTTHandler):
         prompt = prompt.lower()
         
         # Remove bemo strings and all preceding words
-        for bemo_string in self._bemo_strings:
+        for bemo_string in self.__name_strings:
             if bemo_string in prompt:
                 prompt = prompt.split(bemo_string)[1]
                 
