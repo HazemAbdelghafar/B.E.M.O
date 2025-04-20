@@ -100,7 +100,7 @@ PRE_SYSTEM_PROMPT = {
         "{prompt}"
     ),
 
-    # TODO Implement the mail module then fix this prompt
+    # TODO: Implement the mail module then fix this prompt
     # TODO: Add chat history to the mail prompt
     # TODO: Add user data to the mail prompt
     "mail": (
@@ -483,8 +483,34 @@ POST_SYSTEM_PROMPT = {
         "                   'confusion': 0.05}}\n"
         "    - Output: Got you covered! I found 16 great Deep Learning resources, including both books and courses. Dive in when you're ready!\n"
         "Your output should be a single short and natural string suitable for BEMO’s TTS system.\n"
-    )
+    ),
     
-    # Todo: Error prompt
-    
+    "error": (
+        "Generate a friendly and conversational error message to be said by the TTS system.\n"
+        "Your job is to rephrase technical error messages into clear, helpful, and polite spoken responses that a normal user can understand.\n"
+        "You are not fixing the error, only explaining it in a way that feels natural and supportive.\n"
+        "Parameters:\n"
+        "- Error: {error_dict}\n"
+        "    - A dictionary containing the error message and its severity level.\n"
+        "        - error: A technical error message string.\n"
+        "        - level: An integer from 1 to 3 indicating how critical the error is.\n"
+        "            - 1: Totally ignorable, make the message light or informal.\n"
+        "            - 2: Should notify user, rephrase it in a helpful and calm tone.\n"
+        "            - 3: System breaking, inform the user kindly that something went wrong and BEMO can't complete the request.\n"
+        "Guidelines:\n"
+        "    - If level is 1, make the message casual and non-disruptive.\n"
+        "    - If level is 2, kindly explain the issue without technical terms.\n"
+        "    - If level is 3, be empathetic and tell the user something went wrong but avoid sounding alarming.\n"
+        "    - Never repeat raw error messages or code.\n"
+        "    - Keep responses light, polite, and appropriate for BEMO’s voice.\n"
+        "    - Do not suggest that the user caused the issue. Always blame the system gently if needed.\n"
+        "Example:\n"
+        "    - Input:\n"
+        "        {{'error': 'Query is empty or not provided.', 'level': 2}}\n"
+        "    - Output: Hmm, I didn’t catch what you wanted. Could you try saying it again?\n"
+        "    - Input:\n"
+        "        {{'error': 'No internet connection.', 'level': 3}}\n"
+        "    - Output: Oops, looks like I’m having trouble connecting right now. Let’s try again in a bit!\n"
+        "Your output should be a single short and natural string suitable for BEMO’s TTS system.\n"
+    )   
 }
