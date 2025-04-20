@@ -102,35 +102,44 @@ class PostProcessing(BaseMQTTHandler):
         task_output = input_data.get("results")
         prompt = input_data.get("prompt")
         emotions = input_data.get("emotions")
+        error = input_data.get("error", None)
         
-        if not task_output:
+        if not task_output and not error:
             logger.error("Input results are missing")
-            return {"error": "Input results are missing", "level": 2}
-        if not isinstance(task_output, dict):
+            return {"error": "Input results are missing", "level": 4}
+        
+        if not isinstance(task_output, dict) and not error:
             logger.error("Input results are not a dictionary")
-            return {"error": "Input results are not a dictionary", "level": 2}
+            return {"error": "Input results are not a dictionary", "level": 4}
         
-        if not prompt:
+        
+        if not prompt and not error:
             logger.error("Prompt is missing")
-            return {"error": "Prompt is missing", "level": 2}
+            return {"error": "Prompt is missing", "level": 4}
+
+        if not error:        
+            module_name = task_output.get("module_name")
+        else:
+            module_name = ""
         
-        module_name = task_output.get("module_name")
-        
-        if not module_name:
+        if not module_name and not error:
             logger.error("Module name is missing")
-            return {"error": "Module name is missing", "level": 2}
-        
-        logger.info(f"Module name: {module_name}")        
+            return {"error": "Module name is missing", "level": 4}
+        else:
+            logger.info(f"Module name: {module_name}")    
         
         response = None
         result = {}
         
         try:
-            response = self.__chains[module_name].invoke({"user_query": prompt, "task_output": task_output, "current_time": datetime.now(), "user_emotions": emotions, "switch_mapping": self.__switch_mapping, "user_data_name": self.__user_data['name'], "user_data_job_title": self.__user_data['job_title'], "user_data_location": self.__user_data['location'], "user_data_age": self.__user_data['age']})
+            if error:
+                response = self.__chains["error"].invoke({"error_dict": input_data})
+            else:
+                response = self.__chains[module_name].invoke({"user_query": prompt, "task_output": task_output, "current_time": datetime.now(), "user_emotions": emotions, "switch_mapping": self.__switch_mapping, "user_data_name": self.__user_data['name'], "user_data_job_title": self.__user_data['job_title'], "user_data_location": self.__user_data['location'], "user_data_age": self.__user_data['age']})
         except Exception as e:
             logger.error(f"Error: {e}")
             response = None
-            result = {"error": str(e), "level": 2, "method": module_name}
+            result = {"error": str(e), "level": 4, "method": module_name}
 
         if response is None:
             return result
@@ -139,13 +148,14 @@ class PostProcessing(BaseMQTTHandler):
             result = response.content
         except Exception as e:
             logger.error(f"Error: {e}")
-            result = {"error": str(e), "level": 2, "method": module_name}
+            result = {"error": str(e), "level": 4, "method": module_name}
         
         result = self.clean_output(result)
         
         # Publish the result
         return {
-            "output": result
+            "output": result,
+            "is_error": True if error else False,
         }
         
     def clean_output(self, output: str) -> str:
