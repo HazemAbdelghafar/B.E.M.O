@@ -91,7 +91,7 @@ send = {"prompt": "Hey Bemo, provide me with some learning resources for Deep Le
 #                 'confusion': 0.059
 #             }
 # }
-
+send = {"error": "An error occurred while processing the request", "level": 2}
 class GlobalMQTTHandler:
     """
     GlobalMQTTHandler listens on 'main/main' and publishes a list of predefined
@@ -101,8 +101,8 @@ class GlobalMQTTHandler:
     def __init__(self, sub_topic: str = "main/main", name: str = "global_publisher"):
         self._result = {}
 
-        # self.__pub_topic = "postprocessing/data"
-        self.__pub_topic = "task_classifier/prompt"
+        self.__pub_topic = "postprocessing/data"
+        # self.__pub_topic = "task_classifier/prompt"
         # self.__pub_topic = "preprocessing/data"
         self.__sub_topic = sub_topic
         self.__name = name
