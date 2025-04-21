@@ -1,8 +1,10 @@
 import sys
 from pathlib import Path
-from utilities import BaseMQTTHandler
+from utilities import BaseMQTTHandler, ERROR_RESPONSES
 import logging
 import os
+import random
+import time
 
 DEFAULT_PATH = os.path.dirname(__file__)
 
@@ -11,6 +13,8 @@ logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s'
 
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
+
+random.seed(time.time())
 
 # Define the name of the module and the topics
 NAME = "main"
@@ -36,6 +40,7 @@ class Main(BaseMQTTHandler):
         self.preprocessed_data = []
         self.response = ""
         self.task_results = {}
+        self.error_dict = {}
     
     def clean_emotions(self, emotions: dict) -> dict:
         # If both the key and value are empty, remove the key from the dictionary
@@ -57,19 +62,38 @@ class Main(BaseMQTTHandler):
             dict: The result of the classification.
         """
         module_name = input_data.get("module_name")
-        error = input_data.get("error")
-        logger.info(f"Module name: {module_name}")
         
-        if error:
-            # Todo: Handle the error case
-            logger.error(f"Error in input data: {error}")
-            pass
+        error = input_data.get("error", None)
+        level = input_data.get("level", None)
         
         if not module_name:
-            # Todo: Handle the case where module_name is not provided
+            self.error_dict = {"error": "Module name is missing, cannot identify the module", "level": 2}
             logger.error("Module name is missing")
-            pass
+            robot_id = input_data.get("src_robot_id")
+            if robot_id:
+                self.robot_id = robot_id
+                logger.info(f"Robot ID: {self.robot_id}")
+            else:
+                logger.error("Robot ID is missing")
+                return None
+        else:
+            logger.info(f"Module name: {module_name}")
         
+        if error or self.error_dict:
+            if error:
+                self.error_dict = {"error": error, "level": level}
+            
+            logger.error(f"Error: {self.error_dict}")
+
+            if self.error_dict["level"] == 4:
+                self.publish_result({"is_error": True, "response": random.choice(ERROR_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
+            else:
+                self.publish_result(self.error_dict, topic="postprocessing/data")
+            
+            self.error_dict = {}
+            
+            return None
+            
         # Handle the case where module_name is "server"
         if module_name == "server":
             logger.info("Received server module data")
@@ -81,11 +105,11 @@ class Main(BaseMQTTHandler):
                 input_data.get("Third_top_label"): input_data.get("Third_top_label_prob")
             }
             if not prompt:
-                # Todo: Handle the case where prompt is not provided
+                self.error_dict = {"error": "Prompt is missing from the server", "level": 2}
+                self.publish_result(self.error_dict, topic="postprocessing/data")
                 logger.error("Prompt is missing")
                 return None
             if not robot_id:
-                # Todo: Handle the case where robot_id is not provided
                 logger.error("Robot ID is missing")
                 return None
             
@@ -116,7 +140,8 @@ class Main(BaseMQTTHandler):
 
             method = input_data.get("method")
             if not method:
-                # Todo: Handle the case where the method is not sent back
+                self.error_dict = {"error": "Method is missing from the preprocessing module", "level": 2}
+                self.publish_result(self.error_dict, topic="postprocessing/data")
                 logger.error("Method is missing")
                 return None
 
@@ -125,7 +150,7 @@ class Main(BaseMQTTHandler):
             if method == "others":
                 self.response = input_data.get("response")
                 if not self.response:
-                    # Todo: Handle the case where the response is not sent back
+                    self.publish_result({"is_error": True, "response": random.choice(ERROR_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
                     logger.error("Response is missing in the others method")
                     return None
                 
@@ -150,7 +175,8 @@ class Main(BaseMQTTHandler):
             logger.info("Received task_handler module data")
             self.task_results = input_data.get("results")
             if not self.task_results:
-                # Todo: Handle the case where task_results is not sent back
+                self.error_dict = {"error": "Task results are missing from the task_handler module", "level": 2}
+                self.publish_result(self.error_dict, topic="postprocessing/data")
                 logger.error("Task results are missing")
                 return None
             logger.info(f"Task results: {self.task_results}")
@@ -161,13 +187,14 @@ class Main(BaseMQTTHandler):
         if module_name == "postprocessing":
             logger.info("Received preprocessing module data")
             self.response = input_data.get("output")
+            is_error = input_data.get("is_error")
             if not self.response:
-                # Todo: Handle the case where the response is not sent back
+                self.publish_result({"is_error": True, "response": random.choice(ERROR_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
                 logger.error("Response is missing in the preprocessing method")
                 return None
             logger.info("Returning the preprocessing method result to the server")
             logger.info(f"Response: {self.response}")
-            self.publish_result({"status": "success", "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
+            self.publish_result({"is_error": is_error, "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
             
         # Todo: DB
         
