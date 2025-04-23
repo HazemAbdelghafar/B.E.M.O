@@ -3,6 +3,7 @@ import time
 from ast import literal_eval
 import json
 import logging
+import threading
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s',
@@ -129,7 +130,8 @@ class BaseMQTTHandler:
         logger.info(f"Received message: {input_data_parsed}")
 
         # Run the built-in function in a separate thread
-        self.__built_in_run(input_data_parsed)
+        thread = threading.Thread(target=self.__built_in_run, args=(input_data_parsed,))
+        thread.start()
 
     def execute_main(self, input_data: dict) -> dict:
         """
