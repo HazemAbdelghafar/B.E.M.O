@@ -35,11 +35,10 @@ class TaskClassifier(BaseMQTTHandler):
         self.__model = pickle.load(open(MODEL_PATH, "rb"))
         self.__labels = pickle.load(open(LABELS_PATH, "rb"))
         
-        # Todo: Define the list of bemo strings
         self.__name_strings = [
             "bemo", "bmo", "bimo", "vemo", "vimo", "vmo", 
             "nemo", "kemo", "bbmo", "moo", "bemoo", "bemu", 
-            "beemo", "temo"
+            "beemo", "temo", "robot"
         ]
 
         
