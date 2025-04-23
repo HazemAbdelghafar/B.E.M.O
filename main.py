@@ -20,7 +20,7 @@ random.seed(time.time())
 NAME = "main"
 SUB_TOPIC = "main/main"
 
-# Todo: THREAAADDINGGG
+# Todo: Add authentication
 class Main(BaseMQTTHandler):
     """
     Server is a class for handling the main server functionality.
@@ -138,16 +138,16 @@ class Main(BaseMQTTHandler):
             logger.info(f"Preprocessed data: {input_data}")
             self.preprocessed_data = [input_data]
 
-            method = input_data.get("method")
-            if not method:
+            task_name = input_data.get("method")
+            if not task_name:
                 self.error_dict = {"error": "Method is missing from the preprocessing module", "level": 2}
                 self.publish_result(self.error_dict, topic="postprocessing/data")
                 logger.error("Method is missing")
                 return None
 
-            logger.info(f"Method: {method}")
+            logger.info(f"Task name received from preprocessing: {task_name}")
 
-            if method == "others":
+            if task_name == "others":
                 self.response = input_data.get("response")
                 if not self.response:
                     self.publish_result({"is_error": True, "response": random.choice(ERROR_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
@@ -157,16 +157,7 @@ class Main(BaseMQTTHandler):
                 logger.info("Returning the others method result to the server")
                 logger.info(f"Response: {self.response}")
                 self.publish_result({"status": "success", "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
-            
-            elif method == "learning_resource":
-                self.response = input_data.get("model_output")
-                if not self.response:
-                    logger.error("Response is missing in the learning_resource method")
-                    self.publish_result({"preprocessed_data": self.preprocessed_data}, topic="task_handler/main") 
-                else:
-                    logger.info("Returning the learning_resources method result to the server")
-                    self.publish_result({"status": "success", "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
-            
+                        
             else:
                 self.publish_result({"preprocessed_data": self.preprocessed_data}, topic="task_handler/main")            
         
@@ -180,6 +171,9 @@ class Main(BaseMQTTHandler):
                 logger.error("Task results are missing")
                 return None
             logger.info(f"Task results: {self.task_results}")
+                                    
+            task_name = self.task_results.get("module_name")
+            logger.info(f"Task name received from task_handler: {task_name}")
             
             self.publish_result({"results": self.task_results, "prompt": self.prompt, "emotions": self.emotions}, topic="postprocessing/data")
 
