@@ -347,7 +347,6 @@ Rules:
     - Include resources from multiple types, not just a few.
     - Provide 12-20 results, prioritizing quality and variety.
     - The output should be in JSON format.
-    - Do not include the number of results in the "model_output".
 
 Returns:
     dict: A JSON-compatible dictionary in the following format:
@@ -357,7 +356,6 @@ Returns:
             {{"title": "Title of resource 2", "url": "URL of the resource 2", "type": "Type of the resource 2"}},
             ...
         ],
-        "model_output": "Summary of results sent to Telegram and B.E.M.O app."
     }}
 """,
                 ),
@@ -575,7 +573,6 @@ Returns:
                 "resources": resources,
                 "topic": topic,
                 "total_resources": len(resources),
-                "model_output": f"Learning resources found for the topic '{topic}', results have been sent to Telegram and B.E.M.O app.",
                 "specific_resources": specific_resources_names,
             }
 
@@ -711,7 +708,6 @@ Returns:
             "resources": non_error_resources,
             "topic": resources["topic"],
             "total_resources": len(non_error_resources),
-            "model_output": resources["model_output"],
             "specific_resources": resources["specific_resources_names"],
         }
 
@@ -831,7 +827,6 @@ Returns:
             "resources": non_error_resources,
             "topic": resources["topic"],
             "total_resources": len(non_error_resources),
-            "model_output": resources["model_output"],
             "specific_resources": resources["specific_resources"],
         }
 
