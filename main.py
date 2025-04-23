@@ -41,6 +41,8 @@ class Main(BaseMQTTHandler):
         self.response = ""
         self.task_results = {}
         self.error_dict = {}
+        self.start_time = 0 
+        self.end_time = 0
     
     def clean_emotions(self, emotions: dict) -> dict:
         # If both the key and value are empty, remove the key from the dictionary
@@ -87,6 +89,8 @@ class Main(BaseMQTTHandler):
 
             if self.error_dict["level"] == 4:
                 self.publish_result({"is_error": True, "response": random.choice(ERROR_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
+                self.end_time = time.time()
+                logger.info(f"Execution time: {self.end_time - self.start_time} seconds")
             else:
                 self.publish_result(self.error_dict, topic="postprocessing/data")
             
@@ -96,6 +100,7 @@ class Main(BaseMQTTHandler):
             
         # Handle the case where module_name is "server"
         if module_name == "server":
+            self.start_time = time.time()
             logger.info("Received server module data")
             prompt = input_data.get("message")
             robot_id = input_data.get("src_robot_id")
@@ -151,12 +156,17 @@ class Main(BaseMQTTHandler):
                 self.response = input_data.get("response")
                 if not self.response:
                     self.publish_result({"is_error": True, "response": random.choice(ERROR_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
+                    self.end_time = time.time()
+                    logger.info(f"Execution time: {self.end_time - self.start_time} seconds")
                     logger.error("Response is missing in the others method")
                     return None
                 
                 logger.info("Returning the others method result to the server")
                 logger.info(f"Response: {self.response}")
                 self.publish_result({"status": "success", "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
+                self.end_time = time.time()
+                logger.info(f"Execution time: {self.end_time - self.start_time} seconds")
+
                         
             else:
                 self.publish_result({"preprocessed_data": self.preprocessed_data}, topic="task_handler/main")            
@@ -184,11 +194,16 @@ class Main(BaseMQTTHandler):
             is_error = input_data.get("is_error")
             if not self.response:
                 self.publish_result({"is_error": True, "response": random.choice(ERROR_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
+                self.end_time = time.time()
+                logger.info(f"Execution time: {self.end_time - self.start_time} seconds")
                 logger.error("Response is missing in the preprocessing method")
                 return None
             logger.info("Returning the preprocessing method result to the server")
             logger.info(f"Response: {self.response}")
             self.publish_result({"is_error": is_error, "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
+            self.end_time = time.time()
+            logger.info(f"Execution time: {self.end_time - self.start_time} seconds")
+
             
         # Todo: DB
         
