@@ -20,7 +20,7 @@ import logging
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from utilities import BaseMQTTHandler
+from utilities import BaseMQTTHandler, LEARNING_RESOURCES_PROMPT
 
 DEFAULT_PATH = os.path.dirname(__file__)
 
@@ -318,47 +318,7 @@ class FindLearningResources(BaseMQTTHandler):
 
         return ChatPromptTemplate(
             [
-                (
-                    "system",
-                    """
-Gather high-quality learning resources based on the specified topic and specific resource types.
-
-Parameters:
-    input_data (str): A string input with the following format:
-    "Topic: <topic> - Specific Resources: <resource1>, <resource2>, ..."
-
-Resource Types:
-    - Roadmaps: Step-by-step guides or structured learning paths.
-    - Blogs/Articles: Informative written content explaining concepts or updates.
-    - YouTube Videos: Video tutorials, lectures, or explainers.
-    - Scientific Papers: Research papers or articles published in journals or conferences.
-    - Courses: Online courses, tutorials, or workshops (free or paid).
-    - Images: Visual resources like diagrams, charts, or infographics.
-    - Communities/Forums: Online platforms discussing the topic.
-    - Code Repositories: Open-source repositories with implementations or datasets.
-    - Slides/Presentations: Educational slide decks or conference presentations.
-    - Books: Textbooks, guides, or eBooks on the topic.
-    - Webinars: Live or recorded online events.
-    - Case Studies: Real-world applications and examples.
-    - Real-world Applications: Practical use cases or industry applications.
-    - Examples: Sample code, projects, or exercises.
-
-Rules:
-    - Include resources from multiple types, not just a few.
-    - Provide 12-20 results, prioritizing quality and variety.
-    - The output should be in JSON format.
-
-Returns:
-    dict: A JSON-compatible dictionary in the following format:
-    {{
-        "resources": [
-            {{"title": "Title of resource 1", "url": "URL of the resource 1", "type": "Type of the resource 1"}},
-            {{"title": "Title of resource 2", "url": "URL of the resource 2", "type": "Type of the resource 2"}},
-            ...
-        ],
-    }}
-""",
-                ),
+                ("system", LEARNING_RESOURCES_PROMPT),
                 ("human", "{user_input}"),
                 ("placeholder", "{messages}"),
             ]
