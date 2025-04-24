@@ -26,7 +26,6 @@ logger.addHandler(console_handler)
 #         'prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today',
 #         'module_name': 'task_classifier'
 #     }
-send = {"prompt": "Hey Bemo, provide me with some learning resources for Deep Learning, make sure to include some courses and books"}
 # send = {
 #         'predicted_labels': ['others'],
 #         'prompt': 'Tell me some jokes about my job',
@@ -91,7 +90,9 @@ send = {"prompt": "Hey Bemo, provide me with some learning resources for Deep Le
 #                 'confusion': 0.059
 #             }
 # }
-send = {"error": "An error occurred while processing the request", "level": 2}
+# send = {"error": "An error occurred while processing the request", "level": 2}
+send = {"prompt": "Check my tasks for today"}
+
 class GlobalMQTTHandler:
     """
     GlobalMQTTHandler listens on 'main/main' and publishes a list of predefined
@@ -101,8 +102,8 @@ class GlobalMQTTHandler:
     def __init__(self, sub_topic: str = "main/main", name: str = "global_publisher"):
         self._result = {}
 
-        self.__pub_topic = "postprocessing/data"
-        # self.__pub_topic = "task_classifier/prompt"
+        # self.__pub_topic = "postprocessing/data"
+        self.__pub_topic = "task_classifier/prompt"
         # self.__pub_topic = "preprocessing/data"
         self.__sub_topic = sub_topic
         self.__name = name

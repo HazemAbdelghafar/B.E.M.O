@@ -9,7 +9,7 @@ logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s'
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
-send = {'message': "Hey Robot, Check my tasks for today", 'top_label': 'curiosity', 'top_label_prob': 0.6451504230499268, 'second_top_label': 'neutral', 'second_top_label_prob': 0.32930633425712585, 'Third_top_label': 'confusion', 'Third_top_label_prob': 0.05925249680876732, 'module_name': 'server', "src_robot_id": "bemo-MK1"}
+send = {'message': "Check my tasks for today", 'top_label': 'curiosity', 'top_label_prob': 0.6451504230499268, 'second_top_label': 'neutral', 'second_top_label_prob': 0.32930633425712585, 'Third_top_label': 'confusion', 'Third_top_label_prob': 0.05925249680876732, 'module_name': 'server', "src_robot_id": "bemo-MK1"}
 
 class GlobalMQTTHandler:
     def __init__(self, sub_topic: str = "server/main", name: str = "server"):
