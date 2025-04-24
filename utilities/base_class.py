@@ -14,6 +14,7 @@ logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s'
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
+# Todo: Add Threading
 class BaseMQTTHandler:
     """
     BaseMQTTHandler is a base class for handling MQTT communication.
