@@ -114,6 +114,8 @@ class TaskClassifier(BaseMQTTHandler):
         if not prompt:
             return {"error": "Prompt not provided", "level": 1}
         
+        prompt = self.preprocess_prompt(prompt) # Preprocess the prompt
+        
         if self.use_llm:
 
             @chain
@@ -152,7 +154,6 @@ class TaskClassifier(BaseMQTTHandler):
 
         else:
             try:
-                prompt = self.preprocess_prompt(prompt) # Preprocess the prompt
                 prediction = self.__model.predict([prompt])[0] # Make a prediction using the model
                 
                 # Get the predicted labels based on the prediction
