@@ -130,8 +130,6 @@ class Main(BaseMQTTHandler):
             self.publish_result({"prompt": self.prompt}, topic="task_classifier/prompt")
                 
         # Handle the case where module_name is "task_classifier"
-        # Todo: Handle llm
-        # [global_publisher] Received message: {'predicted_labels': ['learning_resources'], 'split_prompts': ['Provide me with learning resources for Deep Learning, including courses and books.'], 'module_name': 'task_classifier'}
         if module_name == "task_classifier":
             logger.info("Received task_classifier module data")
             
@@ -148,8 +146,6 @@ class Main(BaseMQTTHandler):
                 logger.info(f"Predicted labels: {predicted_labels}")
                 logger.info(f"Split prompts: {split_prompts}")
                 self.publish_result({"prompt": self.prompt, "predicted_labels": self.predicted_labels, "split_prompts": self.split_prompts}, topic="preprocessing/data")
-                    
-            
             
         if module_name == "preprocessing":
             logger.info("Received preprocessing module data")
