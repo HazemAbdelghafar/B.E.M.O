@@ -159,22 +159,27 @@ class PreProcessing(BaseMQTTHandler):
         """
                 
         # Get the prompt and labels from the input data
-        prompt = input_data.get("prompt")
+        main_prompt = input_data.get("prompt")
         labels = input_data.get("predicted_labels")
+        split_prompts = input_data.get("split_prompts")
         
-        if not prompt:
+        if not main_prompt:
             logger.error("Prompt is missing")
             return {"error": "Prompt is missing", "level": 2}
         
         if not labels:
             logger.error("Labels are missing")
             return {"error": "Labels are missing", "level": 2}
-                
+        
+        if not split_prompts:
+            split_prompts = [main_prompt] * len(labels)
+        
         # Initialize the results
         results = []
         
-        for label in labels:
+        for label, prompt in zip(labels, split_prompts):
             logger.info(f"Label: {label}")
+            logger.info(f"Prompt: {prompt}")
             response = None
             try:
                 response = self.__chains[label].invoke({"prompt": prompt, "current_time": datetime.now(), "chat_history": self.__chat_history[label], "switch_mapping": self.__switch_mapping, "user_data_name": self.__user_data['name'], "user_data_job_title": self.__user_data['job_title'], "user_data_location": self.__user_data['location'], "user_data_age": self.__user_data['age']})
