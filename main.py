@@ -37,6 +37,7 @@ class Main(BaseMQTTHandler):
         self.emotions = {}
         self.prompt = ""
         self.predicted_labels = []
+        self.split_prompts = []
         self.preprocessed_data = []
         self.response = ""
         self.task_results = {}
@@ -90,7 +91,7 @@ class Main(BaseMQTTHandler):
             if self.error_dict["level"] == 4:
                 self.publish_result({"is_error": True, "response": random.choice(ERROR_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
                 self.end_time = time.time()
-                logger.info(f"Execution time: {self.end_time - self.start_time} seconds")
+                logger.info(f"Execution time (All): {self.end_time - self.start_time} seconds")
             else:
                 self.publish_result(self.error_dict, topic="postprocessing/data")
             
@@ -129,15 +130,27 @@ class Main(BaseMQTTHandler):
             self.publish_result({"prompt": self.prompt}, topic="task_classifier/prompt")
                 
         # Handle the case where module_name is "task_classifier"
+        # Todo: Handle llm
+        # [global_publisher] Received message: {'predicted_labels': ['learning_resources'], 'split_prompts': ['Provide me with learning resources for Deep Learning, including courses and books.'], 'module_name': 'task_classifier'}
         if module_name == "task_classifier":
             logger.info("Received task_classifier module data")
             
             predicted_labels = input_data.get("predicted_labels")
-            self.predicted_labels = predicted_labels
-            logger.info(f"Predicted labels: {predicted_labels}")
+            split_prompts = input_data.get("split_prompts")
             
-            self.publish_result({"prompt": self.prompt, "predicted_labels": self.predicted_labels}, topic="preprocessing/data")
-                
+            if not split_prompts:
+                self.predicted_labels = predicted_labels
+                logger.info(f"Predicted labels: {predicted_labels}")
+                self.publish_result({"prompt": self.prompt, "predicted_labels": self.predicted_labels}, topic="preprocessing/data")
+            else:
+                self.split_prompts = split_prompts
+                self.predicted_labels = predicted_labels
+                logger.info(f"Predicted labels: {predicted_labels}")
+                logger.info(f"Split prompts: {split_prompts}")
+                self.publish_result({"prompt": self.prompt, "predicted_labels": self.predicted_labels, "split_prompts": self.split_prompts}, topic="preprocessing/data")
+                    
+            
+            
         if module_name == "preprocessing":
             logger.info("Received preprocessing module data")
             logger.info(f"Preprocessed data: {input_data}")
@@ -157,7 +170,7 @@ class Main(BaseMQTTHandler):
                 if not self.response:
                     self.publish_result({"is_error": True, "response": random.choice(ERROR_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
                     self.end_time = time.time()
-                    logger.info(f"Execution time: {self.end_time - self.start_time} seconds")
+                    logger.info(f"Execution time (All): {self.end_time - self.start_time} seconds")
                     logger.error("Response is missing in the others method")
                     return None
                 
@@ -165,7 +178,7 @@ class Main(BaseMQTTHandler):
                 logger.info(f"Response: {self.response}")
                 self.publish_result({"status": "success", "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
                 self.end_time = time.time()
-                logger.info(f"Execution time: {self.end_time - self.start_time} seconds")
+                logger.info(f"Execution time (All): {self.end_time - self.start_time} seconds")
 
                         
             else:
@@ -195,14 +208,14 @@ class Main(BaseMQTTHandler):
             if not self.response:
                 self.publish_result({"is_error": True, "response": random.choice(ERROR_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
                 self.end_time = time.time()
-                logger.info(f"Execution time: {self.end_time - self.start_time} seconds")
+                logger.info(f"Execution time (All): {self.end_time - self.start_time} seconds")
                 logger.error("Response is missing in the preprocessing method")
                 return None
             logger.info("Returning the preprocessing method result to the server")
             logger.info(f"Response: {self.response}")
             self.publish_result({"is_error": is_error, "response": self.response, "target_robot_id": self.robot_id}, topic="server/main")
             self.end_time = time.time()
-            logger.info(f"Execution time: {self.end_time - self.start_time} seconds")
+            logger.info(f"Execution time (All): {self.end_time - self.start_time} seconds")
 
             
         # Todo: DB
