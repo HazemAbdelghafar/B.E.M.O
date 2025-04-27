@@ -159,20 +159,16 @@ class PreProcessing(BaseMQTTHandler):
         """
                 
         # Get the prompt and labels from the input data
-        main_prompt = input_data.get("prompt")
         labels = input_data.get("predicted_labels")
         split_prompts = input_data.get("split_prompts")
-        
-        if not main_prompt:
-            logger.error("Prompt is missing")
-            return {"error": "Prompt is missing", "level": 2}
-        
+                
         if not labels:
             logger.error("Labels are missing")
             return {"error": "Labels are missing", "level": 2}
         
         if not split_prompts:
-            split_prompts = [main_prompt] * len(labels)
+            logger.error("Split prompts are missing")
+            return {"error": "Split prompts are missing", "level": 2}
         
         # Initialize the results
         results = []
