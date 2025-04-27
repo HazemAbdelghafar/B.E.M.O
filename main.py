@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
-from utilities import BaseMQTTHandler, ERROR_RESPONSES
+from utilities import BaseMQTTHandler
+from utilities import ERROR_RESPONSES, AUTH_RESPONSES, NO_FACE_RESPONSES, NO_FACE_RESPONSES_FINAL, BAD_FACE_RESPONSES,                  BAD_FACE_RESPONSES_FINAL, BLOCKED_RESPONSES
 import logging
 import os
 import random
@@ -14,11 +15,17 @@ logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s'
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
-random.seed(time.time())
+AUTH_TASKS = ["todo", "mail"]
 
 # Define the name of the module and the topics
 NAME = "main"
 SUB_TOPIC = "main/main"
+
+MAX_NO_FACE = 5
+MAX_BAD_FACE = 3
+BLOCK_TIME_RANGE = 15 * 60  # 15 minutes
+
+blocked_ids = {}
 
 # Todo: Add authentication
 class Main(BaseMQTTHandler):
@@ -44,6 +51,43 @@ class Main(BaseMQTTHandler):
         self.error_dict = {}
         self.start_time = 0 
         self.end_time = 0
+        self.need_auth = False
+        self.no_face_counter = 0
+        self.bad_face_counter = 0
+        self.is_blocked = False
+        
+        random.seed(time.time())
+    
+    def block_id(self, id: str):
+        # Record the current time when the id is blocked
+        global blocked_ids
+        blocked_ids[id] = time.time()
+        print(f"ID {id} is now blocked at {time.ctime(blocked_ids[id])}.")
+
+    # Function to check if an id is blocked and respond accordingly 
+    # True: Blocked, False: Not blocked
+    def check_is_blocked(self, id: str) -> bool:
+        # Get the current time
+        current_time = time.time()
+
+        # Check if the id is in the blocked_ids dictionary
+        if id in blocked_ids:
+            # Check if the time difference is within the block time range
+            block_time = blocked_ids[id]
+            if current_time - block_time <= BLOCK_TIME_RANGE:
+                # If within the block time range, return a custom message
+                print(f"ID {id} is still blocked.")
+                return True
+            else:
+                # If outside the block time range, unblock the id
+                del blocked_ids[id]
+                print(f"ID {id} is no longer blocked.")
+                return False
+        else:
+            # If the id is not blocked, return a normal response
+            print(f"ID {id} is not blocked. Proceeding normally.")
+            return False
+
     
     def clean_emotions(self, emotions: dict) -> dict:
         # If both the key and value are empty, remove the key from the dictionary
@@ -76,6 +120,9 @@ class Main(BaseMQTTHandler):
             if robot_id:
                 self.robot_id = robot_id
                 logger.info(f"Robot ID: {self.robot_id}")
+                self.is_blocked = self.check_is_blocked(self.robot_id)
+                if self.is_blocked:
+                    self.publish_result({"is_error": False, "response": random.choice(BLOCKED_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
             else:
                 logger.error("Robot ID is missing")
                 return None
@@ -103,31 +150,74 @@ class Main(BaseMQTTHandler):
         if module_name == "server":
             self.start_time = time.time()
             logger.info("Received server module data")
-            prompt = input_data.get("message")
-            robot_id = input_data.get("src_robot_id")
-            emotions = {
-                input_data.get("top_label"): input_data.get("top_label_prob"),
-                input_data.get("second_top_label"): input_data.get("second_top_label_prob"),
-                input_data.get("Third_top_label"): input_data.get("Third_top_label_prob")
-            }
-            if not prompt:
+            message = input_data.get("message")
+            if not message:
                 self.error_dict = {"error": "Prompt is missing from the server", "level": 2}
                 self.publish_result(self.error_dict, topic="postprocessing/data")
                 logger.error("Prompt is missing")
                 return None
-            if not robot_id:
-                logger.error("Robot ID is missing")
-                return None
             
-            self.emotions = self.clean_emotions(emotions)
-            self.prompt = prompt
-            self.robot_id = robot_id
+            # Remove extra spaces from the message
+            message = " ".join(message.split())
             
-            logger.info(f"Received prompt: {prompt}")
-            logger.info(f"Emotions: {emotions}")
-            logger.info(f"Robot ID: {robot_id}")
+            if message in [":|", ":)", ":("]:
+                if message == ":)":
+                    logger.info("Face detected")
+                    self.publish_result({"predicted_labels": self.predicted_labels, "split_prompts": self.split_prompts}, topic="preprocessing/data")
+                    self.no_face_counter = 0
+                    self.bad_face_counter = 0
+                    self.need_auth = False
+                elif message == ":|":
+                    logger.info("No face detected")
+                    if self.no_face_counter >= MAX_NO_FACE:
+                        self.no_face_counter = 0
+                        self.bad_face_counter = 0
+                        self.need_auth = False
+                        self.publish_result({"is_error": False, "target_robot_id": self.robot_id, "response": random.choice(NO_FACE_RESPONSES_FINAL)}, topic="server/main")
+                    else:
+                        self.no_face_counter += 1
+                        self.need_auth = True
+                        self.publish_result({"is_error": False, "is_auth": self.need_auth, "target_robot_id": self.robot_id, "response": random.choice(NO_FACE_RESPONSES)}, topic="server/main")
+                else:
+                    logger.info("Bad face detected")
+                    if self.bad_face_counter >= MAX_BAD_FACE:
+                        # Block the robot ID
+                        self.block_id(self.robot_id)
+                        self.is_blocked = self.check_is_blocked(self.robot_id)
+                        self.need_auth = False
+                        self.publish_result({"is_error": False, "target_robot_id": self.robot_id, "response": random.choice(BAD_FACE_RESPONSES_FINAL)}, topic="server/main")
+                        # TODO: Send email to check the robot
+                        self.bad_face_counter = 0
+                        self.no_face_counter = 0
+                    else:
+                        self.bad_face_counter += 1
+                        self.need_auth = True
+                        self.publish_result({"is_error": False, "is_auth": self.need_auth, "target_robot_id": self.robot_id, "response": random.choice(BAD_FACE_RESPONSES)}, topic="server/main")
+
+            else:
+                robot_id = input_data.get("src_robot_id")
+                emotions = {
+                    input_data.get("top_label"): input_data.get("top_label_prob"),
+                    input_data.get("second_top_label"): input_data.get("second_top_label_prob"),
+                    input_data.get("Third_top_label"): input_data.get("Third_top_label_prob")
+                }
+                if not robot_id:
+                    logger.error("Robot ID is missing")
+                    return None
             
-            self.publish_result({"prompt": self.prompt}, topic="task_classifier/prompt")
+                self.emotions = self.clean_emotions(emotions)
+                self.prompt = message
+                self.robot_id = robot_id
+                
+                logger.info(f"Received prompt: {self.prompt}")
+                logger.info(f"Emotions: {self.emotions}")
+                logger.info(f"Robot ID: {self.robot_id}")
+                
+                self.is_blocked = self.check_is_blocked(self.robot_id)
+                if self.is_blocked:
+                    self.publish_result({"is_error": False, "response": random.choice(BLOCKED_RESPONSES), "target_robot_id": self.robot_id}, topic="server/main")
+                else:
+                    self.publish_result({"prompt": self.prompt}, topic="task_classifier/prompt")
                 
         # Handle the case where module_name is "task_classifier"
         if module_name == "task_classifier":
@@ -136,17 +226,32 @@ class Main(BaseMQTTHandler):
             predicted_labels = input_data.get("predicted_labels")
             split_prompts = input_data.get("split_prompts")
             
-            if not split_prompts:
-                self.predicted_labels = predicted_labels
-                logger.info(f"Predicted labels: {predicted_labels}")
-                self.publish_result({"prompt": self.prompt, "predicted_labels": self.predicted_labels}, topic="preprocessing/data")
-            else:
-                self.split_prompts = split_prompts
-                self.predicted_labels = predicted_labels
-                logger.info(f"Predicted labels: {predicted_labels}")
-                logger.info(f"Split prompts: {split_prompts}")
-                self.publish_result({"prompt": self.prompt, "predicted_labels": self.predicted_labels, "split_prompts": self.split_prompts}, topic="preprocessing/data")
+            self.predicted_labels = predicted_labels
+            logger.info(f"Predicted labels: {self.predicted_labels}")
             
+            if not split_prompts:
+                split_prompts = [self.prompt] * len(predicted_labels)
+            
+            self.split_prompts = split_prompts
+            logger.info(f"Split prompts: {split_prompts}")
+            
+            auth_label = ""
+            for label in self.predicted_labels:
+                if label in AUTH_TASKS:
+                    self.need_auth = True
+                    auth_label = label
+                else:
+                    self.need_auth = False
+                    
+                
+            if not self.need_auth:
+                logger.info("No authentication required")                
+                self.publish_result({"predicted_labels": self.predicted_labels, "split_prompts": self.split_prompts}, topic="preprocessing/data")
+            else:
+                logger.info(f"Authentication required for label: {auth_label}")
+                self.publish_result({"is_error": False, "is_auth": self.need_auth, "target_robot_id": self.robot_id, "response": random.choice(AUTH_RESPONSES)}, topic="server/main")
+               
+                            
         if module_name == "preprocessing":
             logger.info("Received preprocessing module data")
             logger.info(f"Preprocessed data: {input_data}")
@@ -213,7 +318,6 @@ class Main(BaseMQTTHandler):
             self.end_time = time.time()
             logger.info(f"Execution time (All): {self.end_time - self.start_time} seconds")
 
-            
         # Todo: DB
         
         return None
