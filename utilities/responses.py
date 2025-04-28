@@ -39,16 +39,27 @@ NO_FACE_RESPONSES = [
     "No face detected! Give it another shot, please.",
     "Still not seeing you — make sure you're in front of the camera!",
     "I’m looking, but I need a better view of your face!",
-    "No luck yet! Try stepping a bit closer to the camera."
+    "No luck yet! Try stepping a bit closer to the camera.",
+    "Can't spot you yet! Make sure the camera has a clear view.",
+    "Still waiting to catch your face. Give me a good look!",
+    "No face showing up! Maybe adjust your position a little?",
+    "I'm scanning, but I need your face right in front of me!",
+    "Almost there, but I still can't see you clearly!"
 ]
 
-NO_FACE_RESPONSES_FINAL = [
-    "I still couldn't find you. Let's try again later!",
-    "No face detected after several tries. Please come back when you're ready!",
-    "Tried my best, but I couldn’t see you. Let’s give it another shot later!",
-    "Couldn’t catch your face this time. Feel free to try again anytime!",
-    "No luck detecting you! Let's restart whenever you're ready."
+NO_FACE_RESPONSES = [
+    "Hmm, I can't see you yet. Could you try facing the camera?",
+    "No face detected! Give it another shot, please.",
+    "Still not seeing you — make sure you're in front of the camera!",
+    "I’m looking, but I need a better view of your face!",
+    "No luck yet! Try stepping a bit closer to the camera.",
+    "Can't spot you yet! Make sure the camera has a clear view.",
+    "Still waiting to catch your face. Give me a good look!",
+    "No face showing up! Maybe adjust your position a little?",
+    "I'm scanning, but I need your face right in front of me!",
+    "Almost there, but I still can't see you clearly!"
 ]
+
 
 BAD_FACE_RESPONSES = [
     "Hmm, you don't look familiar, my friend. Are you the right one?",
