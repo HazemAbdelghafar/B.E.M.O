@@ -57,14 +57,32 @@ class Main(BaseMQTTHandler):
         random.seed(time.time())
     
     def block_id(self, id: str):
-        # Record the current time when the id is blocked
+        """
+        Blocks the given id for a specified time range.
+        
+        Args:
+            id (str): The id to block.
+        """
         global blocked_ids
+        
+        # Check if the id is already blocked
+        if id in blocked_ids:
+            print(f"ID {id} is already blocked.")
+            return        
+
         blocked_ids[id] = time.time()
         print(f"ID {id} is now blocked at {time.ctime(blocked_ids[id])}.")
 
-    # Function to check if an id is blocked and respond accordingly 
-    # True: Blocked, False: Not blocked
     def check_is_blocked(self, id: str) -> bool:
+        """
+        Checks if the given id is blocked and returns a boolean value.
+        
+        Args:
+            id (str): The id to check.
+            
+        Returns:
+            bool: True if the id is blocked, False otherwise.
+        """
         # Get the current time
         current_time = time.time()
 
@@ -88,14 +106,23 @@ class Main(BaseMQTTHandler):
 
     
     def clean_emotions(self, emotions: dict) -> dict:
-        # If both the key and value are empty, remove the key from the dictionary
+        """
+        Cleans the emotions dictionary by removing empty keys and values.
+        
+        Args:
+            emotions (dict): The emotions dictionary to clean.
+            
+        Returns:
+            dict: The cleaned emotions dictionary.
+        """
         cleaned_emotions = {}
         for key, value in emotions.items():
             if key and value:
                 cleaned_emotions[key] = value
                 
         return cleaned_emotions
-        
+    
+    # Todo: Clean the code and remove unnecessary comments
     def execute_main(self, input_data: dict) -> dict:
         """
         Executes the main functionality of the class.
