@@ -13,7 +13,7 @@ from langchain_core.runnables import chain, RunnableConfig
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from utilities import BaseMQTTHandler
+from utilities import BaseMQTTHandler, GENERAL_QUESTIONS_PROMPT
 
 
 load_dotenv()
@@ -105,27 +105,7 @@ class GeneralQuestions(BaseMQTTHandler):
 
     def _init_prompt(self) -> ChatPromptTemplate:
         return ChatPromptTemplate.from_messages([
-        ("system", """
-You are a general knowledge assistant designed to answer a wide variety of user questions using both your internal knowledge and up-to-date web search results.
-Your role is to provide accurate, relevant, and contextually appropriate answers — especially for time-sensitive or current event-related queries. For all questions involving facts, current events, or real-time data (such as currency rates or weather), you **must** call the search tool to fetch updated information. Only use your internal knowledge if the tool cannot be called.
-
-Parameters:
-    input_data (str) : A string input with the following format:
-    \"user_query\": \"<query>\"
-
-Returns:
-    dict: A JSON-compaitable dictionary in the format below:
-        {{
-            \"response\" : \"Answer for the query\"
-        }}
-
-Behavior Guidelines:
-    - If the question relates to recent or time-relative events (e.g., “What was the score of yesterday's match between Real Betis and Real Valladolid?”), prioritize using the provided web search results.
-    - Use your own reasoning and general knowledge only when web search results are missing, insufficient, or not relevant.
-    - Do not include the search results themselves in the output—only use them to inform your answer.
-    - Be concise, clear, and factually accurate.
-    - Do not hallucinate or fabricate answers. If the information is not available or uncertain, say so explicitly in your response.
-"""),
+        ("system", GENERAL_QUESTIONS_PROMPT),
         ("human", "{user_input}"),
         ("placeholder", "{messages}")
     ])
