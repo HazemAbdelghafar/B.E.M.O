@@ -8,11 +8,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import chain, RunnableConfig
 
-# Todo: Add Gemini usage to the pipeline to ensure that the answer is correct
-
 load_dotenv()
 DEFAULT_PATH = os.path.dirname(__file__)
-
 
 class GeneralQuestions:
     def __init__(
