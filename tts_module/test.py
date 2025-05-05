@@ -37,7 +37,7 @@ audio = AudioSegment(
 
 # Apply childish pitch effect
 childish_audio = audio._spawn(audio.raw_data, overrides={
-    "frame_rate": int(audio.frame_rate * 1.05)
+    "frame_rate": int(audio.frame_rate * 1.07)
 }).set_frame_rate(audio.frame_rate)
 
 # Save the modified audio to memory
