@@ -9,7 +9,8 @@ import time
 tts = TTS(model_name="tts_models/en/jenny/jenny", progress_bar=False, gpu=False)
 
 # Your text input
-text_input = "Hello, This is a test of my voice. Can you hear me clearly? I can speak fast. like this, Zoom, Or slow. and. calm. like this.I ask questions: What's your favorite color?I make statements: The sky is blue.I show emotion: Wow, That’s amazing!And now, for a tongue twister:fucking fucker fuckers fucking bullshit."
+text_input ="Hello, This is a test of my voice. Can you hear me clearly? I can speak fast.like this, Zoom, Or slow. and. calm. like this.I ask questions: What's your favorite color?I make statements: The sky is blue.I show emotion: Wow, That’s amazing!And now, for a tongue twister:fucking fucker fuckers fucking bullshit."
+
 
 # Measure TTS generation time
 start = time.time()
