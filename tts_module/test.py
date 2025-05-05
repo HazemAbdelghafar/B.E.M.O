@@ -20,7 +20,7 @@ sample_rate = tts.synthesizer.output_sample_rate
 
 # Convert list of floats to numpy int16 array
 wav_np = np.array(wav, dtype=np.float32)
-wav_np = wav_np / np.max(np.abs(wav_np))  # Normalize to range [-1, 1]
+wav_np = wav_np / np.max(np.abs(wav_np))
 wav_int16 = (wav_np * 32767).astype(np.int16)
 
 end = time.time()
