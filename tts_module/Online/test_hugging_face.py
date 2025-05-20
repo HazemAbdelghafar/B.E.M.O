@@ -24,7 +24,7 @@ if os.path.exists(cached_path):
     print("Using cached voice")
     final_audio = AudioSegment.from_file(cached_path, format="wav")
 else:
-    print("🎤 Generating new voice...")
+    print("Generating new voice...")
 
     # Load the model (runs only once)
     tts = TTS(model_name="tts_models/en/ljspeech/tacotron2-DDC_ph", progress_bar=False, gpu=False)
