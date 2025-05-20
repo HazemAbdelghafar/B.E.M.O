@@ -38,6 +38,33 @@ def get_random_error_response():
     """
     return random.choice(ERROR_RESPONSES)
 
+def make_api_request(text, max_retries=3, retry_delay=2):
+    """Make API request with retry logic"""
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(API_URL, headers=headers, json={"inputs": text}, timeout=30)
+            if response.status_code == 200:
+                return response
+            elif response.status_code == 404:
+                print(f"Model not found (404). Attempt {attempt + 1}/{max_retries}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    continue
+                raise Exception("Model not found after multiple attempts")
+            else:
+                print(f"API request failed with status {response.status_code}: {response.text}")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay)
+                    continue
+                raise Exception(f"API request failed after {max_retries} attempts")
+        except requests.exceptions.RequestException as e:
+            print(f"Request error: {str(e)}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                continue
+            raise
+    raise Exception("All retry attempts failed")
+
 class TTS_Handler(BaseMQTTHandler):
     def __init__(self, topic, main_topic, name):
         super().__init__(topic, main_topic, name)
@@ -66,11 +93,8 @@ class TTS_Handler(BaseMQTTHandler):
         else:
             print("Generating new voice...")
             
-            # Generate audio using Hugging Face API
-            response = requests.post(API_URL, headers=headers, json={"inputs": text})
-            
-            if response.status_code != 200:
-                raise Exception(f"API request failed with status {response.status_code}: {response.text}")
+            # Generate audio using Hugging Face API with retry logic
+            response = make_api_request(text)
             
             # Save raw audio to temporary file
             with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
@@ -87,7 +111,7 @@ class TTS_Handler(BaseMQTTHandler):
             childlike = childlike.set_frame_rate(22050)
             
             # Step 2: Slightly faster (5%)
-            speed_factor = 1.05
+            speed_factor = 1
             faster = childlike._spawn(childlike.raw_data, overrides={
                 "frame_rate": int(childlike.frame_rate * speed_factor)
             }).set_frame_rate(22050)
