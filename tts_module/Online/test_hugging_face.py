@@ -24,11 +24,14 @@ if not os.path.exists(CACHE_DIR):
     os.makedirs(CACHE_DIR)
 
 # Hugging Face API settings
-API_URL = "https://api-inference.huggingface.co/models/tts_models/en/ljspeech/tacotron2-DDC_ph"
+API_URL = "https://api-inference.huggingface.co/models/tts_models--en--ljspeech--tacotron2-DDC_ph"
 API_TOKEN = os.getenv("HF_TOKEN")
 if not API_TOKEN:
     raise ValueError("HF_TOKEN not found in environment variables. Please check your .env file.")
-headers = {"Authorization": f"Bearer {API_TOKEN}"}
+headers = {
+    "Authorization": f"Bearer {API_TOKEN}",
+    "Content-Type": "application/json"
+}
 
 random.seed(time.time())
 
@@ -37,33 +40,6 @@ def get_random_error_response():
     Returns a random error response from the predefined list.
     """
     return random.choice(ERROR_RESPONSES)
-
-def make_api_request(text, max_retries=3, retry_delay=2):
-    """Make API request with retry logic"""
-    for attempt in range(max_retries):
-        try:
-            response = requests.post(API_URL, headers=headers, json={"inputs": text}, timeout=30)
-            if response.status_code == 200:
-                return response
-            elif response.status_code == 404:
-                print(f"Model not found (404). Attempt {attempt + 1}/{max_retries}")
-                if attempt < max_retries - 1:
-                    time.sleep(retry_delay)
-                    continue
-                raise Exception("Model not found after multiple attempts")
-            else:
-                print(f"API request failed with status {response.status_code}: {response.text}")
-                if attempt < max_retries - 1:
-                    time.sleep(retry_delay)
-                    continue
-                raise Exception(f"API request failed after {max_retries} attempts")
-        except requests.exceptions.RequestException as e:
-            print(f"Request error: {str(e)}")
-            if attempt < max_retries - 1:
-                time.sleep(retry_delay)
-                continue
-            raise
-    raise Exception("All retry attempts failed")
 
 class TTS_Handler(BaseMQTTHandler):
     def __init__(self, topic, main_topic, name):
@@ -93,37 +69,48 @@ class TTS_Handler(BaseMQTTHandler):
         else:
             print("Generating new voice...")
             
-            # Generate audio using Hugging Face API with retry logic
-            response = make_api_request(text)
-            
-            # Save raw audio to temporary file
-            with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
-                temp_file.write(response.content)
-                raw_path = temp_file.name
-            
-            # Load raw audio
-            sound = AudioSegment.from_file(raw_path, format="wav")
-            
-            # Step 1: Childlike pitch (0.13 octaves up)
-            octaves = 0.13
-            new_sample_rate = int(sound.frame_rate * (2.0 ** octaves))
-            childlike = sound._spawn(sound.raw_data, overrides={'frame_rate': new_sample_rate})
-            childlike = childlike.set_frame_rate(22050)
-            
-            # Step 2: Slightly faster (5%)
-            speed_factor = 1
-            faster = childlike._spawn(childlike.raw_data, overrides={
-                "frame_rate": int(childlike.frame_rate * speed_factor)
-            }).set_frame_rate(22050)
-            
-            # Save final voice to cache
-            faster.export(cached_path, format="wav")
-            os.remove(raw_path)  # Clean up raw file
-            final_audio = faster
-            
-            # Print API response time
-            api_time = time.time() - start_time
-            print(f"API Response time: {api_time:.2f} seconds")
+            # Generate audio using Hugging Face API
+            try:
+                print(f"Making API request to: {API_URL}")
+                response = requests.post(API_URL, headers=headers, json={"inputs": text})
+                print(f"Response status: {response.status_code}")
+                print(f"Response headers: {response.headers}")
+                
+                if response.status_code != 200:
+                    print(f"Error response: {response.text}")
+                    raise Exception(f"API request failed with status {response.status_code}: {response.text}")
+                
+                # Save raw audio to temporary file
+                with tempfile.NamedTemporaryFile(suffix='.wav', delete=False) as temp_file:
+                    temp_file.write(response.content)
+                    raw_path = temp_file.name
+                
+                # Load raw audio
+                sound = AudioSegment.from_file(raw_path, format="wav")
+                
+                # Step 1: Childlike pitch (0.13 octaves up)
+                octaves = 0.13
+                new_sample_rate = int(sound.frame_rate * (2.0 ** octaves))
+                childlike = sound._spawn(sound.raw_data, overrides={'frame_rate': new_sample_rate})
+                childlike = childlike.set_frame_rate(22050)
+                
+                # Step 2: Slightly faster (5%)
+                speed_factor = 1
+                faster = childlike._spawn(childlike.raw_data, overrides={
+                    "frame_rate": int(childlike.frame_rate * speed_factor)
+                }).set_frame_rate(22050)
+                
+                # Save final voice to cache
+                faster.export(cached_path, format="wav")
+                os.remove(raw_path)  # Clean up raw file
+                final_audio = faster
+                
+                # Print API response time
+                api_time = time.time() - start_time
+                print(f"API Response time: {api_time:.2f} seconds")
+            except Exception as e:
+                print(f"Error in text_to_speech: {e}")
+                raise
         
         return final_audio
 
