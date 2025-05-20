@@ -1,0 +1,66 @@
+04/11/2025 09:43:34 AM base_class.py INFO: task_classifier initialized successfully!
+04/11/2025 09:43:35 AM base_class.py INFO: Connected to broker!
+04/11/2025 09:43:57 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 09:43:57 AM base_class.py INFO: Execution time for task_classifier: 0.010771036148071289 seconds
+04/11/2025 09:43:57 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 09:59:08 AM base_class.py INFO: task_classifier initialized successfully!
+04/11/2025 09:59:08 AM base_class.py INFO: Connected to broker!
+04/11/2025 09:59:48 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 09:59:48 AM base_class.py INFO: Execution time for task_classifier: 0.00912618637084961 seconds
+04/11/2025 09:59:48 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:03:45 AM base_class.py INFO: task_classifier initialized successfully!
+04/11/2025 10:03:45 AM base_class.py INFO: Connected to broker!
+04/11/2025 10:05:43 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:05:43 AM base_class.py INFO: Execution time for task_classifier: 0.006618499755859375 seconds
+04/11/2025 10:05:43 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:08:39 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:08:39 AM base_class.py INFO: Execution time for task_classifier: 0.005451679229736328 seconds
+04/11/2025 10:08:39 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:09:41 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:09:41 AM base_class.py INFO: Execution time for task_classifier: 0.004970073699951172 seconds
+04/11/2025 10:09:41 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:10:17 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:10:17 AM base_class.py INFO: Execution time for task_classifier: 0.005037069320678711 seconds
+04/11/2025 10:10:17 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:12:11 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:12:11 AM base_class.py INFO: Execution time for task_classifier: 0.0054166316986083984 seconds
+04/11/2025 10:12:11 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:14:09 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:14:09 AM base_class.py INFO: Execution time for task_classifier: 0.006373167037963867 seconds
+04/11/2025 10:14:09 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:14:49 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:14:49 AM base_class.py INFO: Execution time for task_classifier: 0.004499673843383789 seconds
+04/11/2025 10:14:49 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:15:06 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:15:06 AM base_class.py INFO: Execution time for task_classifier: 0.006189584732055664 seconds
+04/11/2025 10:15:06 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:15:25 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:15:25 AM base_class.py INFO: Execution time for task_classifier: 0.004675149917602539 seconds
+04/11/2025 10:15:25 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:15:57 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:15:57 AM base_class.py INFO: Execution time for task_classifier: 0.005232095718383789 seconds
+04/11/2025 10:15:57 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:16:44 AM base_class.py INFO: task_classifier initialized successfully!
+04/11/2025 10:16:45 AM base_class.py INFO: Connected to broker!
+04/11/2025 10:17:32 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:17:32 AM base_class.py INFO: Execution time for task_classifier: 0.007996797561645508 seconds
+04/11/2025 10:17:32 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:20:03 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:20:03 AM base_class.py INFO: Execution time for task_classifier: 0.005923748016357422 seconds
+04/11/2025 10:20:03 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:20:49 AM base_class.py INFO: task_classifier initialized successfully!
+04/11/2025 10:20:50 AM base_class.py INFO: Connected to broker!
+04/11/2025 10:20:54 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:20:54 AM base_class.py INFO: Execution time for task_classifier: 0.005815744400024414 seconds
+04/11/2025 10:20:54 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:32:59 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:32:59 AM base_class.py INFO: Execution time for task_classifier: 0.006972312927246094 seconds
+04/11/2025 10:32:59 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/11/2025 10:34:01 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'module_name': 'main'}
+04/11/2025 10:34:01 AM base_class.py INFO: Execution time for task_classifier: 0.004367828369140625 seconds
+04/11/2025 10:34:01 AM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['general'], 'preprocessed_prompt': 'hey robot whats the weather like today', 'module_name': 'task_classifier'}
+04/15/2025 10:53:00 PM base_class.py INFO: task_classifier initialized successfully!
+04/15/2025 10:53:00 PM base_class.py INFO: Connected to broker!
+04/15/2025 10:54:46 PM base_class.py INFO: Received message: {'prompt': 'Hey Bemo, provide me with some learning resources for Deep Learning, make sure to include some courses and books'}
+04/15/2025 10:54:46 PM base_class.py INFO: Execution time for task_classifier: 0.0067081451416015625 seconds
+04/15/2025 10:54:46 PM base_class.py INFO: Published result to topic 'main/main': {'predicted_labels': ['todo', 'learning_resources'], 'preprocessed_prompt': 'provide me with some learning resources for deep learning make sure to include some courses and books', 'module_name': 'task_classifier'}

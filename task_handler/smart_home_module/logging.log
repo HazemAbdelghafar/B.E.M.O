@@ -1,0 +1,57 @@
+04/11/2025 08:27:17 AM connectionpool.py DEBUG: Starting new HTTPS connection (1): openapi.tuyaeu.com:443
+04/11/2025 08:27:17 AM connectionpool.py DEBUG: https://openapi.tuyaeu.com:443 "GET /v1.0/token?grant_type=1 HTTP/1.1" 200 235
+04/11/2025 08:27:17 AM Cloud.py DEBUG: GET: URL=https://openapi.tuyaeu.com/v1.0/token?grant_type=1 HEADERS={'secret': 'bd8807d0411b4a1ebd733e096a43f822', 'client_id': 'wmqfvef7hduac4cf4jjs', 'sign': 'BC0DEE53923CCACCBDA00BDFD770084C38A8F71B04ADD2101AE904BC8C421D93', 't': '1744352837244', 'sign_method': 'HMAC-SHA256', 'mode': 'cors'} response code=200 text={"result":{"access_token":"25b33f7b05e9eba93fda738aafd456a3","expire_time":7200,"refresh_token":"364baa7319e391eb3fa854bc09f673ee","uid":"bay1729887851745TsO7"},"success":true,"t":1744352837506,"tid":"03e78080169e11f0905d5e1a959ba61d"} token=None
+04/11/2025 08:27:17 AM Cloud.py DEBUG: server_time_offset: 0
+04/11/2025 08:27:17 AM base_class.py INFO: smart_home initialized successfully!
+04/11/2025 08:27:17 AM base_class.py INFO: Connected to broker!
+04/11/2025 08:28:11 AM base_class.py INFO: Received message: {'method': 'smart_home', 'switch': ['switch_1'], 'status': ['on'], 'module_name': 'task_handler'}
+04/11/2025 08:28:11 AM Cloud.py DEBUG: POST: URL=https://openapi.tuyaeu.com/v1.0/iot-03/devices/25708170807d3a6503a2/commands HEADERS={'Content-type': 'application/json', 'Signature-Headers': 'Content-type', 'client_id': 'wmqfvef7hduac4cf4jjs', 'sign': 'B002010FD79DAA9D1AA209096878B27A2FB166E15B2DF15C2507D7238CABF83E', 't': '1744352891382', 'sign_method': 'HMAC-SHA256', 'mode': 'cors', 'access_token': '25b33f7b05e9eba93fda738aafd456a3'} DATA={"commands": [{"code": "switch_1", "value": true}]}
+04/11/2025 08:28:11 AM connectionpool.py DEBUG: Starting new HTTPS connection (1): openapi.tuyaeu.com:443
+04/11/2025 08:28:11 AM connectionpool.py DEBUG: https://openapi.tuyaeu.com:443 "POST /v1.0/iot-03/devices/25708170807d3a6503a2/commands HTTP/1.1" 200 89
+04/11/2025 08:28:11 AM Cloud.py DEBUG: POST RESPONSE: code=200 text={"result":true,"success":true,"t":1744352891677,"tid":"24259390169e11f0905d5e1a959ba61d"} token=25b33f7b05e9eba93fda738aafd456a3
+04/11/2025 08:28:11 AM base_class.py INFO: Published result to topic 'task_handler/main': {'results': [{'switch': 'switch_1', 'status': 'on', 'success': True}], 'module_name': 'smart_home'}
+04/11/2025 08:28:11 AM base_class.py INFO: Execution time for smart_home: 0.3209240436553955 seconds
+04/11/2025 08:34:00 AM connectionpool.py DEBUG: Starting new HTTPS connection (1): openapi.tuyaeu.com:443
+04/11/2025 08:34:01 AM connectionpool.py DEBUG: https://openapi.tuyaeu.com:443 "GET /v1.0/token?grant_type=1 HTTP/1.1" 200 235
+04/11/2025 08:34:01 AM Cloud.py DEBUG: GET: URL=https://openapi.tuyaeu.com/v1.0/token?grant_type=1 HEADERS={'secret': 'bd8807d0411b4a1ebd733e096a43f822', 'client_id': 'wmqfvef7hduac4cf4jjs', 'sign': 'BC1C7589ED9CC3C5B39601F9BF15EF35B0ADC59E2013C29DE4B5E277BBB95F10', 't': '1744353240621', 'sign_method': 'HMAC-SHA256', 'mode': 'cors'} response code=200 text={"result":{"access_token":"25b33f7b05e9eba93fda738aafd456a3","expire_time":6797,"refresh_token":"364baa7319e391eb3fa854bc09f673ee","uid":"bay1729887851745TsO7"},"success":true,"t":1744353240970,"tid":"f46807c6169e11f0905d5e1a959ba61d"} token=None
+04/11/2025 08:34:01 AM Cloud.py DEBUG: server_time_offset: 0
+04/11/2025 08:34:01 AM base_class.py INFO: smart_home initialized successfully!
+04/11/2025 08:34:01 AM base_class.py INFO: Connected to broker!
+04/11/2025 08:34:03 AM base_class.py INFO: Received message: {'method': 'smart_home', 'switch': ['switch_1'], 'status': ['on'], 'module_name': 'task_handler'}
+04/11/2025 08:34:03 AM Cloud.py DEBUG: POST: URL=https://openapi.tuyaeu.com/v1.0/iot-03/devices/25708170807d3a6503a2/commands HEADERS={'Content-type': 'application/json', 'Signature-Headers': 'Content-type', 'client_id': 'wmqfvef7hduac4cf4jjs', 'sign': '2ECF47C9C22284355FDF99FB60D276A68CEFDC113100830AB3DCD134694B2D28', 't': '1744353243309', 'sign_method': 'HMAC-SHA256', 'mode': 'cors', 'access_token': '25b33f7b05e9eba93fda738aafd456a3'} DATA={"commands": [{"code": "switch_1", "value": true}]}
+04/11/2025 08:34:03 AM connectionpool.py DEBUG: Starting new HTTPS connection (1): openapi.tuyaeu.com:443
+04/11/2025 08:34:03 AM connectionpool.py DEBUG: https://openapi.tuyaeu.com:443 "POST /v1.0/iot-03/devices/25708170807d3a6503a2/commands HTTP/1.1" 200 89
+04/11/2025 08:34:03 AM Cloud.py DEBUG: POST RESPONSE: code=200 text={"result":true,"success":true,"t":1744353243583,"tid":"f5ec690e169e11f093c95697c6631661"} token=25b33f7b05e9eba93fda738aafd456a3
+04/11/2025 08:34:03 AM base_class.py INFO: Published result to topic 'task_handler/main': {'results': [{'switch': 'switch_1', 'status': 'on', 'success': True}], 'module_name': 'smart_home'}
+04/11/2025 08:34:03 AM base_class.py INFO: Execution time for smart_home: 0.2918529510498047 seconds
+04/11/2025 08:36:30 AM connectionpool.py DEBUG: Starting new HTTPS connection (1): openapi.tuyaeu.com:443
+04/11/2025 08:36:30 AM connectionpool.py DEBUG: https://openapi.tuyaeu.com:443 "GET /v1.0/token?grant_type=1 HTTP/1.1" 200 235
+04/11/2025 08:36:30 AM Cloud.py DEBUG: GET: URL=https://openapi.tuyaeu.com/v1.0/token?grant_type=1 HEADERS={'secret': 'bd8807d0411b4a1ebd733e096a43f822', 'client_id': 'wmqfvef7hduac4cf4jjs', 'sign': 'AF476D016DE2C4F55068AE7150C889D71E37611A6DCF1EC00A55A77EF0E1FC57', 't': '1744353390073', 'sign_method': 'HMAC-SHA256', 'mode': 'cors'} response code=200 text={"result":{"access_token":"25b33f7b05e9eba93fda738aafd456a3","expire_time":6647,"refresh_token":"364baa7319e391eb3fa854bc09f673ee","uid":"bay1729887851745TsO7"},"success":true,"t":1744353390338,"tid":"4d6da26a169f11f086de06fdb36e8798"} token=None
+04/11/2025 08:36:30 AM Cloud.py DEBUG: server_time_offset: 0
+04/11/2025 08:36:30 AM base_class.py INFO: smart_home initialized successfully!
+04/11/2025 08:36:30 AM base_class.py INFO: Connected to broker!
+04/11/2025 08:36:32 AM base_class.py INFO: Received message: {'method': 'smart_home', 'switch': ['switch_1'], 'status': ['off'], 'module_name': 'task_handler'}
+04/11/2025 08:36:32 AM base_class.py INFO: Published result to topic 'task_handler/main': {'statuses': [], 'module_name': 'smart_home'}
+04/11/2025 08:36:32 AM base_class.py INFO: Execution time for smart_home: 0.00019025802612304688 seconds
+04/11/2025 08:37:53 AM connectionpool.py DEBUG: Starting new HTTPS connection (1): openapi.tuyaeu.com:443
+04/11/2025 08:37:53 AM connectionpool.py DEBUG: https://openapi.tuyaeu.com:443 "GET /v1.0/token?grant_type=1 HTTP/1.1" 200 235
+04/11/2025 08:37:53 AM Cloud.py DEBUG: GET: URL=https://openapi.tuyaeu.com/v1.0/token?grant_type=1 HEADERS={'secret': 'bd8807d0411b4a1ebd733e096a43f822', 'client_id': 'wmqfvef7hduac4cf4jjs', 'sign': '51EFA451D753DB4817F4D7EB951F2FEE5E7CD066BC58AE5B54E47DADA2022F04', 't': '1744353473296', 'sign_method': 'HMAC-SHA256', 'mode': 'cors'} response code=200 text={"result":{"access_token":"25b33f7b05e9eba93fda738aafd456a3","expire_time":6564,"refresh_token":"364baa7319e391eb3fa854bc09f673ee","uid":"bay1729887851745TsO7"},"success":true,"t":1744353473870,"tid":"7f3a108f169f11f0905d5e1a959ba61d"} token=None
+04/11/2025 08:37:53 AM Cloud.py DEBUG: server_time_offset: 0
+04/11/2025 08:37:53 AM base_class.py INFO: smart_home initialized successfully!
+04/11/2025 08:37:53 AM base_class.py INFO: Connected to broker!
+04/11/2025 08:37:56 AM base_class.py INFO: Received message: {'method': 'smart_home', 'switch': ['switch_1'], 'status': ['off'], 'module_name': 'task_handler'}
+04/11/2025 08:37:56 AM base_class.py INFO: Published result to topic 'task_handler/main': {'statuses': [], 'module_name': 'smart_home'}
+04/11/2025 08:37:56 AM base_class.py INFO: Execution time for smart_home: 0.00011944770812988281 seconds
+04/11/2025 08:38:24 AM connectionpool.py DEBUG: Starting new HTTPS connection (1): openapi.tuyaeu.com:443
+04/11/2025 08:38:24 AM connectionpool.py DEBUG: https://openapi.tuyaeu.com:443 "GET /v1.0/token?grant_type=1 HTTP/1.1" 200 235
+04/11/2025 08:38:24 AM Cloud.py DEBUG: GET: URL=https://openapi.tuyaeu.com/v1.0/token?grant_type=1 HEADERS={'secret': 'bd8807d0411b4a1ebd733e096a43f822', 'client_id': 'wmqfvef7hduac4cf4jjs', 'sign': '503575E67C7321EB2D791E1E945D63C18EB6AE86F21313F4F7F14C3F6F3C6ECB', 't': '1744353504242', 'sign_method': 'HMAC-SHA256', 'mode': 'cors'} response code=200 text={"result":{"access_token":"25b33f7b05e9eba93fda738aafd456a3","expire_time":6533,"refresh_token":"364baa7319e391eb3fa854bc09f673ee","uid":"bay1729887851745TsO7"},"success":true,"t":1744353504702,"tid":"919a6bb0169f11f0905d5e1a959ba61d"} token=None
+04/11/2025 08:38:24 AM Cloud.py DEBUG: server_time_offset: 0
+04/11/2025 08:38:24 AM base_class.py INFO: smart_home initialized successfully!
+04/11/2025 08:38:24 AM base_class.py INFO: Connected to broker!
+04/11/2025 08:38:25 AM base_class.py INFO: Received message: {'method': 'smart_home', 'switch': ['switch_1'], 'status': ['off'], 'module_name': 'task_handler'}
+04/11/2025 08:38:25 AM Cloud.py DEBUG: POST: URL=https://openapi.tuyaeu.com/v1.0/iot-03/devices/25708170807d3a6503a2/commands HEADERS={'Content-type': 'application/json', 'Signature-Headers': 'Content-type', 'client_id': 'wmqfvef7hduac4cf4jjs', 'sign': 'DB8B5CFB395E4A42BAE6FA6CBFD7F60D77BEDD4AC966BFDBD132F6AECFA6FC55', 't': '1744353505896', 'sign_method': 'HMAC-SHA256', 'mode': 'cors', 'access_token': '25b33f7b05e9eba93fda738aafd456a3'} DATA={"commands": [{"code": "switch_1", "value": false}]}
+04/11/2025 08:38:25 AM connectionpool.py DEBUG: Starting new HTTPS connection (1): openapi.tuyaeu.com:443
+04/11/2025 08:38:26 AM connectionpool.py DEBUG: https://openapi.tuyaeu.com:443 "POST /v1.0/iot-03/devices/25708170807d3a6503a2/commands HTTP/1.1" 200 89
+04/11/2025 08:38:26 AM Cloud.py DEBUG: POST RESPONSE: code=200 text={"result":true,"success":true,"t":1744353506412,"tid":"9298b6b6169f11f086de06fdb36e8798"} token=25b33f7b05e9eba93fda738aafd456a3
+04/11/2025 08:38:26 AM base_class.py INFO: Published result to topic 'task_handler/main': {'statuses': [{'switch': 'switch_1', 'status': 'off', 'success': True}], 'module_name': 'smart_home'}
+04/11/2025 08:38:26 AM base_class.py INFO: Execution time for smart_home: 0.6167762279510498 seconds

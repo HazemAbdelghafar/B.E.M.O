@@ -1,0 +1,20 @@
+04/11/2025 08:50:15 AM base_class.py INFO: tasks_api initialized successfully!
+04/11/2025 08:50:15 AM init_user.py INFO: Loading existing user...
+04/11/2025 08:50:15 AM init_user.py INFO: Refreshing token...
+04/11/2025 08:50:15 AM requests.py DEBUG: Making request: POST https://oauth2.googleapis.com/token
+04/11/2025 08:50:15 AM connectionpool.py DEBUG: Starting new HTTPS connection (1): oauth2.googleapis.com:443
+04/11/2025 08:50:15 AM connectionpool.py DEBUG: https://oauth2.googleapis.com:443 "POST /token HTTP/1.1" 200 None
+04/11/2025 08:50:15 AM __init__.py INFO: file_cache is only supported with oauth2client<4.0.0
+04/11/2025 08:50:15 AM base_class.py INFO: Connected to broker!
+04/11/2025 08:50:19 AM base_class.py INFO: Received message: {'method': 'todo', 'list_all_tasks': False, 'object_type': 'task', 'action': 'insert', 'new_task_name': 'Schedule doctor appointment', 'due_date': '2025-04-07T23:00:00', 'module_name': 'task_handler'}
+04/11/2025 08:50:19 AM discovery.py DEBUG: URL being requested: GET https://tasks.googleapis.com/tasks/v1/users/@me/lists?maxResults=10&alt=json
+04/11/2025 08:50:19 AM discovery.py DEBUG: URL being requested: POST https://tasks.googleapis.com/tasks/v1/lists/MTE3NDYyMDEyNzE5NTgwODc4Njc6MDow/tasks?alt=json
+04/11/2025 08:50:20 AM tasks_api.py INFO: Result: {'id': 'c1lLUU8yMS1rVkF6T1k2eA', 'name': 'Schedule Doctor Appointment', 'last_updated': '2025-04-11 08:50:20', 'last_updated_relative': 'Just Now'}
+04/11/2025 08:50:20 AM base_class.py INFO: Published result to topic 'task_handler/main': {'id': 'c1lLUU8yMS1rVkF6T1k2eA', 'name': 'Schedule Doctor Appointment', 'last_updated': '2025-04-11 08:50:20', 'last_updated_relative': 'Just Now', 'module_name': 'tasks_api'}
+04/11/2025 08:50:20 AM base_class.py INFO: Execution time for tasks_api: 0.9857568740844727 seconds
+04/11/2025 08:51:18 AM base_class.py INFO: Received message: {'method': 'todo', 'list_all_tasks': False, 'object_type': 'task', 'action': 'insert', 'new_task_name': 'Schedule doctor appointment', 'due_date': '2025-04-07T23:00:00', 'module_name': 'task_handler'}
+04/11/2025 08:51:18 AM discovery.py DEBUG: URL being requested: GET https://tasks.googleapis.com/tasks/v1/users/@me/lists?maxResults=10&alt=json
+04/11/2025 08:51:18 AM discovery.py DEBUG: URL being requested: POST https://tasks.googleapis.com/tasks/v1/lists/MTE3NDYyMDEyNzE5NTgwODc4Njc6MDow/tasks?alt=json
+04/11/2025 08:51:19 AM tasks_api.py INFO: Result: {'id': 'ZVBZVGY0RHZpQTVSYlNTVQ', 'name': 'Schedule Doctor Appointment', 'last_updated': '2025-04-11 08:51:19', 'last_updated_relative': 'Just Now'}
+04/11/2025 08:51:19 AM base_class.py INFO: Published result to topic 'task_handler/main': {'id': 'ZVBZVGY0RHZpQTVSYlNTVQ', 'name': 'Schedule Doctor Appointment', 'last_updated': '2025-04-11 08:51:19', 'last_updated_relative': 'Just Now', 'module_name': 'tasks_api'}
+04/11/2025 08:51:19 AM base_class.py INFO: Execution time for tasks_api: 0.787168025970459 seconds

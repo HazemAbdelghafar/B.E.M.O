@@ -1,0 +1,326 @@
+04/08/2025 05:55:35 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 05:55:35 AM base_class.py INFO: Connected to broker!
+04/08/2025 05:55:39 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 05:55:39 AM base_class.py INFO: Connected to broker!
+04/08/2025 05:55:45 AM base_class.py INFO: Received message: {'predicted_labels': ['general'], 'preprocessed_prompt': 'what about tomorrow', 'module_name': 'task_classifier'}
+04/08/2025 05:55:45 AM preprocessing.py INFO: Label: general
+04/08/2025 05:55:47 AM base_class.py INFO: Published result to topic 'server/main': {'method': 'general', 'query': 'What about 2025-04-09?', 'topic': 'general', 'module_name': 'preprocessing'}
+04/08/2025 05:55:47 AM base_class.py INFO: Execution time for preprocessing: 1.1524205207824707 seconds
+04/08/2025 05:56:31 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 05:56:31 AM base_class.py INFO: Connected to broker!
+04/08/2025 05:56:33 AM base_class.py INFO: Received message: {'predicted_labels': ['general'], 'preprocessed_prompt': 'what are names that i can name my son based on my name', 'module_name': 'task_classifier'}
+04/08/2025 05:56:33 AM preprocessing.py INFO: Label: general
+04/08/2025 05:56:34 AM base_class.py INFO: Published result to topic 'server/main': {'method': 'general', 'query': 'What are names that I can name my son based on my name?', 'topic': 'general', 'module_name': 'preprocessing'}
+04/08/2025 05:56:34 AM base_class.py INFO: Execution time for preprocessing: 0.9454371929168701 seconds
+04/08/2025 06:22:29 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 06:22:29 AM base_class.py INFO: Connected to broker!
+04/08/2025 06:22:31 AM base_class.py INFO: Received message: {'predicted_labels': ['general'], 'preprocessed_prompt': 'what are names that i can name my son based on my name', 'module_name': 'task_classifier'}
+04/08/2025 06:22:31 AM preprocessing.py INFO: Label: general
+04/08/2025 06:22:32 AM base_class.py INFO: Published result to topic 'server/main': {'method': 'general', 'query': 'What are names that I can name my son based on the name Ali?', 'topic': 'general', 'module_name': 'preprocessing'}
+04/08/2025 06:22:32 AM base_class.py INFO: Execution time for preprocessing: 1.2607173919677734 seconds
+04/08/2025 06:23:25 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 06:23:25 AM base_class.py INFO: Connected to broker!
+04/08/2025 06:23:28 AM base_class.py INFO: Received message: {'predicted_labels': ['general'], 'preprocessed_prompt': 'what is the average salary for my job in my country?', 'module_name': 'task_classifier'}
+04/08/2025 06:23:28 AM preprocessing.py INFO: Label: general
+04/08/2025 06:23:29 AM base_class.py INFO: Published result to topic 'server/main': {'method': 'general', 'query': 'What is the average salary for a Software Engineer in Egypt?', 'topic': 'general', 'module_name': 'preprocessing'}
+04/08/2025 06:23:29 AM base_class.py INFO: Execution time for preprocessing: 1.196202278137207 seconds
+04/08/2025 06:28:30 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 06:28:30 AM base_class.py INFO: Connected to broker!
+04/08/2025 06:28:32 AM base_class.py INFO: Received message: {'predicted_labels': ['test'], 'preprocessed_prompt': 'Tell me some jokes about my job', 'module_name': 'task_classifier'}
+04/08/2025 06:28:32 AM preprocessing.py INFO: Label: test
+04/08/2025 06:28:32 AM preprocessing.py ERROR: Error: 'test'
+04/08/2025 06:28:32 AM base_class.py INFO: Published result to topic 'server/main': {'method': 'test', 'response': '', 'error': "'test'", 'module_name': 'preprocessing'}
+04/08/2025 06:28:32 AM base_class.py INFO: Execution time for preprocessing: 0.0002994537353515625 seconds
+04/08/2025 06:30:00 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 06:30:00 AM base_class.py INFO: Connected to broker!
+04/08/2025 06:30:02 AM base_class.py INFO: Received message: {'predicted_labels': ['general'], 'preprocessed_prompt': 'what is the average salary for my job in my country?', 'module_name': 'task_classifier'}
+04/08/2025 06:30:02 AM preprocessing.py INFO: Label: general
+04/08/2025 06:30:03 AM base_class.py INFO: Published result to topic 'server/main': {'method': 'general', 'query': 'What is the average salary for a Software Engineer in Egypt?', 'topic': 'general', 'module_name': 'preprocessing'}
+04/08/2025 06:30:03 AM base_class.py INFO: Execution time for preprocessing: 1.0874485969543457 seconds
+04/08/2025 06:30:22 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 06:30:22 AM base_class.py INFO: Connected to broker!
+04/08/2025 06:30:23 AM base_class.py INFO: Received message: {'predicted_labels': ['test'], 'preprocessed_prompt': 'Tell me some jokes about my job', 'module_name': 'task_classifier'}
+04/08/2025 06:30:23 AM preprocessing.py INFO: Label: test
+04/08/2025 06:30:23 AM preprocessing.py ERROR: Error: 'test'
+04/08/2025 06:30:23 AM base_class.py INFO: Published result to topic 'server/main': {'method': 'test', 'response': '', 'error': "'test'", 'module_name': 'preprocessing'}
+04/08/2025 06:30:23 AM base_class.py INFO: Execution time for preprocessing: 0.0003094673156738281 seconds
+04/08/2025 06:30:27 AM base_class.py INFO: Received message: {'predicted_labels': ['test'], 'preprocessed_prompt': 'Tell me some jokes about my job', 'module_name': 'task_classifier'}
+04/08/2025 06:30:27 AM preprocessing.py INFO: Label: test
+04/08/2025 06:30:27 AM preprocessing.py ERROR: Error: 'test'
+04/08/2025 06:30:27 AM base_class.py INFO: Published result to topic 'server/main': {'method': 'test', 'response': '', 'error': "'test'", 'module_name': 'preprocessing'}
+04/08/2025 06:30:27 AM base_class.py INFO: Execution time for preprocessing: 0.00025653839111328125 seconds
+04/08/2025 06:31:22 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 06:31:22 AM base_class.py INFO: Connected to broker!
+04/08/2025 06:31:25 AM base_class.py INFO: Received message: {'predicted_labels': ['others'], 'preprocessed_prompt': 'Tell me some jokes about my job', 'module_name': 'task_classifier'}
+04/08/2025 06:31:25 AM preprocessing.py INFO: Label: others
+04/08/2025 06:38:32 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 06:38:32 AM base_class.py INFO: Connected to broker!
+04/08/2025 06:40:04 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 06:40:04 AM base_class.py INFO: Connected to broker!
+04/08/2025 06:41:57 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 06:41:57 AM base_class.py INFO: Connected to broker!
+04/08/2025 06:41:59 AM base_class.py INFO: Received message: {'predicted_labels': ['others'], 'preprocessed_prompt': 'Tell me some jokes about my job', 'module_name': 'task_classifier'}
+04/08/2025 06:41:59 AM preprocessing.py INFO: Label: others
+04/08/2025 06:42:40 AM base_class.py INFO: preprocessing initialized successfully!
+04/08/2025 06:42:40 AM base_class.py INFO: Connected to broker!
+04/08/2025 06:42:41 AM base_class.py INFO: Received message: {'predicted_labels': ['others'], 'preprocessed_prompt': 'Tell me some jokes about my job', 'module_name': 'task_classifier'}
+04/08/2025 06:42:41 AM preprocessing.py INFO: Label: others
+04/08/2025 06:42:42 AM base_class.py INFO: Published result to topic 'server/main': {'method': 'others', 'response': "Why was the software engineer sad? Because they didn't Node how to Express themselves!  Hope that brightened your day, Ali!", 'module_name': 'preprocessing'}
+04/08/2025 06:42:42 AM base_class.py INFO: Execution time for preprocessing: 0.9740440845489502 seconds
+04/10/2025 03:11:50 PM base_class.py INFO: preprocessing initialized successfully!
+04/10/2025 03:11:50 PM base_class.py INFO: Connected to broker!
+04/10/2025 03:19:22 PM base_class.py INFO: Received message: {'predicted_labels': ['others'], 'preprocessed_prompt': 'Tell me some jokes about my job', 'module_name': 'task_classifier'}
+04/10/2025 03:19:22 PM preprocessing.py INFO: Label: others
+04/10/2025 03:19:23 PM base_class.py INFO: Published result to topic 'server/main': {'method': 'others', 'response': "Why did the software engineer quit his job? Because he didn't get arrays!", 'module_name': 'preprocessing'}
+04/10/2025 03:19:23 PM base_class.py INFO: Execution time for preprocessing: 1.029876708984375 seconds
+04/10/2025 03:22:35 PM base_class.py INFO: Received message: {'predicted_labels': ['others'], 'preprocessed_prompt': 'Haha that was funny, tell me another one', 'module_name': 'task_classifier'}
+04/10/2025 03:22:35 PM preprocessing.py INFO: Label: others
+04/10/2025 03:22:35 PM base_class.py INFO: Published result to topic 'server/main': {'method': 'others', 'response': "Okay, here's another one: Why do programmers prefer dark mode? Because light attracts bugs!", 'module_name': 'preprocessing'}
+04/10/2025 03:22:35 PM base_class.py INFO: Execution time for preprocessing: 0.702810525894165 seconds
+04/10/2025 03:34:31 PM base_class.py INFO: preprocessing initialized successfully!
+04/10/2025 03:34:31 PM base_class.py INFO: Connected to broker!
+04/10/2025 03:34:32 PM base_class.py INFO: Received message: {'predicted_labels': ['others'], 'preprocessed_prompt': 'Haha that was funny, tell me another one', 'module_name': 'task_classifier'}
+04/10/2025 03:34:32 PM preprocessing.py INFO: Label: others
+04/10/2025 03:34:33 PM base_class.py INFO: Published result to topic 'server/main': {'method': 'others', 'response': "Why don't scientists trust atoms? Because they make up everything!", 'module_name': 'preprocessing'}
+04/10/2025 03:34:33 PM base_class.py INFO: Execution time for preprocessing: 1.5238361358642578 seconds
+04/11/2025 09:59:34 AM base_class.py INFO: preprocessing initialized successfully!
+04/11/2025 09:59:34 AM base_class.py INFO: Connected to broker!
+04/11/2025 09:59:48 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 09:59:48 AM preprocessing.py INFO: Label: general
+04/11/2025 09:59:49 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 09:59:49 AM base_class.py INFO: Execution time for preprocessing: 1.023632287979126 seconds
+04/11/2025 10:03:42 AM base_class.py INFO: preprocessing initialized successfully!
+04/11/2025 10:03:42 AM base_class.py INFO: Connected to broker!
+04/11/2025 10:05:43 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:05:43 AM preprocessing.py INFO: Label: general
+04/11/2025 10:05:44 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:05:44 AM base_class.py INFO: Execution time for preprocessing: 1.1044580936431885 seconds
+04/11/2025 10:08:39 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:08:39 AM preprocessing.py INFO: Label: general
+04/11/2025 10:08:40 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:08:40 AM base_class.py INFO: Execution time for preprocessing: 0.8553166389465332 seconds
+04/11/2025 10:09:41 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:09:41 AM preprocessing.py INFO: Label: general
+04/11/2025 10:09:42 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:09:42 AM base_class.py INFO: Execution time for preprocessing: 0.8783185482025146 seconds
+04/11/2025 10:10:17 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:10:17 AM preprocessing.py INFO: Label: general
+04/11/2025 10:10:18 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:10:18 AM base_class.py INFO: Execution time for preprocessing: 0.8857367038726807 seconds
+04/11/2025 10:12:11 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:12:11 AM preprocessing.py INFO: Label: general
+04/11/2025 10:12:12 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:12:12 AM base_class.py INFO: Execution time for preprocessing: 0.9208519458770752 seconds
+04/11/2025 10:14:09 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:14:09 AM preprocessing.py INFO: Label: general
+04/11/2025 10:14:10 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:14:10 AM base_class.py INFO: Execution time for preprocessing: 0.7339437007904053 seconds
+04/11/2025 10:14:49 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:14:49 AM preprocessing.py INFO: Label: general
+04/11/2025 10:14:49 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:14:49 AM base_class.py INFO: Execution time for preprocessing: 0.7445380687713623 seconds
+04/11/2025 10:15:06 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:15:06 AM preprocessing.py INFO: Label: general
+04/11/2025 10:15:07 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:15:07 AM base_class.py INFO: Execution time for preprocessing: 0.8008761405944824 seconds
+04/11/2025 10:15:25 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:15:25 AM preprocessing.py INFO: Label: general
+04/11/2025 10:15:26 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:15:26 AM base_class.py INFO: Execution time for preprocessing: 0.7419967651367188 seconds
+04/11/2025 10:15:57 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:15:57 AM preprocessing.py INFO: Label: general
+04/11/2025 10:15:57 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:15:57 AM base_class.py INFO: Execution time for preprocessing: 0.9030454158782959 seconds
+04/11/2025 10:16:43 AM base_class.py INFO: preprocessing initialized successfully!
+04/11/2025 10:16:43 AM base_class.py INFO: Connected to broker!
+04/11/2025 10:17:32 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:17:32 AM preprocessing.py INFO: Label: general
+04/11/2025 10:17:33 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:17:33 AM base_class.py INFO: Execution time for preprocessing: 1.0083892345428467 seconds
+04/11/2025 10:19:57 AM base_class.py INFO: preprocessing initialized successfully!
+04/11/2025 10:19:57 AM base_class.py INFO: Connected to broker!
+04/11/2025 10:20:03 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:20:03 AM preprocessing.py INFO: Label: general
+04/11/2025 10:20:05 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:20:05 AM base_class.py INFO: Execution time for preprocessing: 2.384246826171875 seconds
+04/11/2025 10:20:48 AM base_class.py INFO: preprocessing initialized successfully!
+04/11/2025 10:20:48 AM base_class.py INFO: Connected to broker!
+04/11/2025 10:20:54 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:20:54 AM preprocessing.py INFO: Label: general
+04/11/2025 10:20:55 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11 in Cairo, Egypt?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:20:55 AM base_class.py INFO: Execution time for preprocessing: 1.1100475788116455 seconds
+04/11/2025 10:32:59 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:32:59 AM preprocessing.py INFO: Label: general
+04/11/2025 10:33:00 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11 in Cairo, Egypt?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:33:00 AM base_class.py INFO: Execution time for preprocessing: 1.0204384326934814 seconds
+04/11/2025 10:34:01 AM base_class.py INFO: Received message: {'prompt': "hey robot, what's the weather like today?", 'predicted_labels': ['general'], 'module_name': 'main'}
+04/11/2025 10:34:01 AM preprocessing.py INFO: Label: general
+04/11/2025 10:34:01 AM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-11 in Cairo, Egypt?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/11/2025 10:34:01 AM base_class.py INFO: Execution time for preprocessing: 0.8377480506896973 seconds
+04/14/2025 01:56:57 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 01:56:57 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:03:28 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:03:28 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:04:06 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'preprocessed_prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:04:06 PM base_class.py ERROR: Error in executing main function: 'prompt'
+04/14/2025 02:04:06 PM base_class.py INFO: Execution time for preprocessing: 9.918212890625e-05 seconds
+04/14/2025 02:04:06 PM base_class.py INFO: Published result to topic 'main/main': {'error': "'prompt'", 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:09:40 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:09:40 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:09:43 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:09:43 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:09:43 PM preprocessing.py ERROR: Error: 'Input to PromptTemplate is missing variables {"\\n    \'method\'"}.  Expected: ["\\n    \'method\'", \'chat_history\', \'prompt\'] Received: [\'prompt\', \'current_time\', \'chat_history\']\nNote: if you intended {\n    \'method\'} to be part of the string and not a variable, please escape it with double curly braces like: \'{{\n    \'method\'}}\'.\nFor troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/INVALID_PROMPT_INPUT '
+04/14/2025 02:09:43 PM base_class.py INFO: Published result to topic 'main/main': {'error': '\'Input to PromptTemplate is missing variables {"\\\\n    \\\'method\\\'"}.  Expected: ["\\\\n    \\\'method\\\'", \\\'chat_history\\\', \\\'prompt\\\'] Received: [\\\'prompt\\\', \\\'current_time\\\', \\\'chat_history\\\']\\nNote: if you intended {\\n    \\\'method\\\'} to be part of the string and not a variable, please escape it with double curly braces like: \\\'{{\\n    \\\'method\\\'}}\\\'.\\nFor troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/INVALID_PROMPT_INPUT \'', 'level': 2, 'method': 'learning_resources', 'module_name': 'preprocessing'}
+04/14/2025 02:09:43 PM base_class.py INFO: Execution time for preprocessing: 0.006170749664306641 seconds
+04/14/2025 02:11:39 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:11:39 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:11:43 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:11:43 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:11:44 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:11:44 PM base_class.py INFO: Execution time for preprocessing: 1.5291521549224854 seconds
+04/14/2025 02:11:44 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:14:07 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:14:07 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:14:09 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:14:09 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:14:10 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:14:10 PM base_class.py INFO: Execution time for preprocessing: 1.3642706871032715 seconds
+04/14/2025 02:14:10 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:16:34 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:16:34 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:16:34 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:16:34 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:16:36 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:16:36 PM base_class.py INFO: Execution time for preprocessing: 1.574350357055664 seconds
+04/14/2025 02:16:36 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:16:49 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:16:49 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:16:49 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:16:49 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:16:51 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:16:51 PM base_class.py INFO: Execution time for preprocessing: 1.382143259048462 seconds
+04/14/2025 02:16:51 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:17:05 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:17:05 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:17:06 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:17:06 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:17:08 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:17:08 PM base_class.py INFO: Execution time for preprocessing: 1.2898533344268799 seconds
+04/14/2025 02:17:08 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:17:29 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:17:29 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:17:31 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:17:31 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:17:33 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:17:33 PM base_class.py INFO: Execution time for preprocessing: 1.3092331886291504 seconds
+04/14/2025 02:17:33 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:17:50 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:17:50 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:17:51 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:17:51 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:17:52 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:17:52 PM base_class.py INFO: Execution time for preprocessing: 1.3239247798919678 seconds
+04/14/2025 02:17:52 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:19:19 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:19:19 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:19:19 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:19:19 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:19:20 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:19:20 PM base_class.py INFO: Execution time for preprocessing: 1.475466251373291 seconds
+04/14/2025 02:19:20 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:19:51 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:19:51 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:19:52 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:19:52 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:19:54 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:19:54 PM base_class.py INFO: Execution time for preprocessing: 1.319075107574463 seconds
+04/14/2025 02:19:54 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:20:05 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:20:05 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:20:08 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:20:08 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:20:10 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:20:10 PM base_class.py INFO: Execution time for preprocessing: 1.3260674476623535 seconds
+04/14/2025 02:20:10 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:20:33 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:20:33 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:20:35 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:20:35 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:20:36 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:20:36 PM base_class.py INFO: Execution time for preprocessing: 1.360722541809082 seconds
+04/14/2025 02:20:36 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:21:16 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:21:16 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:21:18 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:21:18 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:21:17 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:21:17 PM base_class.py INFO: Execution time for preprocessing: -1.046966791152954 seconds
+04/14/2025 02:21:17 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:22:26 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:22:26 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:22:32 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:22:32 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:22:33 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:22:33 PM base_class.py INFO: Execution time for preprocessing: 1.3912038803100586 seconds
+04/14/2025 02:22:33 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:23:51 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:23:51 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:23:52 PM base_class.py INFO: Received message: {'predicted_labels': ['general'], 'prompt': 'what is the average salary for my job in my country?', 'module_name': 'task_classifier'}
+04/14/2025 02:23:52 PM preprocessing.py INFO: Label: general
+04/14/2025 02:23:54 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': 'What is the average salary for a Software Engineer in Egypt?', 'topic': 'general', 'module_name': 'preprocessing'}
+04/14/2025 02:23:54 PM base_class.py INFO: Execution time for preprocessing: 1.267092227935791 seconds
+04/14/2025 02:25:34 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:25:34 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:25:36 PM base_class.py INFO: Received message: {'predicted_labels': ['general'], 'prompt': 'what is the average salary for my job in my country?', 'module_name': 'task_classifier'}
+04/14/2025 02:25:36 PM preprocessing.py INFO: Label: general
+04/14/2025 02:25:38 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': 'What is the average salary for a Software Engineer in Egypt?', 'topic': 'general', 'module_name': 'preprocessing'}
+04/14/2025 02:25:38 PM base_class.py INFO: Execution time for preprocessing: 1.4748668670654297 seconds
+04/14/2025 02:25:53 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:25:53 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:25:54 PM base_class.py ERROR: Error in executing main function: list indices must be integers or slices, not str
+04/14/2025 02:25:54 PM base_class.py INFO: Execution time for preprocessing: 1.0238239765167236 seconds
+04/14/2025 02:25:54 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'list indices must be integers or slices, not str', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 02:26:16 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:26:16 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:26:15 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources'], 'prompt': 'Provide me with some learning resources for my job, make sure to include some videos and books', 'module_name': 'task_classifier'}
+04/14/2025 02:26:15 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:26:16 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'learning_resources', 'topic': 'Software Engineering', 'specific_resources': ['Videos', 'Books'], 'module_name': 'preprocessing'}
+04/14/2025 02:26:16 PM base_class.py INFO: Execution time for preprocessing: 1.4131548404693604 seconds
+04/14/2025 02:27:47 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 02:27:47 PM base_class.py INFO: Connected to broker!
+04/14/2025 02:27:49 PM base_class.py INFO: Received message: {'predicted_labels': ['learning_resources', 'todo'], 'prompt': 'Provide me with some learning resources about arabic language and schedule a doctor appointment at 11 pm', 'module_name': 'task_classifier'}
+04/14/2025 02:27:49 PM preprocessing.py INFO: Label: learning_resources
+04/14/2025 02:27:50 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'learning_resources', 'topic': 'Arabic Language', 'specific_resources': [], 'module_name': 'preprocessing'}
+04/14/2025 02:27:50 PM preprocessing.py INFO: Label: todo
+04/14/2025 02:27:51 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'todo', 'list_all_tasks': False, 'object_type': 'task', 'action': 'insert', 'new_task_name': 'Find Arabic learning resources', 'due_date': None, 'notes': None, 'parent_task_name': None, 'module_name': 'preprocessing'}
+04/14/2025 02:27:51 PM base_class.py INFO: Execution time for preprocessing: 2.5285911560058594 seconds
+04/14/2025 02:28:38 PM base_class.py INFO: Received message: {'predicted_labels': ['todo'], 'prompt': 'Schedule a doctor appointment at 11 pm', 'module_name': 'task_classifier'}
+04/14/2025 02:28:38 PM preprocessing.py INFO: Label: todo
+04/14/2025 02:28:39 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'todo', 'list_all_tasks': False, 'object_type': 'task', 'action': 'insert', 'new_task_name': 'Doctor appointment', 'due_date': '2025-04-14T23:00:00', 'module_name': 'preprocessing'}
+04/14/2025 02:28:39 PM base_class.py INFO: Execution time for preprocessing: 1.0902626514434814 seconds
+04/14/2025 06:12:31 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 06:12:31 PM base_class.py INFO: Connected to broker!
+04/14/2025 06:12:39 PM base_class.py INFO: Received message: {'results': {'query': "What's the weather like on 2025-04-11 in Cairo, Egypt?", 'answer': 'On April 11, 2025, Cairo will have partly cloudy skies with a temperature of 17.3C (63.1F). Winds will come from the WNW at 7.6 mph (12.2 kph). No precipitation is expected.', 'topic': 'general', 'module_name': 'general'}, 'module_name': 'task_handler', 'prompt': "What's the weather like today?"}
+04/14/2025 06:12:39 PM preprocessing.py ERROR: Labels are missing
+04/14/2025 06:12:39 PM base_class.py INFO: Execution time for preprocessing: 7.2479248046875e-05 seconds
+04/14/2025 06:12:39 PM base_class.py INFO: Published result to topic 'main/main': {'error': 'Labels are missing', 'level': 2, 'module_name': 'preprocessing'}
+04/14/2025 06:12:58 PM base_class.py INFO: preprocessing initialized successfully!
+04/14/2025 06:12:58 PM base_class.py INFO: Connected to broker!
+04/14/2025 06:12:59 PM base_class.py INFO: Received message: {'predicted_labels': ['others'], 'prompt': 'Tell me some jokes about my job', 'module_name': 'task_classifier'}
+04/14/2025 06:12:59 PM preprocessing.py INFO: Label: others
+04/14/2025 06:13:01 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'others', 'response': "Why was the software engineer sad? Because he didn't Node how to Express himself!  Hope that brightened your day, Ali Mohamed Abdelnasser!", 'module_name': 'preprocessing'}
+04/14/2025 06:13:01 PM base_class.py INFO: Execution time for preprocessing: 1.5432422161102295 seconds
+04/15/2025 07:42:29 PM base_class.py INFO: preprocessing initialized successfully!
+04/15/2025 07:42:29 PM base_class.py INFO: Connected to broker!
+04/15/2025 07:43:24 PM base_class.py INFO: Received message: {'predicted_labels': ['general'], 'prompt': 'what is the average salary for my job in my country?', 'module_name': 'task_classifier'}
+04/15/2025 07:43:24 PM preprocessing.py INFO: Label: general
+04/15/2025 07:43:26 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': 'What is the average salary for a Software Engineer in Egypt?', 'topic': 'general', 'module_name': 'preprocessing'}
+04/15/2025 07:43:26 PM base_class.py INFO: Execution time for preprocessing: 2.050976037979126 seconds
+04/15/2025 07:43:41 PM base_class.py INFO: Received message: {'predicted_labels': ['smart_home', 'todo', 'general'], 'prompt': 'light up the living room then schedule a doctor appointment at 11 pm and whats the weather like today', 'module_name': 'task_classifier'}
+04/15/2025 07:43:41 PM preprocessing.py INFO: Label: smart_home
+04/15/2025 07:43:42 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'smart_home', 'switch': ['switch_1'], 'status': ['on'], 'module_name': 'preprocessing'}
+04/15/2025 07:43:42 PM preprocessing.py INFO: Label: todo
+04/15/2025 07:43:43 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'todo', 'list_all_tasks': False, 'object_type': 'task', 'action': 'insert', 'new_task_name': 'Schedule doctor appointment', 'due_date': '2025-04-15T23:00:00', 'module_name': 'preprocessing'}
+04/15/2025 07:43:43 PM preprocessing.py INFO: Label: general
+04/15/2025 07:43:44 PM base_class.py INFO: Published result to topic 'main/main': {'method': 'general', 'query': "What's the weather like on 2025-04-15 in Cairo, Egypt?", 'topic': 'general', 'module_name': 'preprocessing'}
+04/15/2025 07:43:44 PM base_class.py INFO: Execution time for preprocessing: 2.8906965255737305 seconds
