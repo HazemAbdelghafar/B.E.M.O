@@ -24,7 +24,7 @@ if not os.path.exists(CACHE_DIR):
     os.makedirs(CACHE_DIR)
 
 # Hugging Face API settings
-API_URL = "https://api-inference.huggingface.co/models/tts_models--en--ljspeech--tacotron2-DDC_ph"
+API_URL = "https://api-inference.huggingface.co/models/coqui/tts_models/en/ljspeech/tacotron2-DDC"
 API_TOKEN = os.getenv("HF_TOKEN")
 if not API_TOKEN:
     raise ValueError("HF_TOKEN not found in environment variables. Please check your .env file.")
