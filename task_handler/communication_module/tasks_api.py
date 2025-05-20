@@ -22,7 +22,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 from utilities import BaseMQTTHandler, UserData
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(filename)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="./logging.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+)
 
 
 console_handler = logging.StreamHandler()
@@ -66,7 +72,7 @@ class TasksApi(BaseMQTTHandler):
         Returns:
             dict: The result of the task operation.
         """
-        
+
         if not isinstance(input_data, dict):
             result = {"error": "Invalid input data", "level": 2}
             logger.error(f"Error processing input data: {result}")
@@ -77,15 +83,14 @@ class TasksApi(BaseMQTTHandler):
             except Exception as e:
                 logger.error(f"Error processing input data: {e}")
                 result = {"error": str(e), "level": 2}
-        
+
         if isinstance(result, list):
             result = {"result_list": result}
-        
+
         self.publish_result(result, "task_handler/main")
-        
+
         return None
 
-        
     # Task Lists
     ####################################################################################################
 
@@ -226,7 +231,7 @@ class TasksApi(BaseMQTTHandler):
                 response = self._delete_task_list_by_id(id)
                 responses.append(response)
                 if all(responses):
-                    return  {"success": True}
+                    return {"success": True}
                 else:
                     return None
         else:
@@ -487,6 +492,12 @@ class TasksApi(BaseMQTTHandler):
                     else:
                         return_list[-1]["parent_title"] = None
 
+                    if return_list[-1]["notes"]:
+                        # Remove the default note from the notes
+                        return_list[-1]["notes"] = return_list[-1]["notes"].replace(
+                            DEFAULT_NOTE, ""
+                        )
+
             return return_list
         else:
             return None
@@ -591,6 +602,12 @@ class TasksApi(BaseMQTTHandler):
                         )["title"]
                     else:
                         return_list[-1]["parent_title"] = None
+
+                    if return_list[-1]["notes"]:
+                        # Remove the default note from the notes
+                        return_list[-1]["notes"] = return_list[-1]["notes"].replace(
+                            DEFAULT_NOTE, ""
+                        )
 
             return return_list
 
@@ -828,7 +845,6 @@ class TasksApi(BaseMQTTHandler):
             "last_updated": response["last_updated"],
             "last_updated_relative": response["last_updated_relative"],
         }
-
 
     # Tasks (Move)
     ####################################################################################################
@@ -1074,25 +1090,36 @@ class TasksApi(BaseMQTTHandler):
         if not due_date:
             year = month = day = hour = minute = second = 0
 
-        
-        if object_type == "list":                
+        if object_type == "list":
             if action == "list":
                 result = self.list_task_lists_all()
-                return result if result else {"error": "No task lists found", "level": 1}
+                return (
+                    result if result else {"error": "No task lists found", "level": 1}
+                )
             elif action == "insert":
                 result = self.insert_task_list(new_list_name)
-                return result if result else {"error": "Task list not inserted", "level": 2}
+                return (
+                    result
+                    if result
+                    else {"error": "Task list not inserted", "level": 2}
+                )
             elif action == "update":
                 result = self.update_task_lists_by_name(list_name, new_list_name)
-                return result if result else {"error": "Task list not updated", "level": 2}
+                return (
+                    result if result else {"error": "Task list not updated", "level": 2}
+                )
             elif action == "remove":
                 result = self.delete_task_lists_by_name(list_name)
-                return result if result else {"error": "Task list not deleted", "level": 2}
+                return (
+                    result if result else {"error": "Task list not deleted", "level": 2}
+                )
             elif action == "get":
                 result = self.get_task_lists_by_name(list_name)
-                return result if result else {"error": "Task list not found", "level": 1}
+                return (
+                    result if result else {"error": "Task list not found", "level": 1}
+                )
 
-        elif object_type == "task":                
+        elif object_type == "task":
             if action == "list":
                 result = self.list_tasks_by_task_list_name(list_name, max_results)
                 return result if result else {"error": "No tasks found", "level": 1}
@@ -1134,6 +1161,7 @@ class TasksApi(BaseMQTTHandler):
                 return result if result else {"error": "Task not found", "level": 1}
 
         return {"error": "Invalid action or object type", "level": 2}
+
 
 if __name__ == "__main__":
     tasks_api = TasksApi("0")
