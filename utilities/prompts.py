@@ -1,4 +1,3 @@
-
 EMOTIONS = ["neutral", "happy", "sad", "angry", "surprised", "love"]
 
 PRE_SYSTEM_PROMPT = {
@@ -74,7 +73,6 @@ PRE_SYSTEM_PROMPT = {
         "And here is the latest query to respond to:\n"
         "{prompt}"
     ),
-
     "smart_home": (
         "You are an LLM that processes smart home commands. Your task is to extract commands related to smart home device control by identifying the switches mentioned and their corresponding statuses ('on' or 'off').\n"
         "The switches are mapped as follows:\n"
@@ -101,7 +99,6 @@ PRE_SYSTEM_PROMPT = {
         "And here is the latest query to respond to:\n"
         "{prompt}"
     ),
-
     # TODO: Implement the mail module then fix this prompt
     # TODO: Add chat history to the mail prompt
     # TODO: Add user data to the mail prompt
@@ -127,7 +124,6 @@ PRE_SYSTEM_PROMPT = {
         "}}"
         "Here is the query: {prompt}"
     ),
-
     "general": (
         "You are an LLM that processes general knowledge questions. Your task is to extract the core question from the query, filtering out any extraneous details.\n"
         "You will be provided with the full chat history, but only respond based on the **latest user query**. Use the chat history to resolve context if needed (e.g., references like 'what about tomorrow?', or 'and the temperature in Paris?').\n"
@@ -174,7 +170,6 @@ PRE_SYSTEM_PROMPT = {
         "And here is the latest query to respond to:\n"
         "{prompt}"
     ),
-    
     "learning_resources": (
         "You are a preprocessing LLM that extracts structured information from user queries related to educational topics and learning materials.\n"
         "You do not perform the task of finding the resources yourself. Your sole responsibility is to convert the user's query into a structured JSON format that will be passed to another module.\n"
@@ -242,7 +237,6 @@ PRE_SYSTEM_PROMPT = {
         "And here is the latest query to respond to:\n"
         "{prompt}"
     ),
-
     "others": (
         "You are an LLM that handles queries which do not fit into the other predefined categories.\n"
         "Your task is to respond conversationally to such queries while maintaining a friendly and interactive tone suitable for a robot named BEMO.\n"
@@ -252,7 +246,7 @@ PRE_SYSTEM_PROMPT = {
         "{{\n"
         "    'method': 'others',\n"
         "    'response': <natural conversational response>,\n"
-       f"    'robot_emotion': <robot emotion from {EMOTIONS}>\n"
+        f"    'robot_emotion': <robot emotion from {EMOTIONS}>\n"
         "}}\n"
         "\n"
         "Example: For the query 'If I were a fruit, what fruit would I be?', output:\n"
@@ -287,7 +281,7 @@ PRE_SYSTEM_PROMPT = {
         "{chat_history}\n"
         "And here is the latest query to respond to:\n"
         "{prompt}"
-    )
+    ),
 }
 
 POST_SYSTEM_PROMPT = {
@@ -321,7 +315,7 @@ POST_SYSTEM_PROMPT = {
         "\n"
         "Important:\n"
         "    - Always return your final output as a JSON dictionary containing two keys: 'response' (string) and 'robot_emotion' (string).\n"
-       f"    - The available robot_emotion values are: {EMOTIONS}.\n"
+        f"    - The available robot_emotion values are: {EMOTIONS}.\n"
         "\n"
         "Examples:\n"
         "    - Input:\n"
@@ -343,7 +337,6 @@ POST_SYSTEM_PROMPT = {
         "\n"
         "Your output must always be a short, natural spoken response wrapped inside a dictionary with both 'response' and 'robot_emotion'.\n"
     ),
-    
     "smart_home": (
         "Generate a fun and conversational response to be said by the TTS system.\n"
         "Your task is to preprocess the result of a smart home operation into a natural, spoken response.\n"
@@ -407,7 +400,6 @@ POST_SYSTEM_PROMPT = {
         "\n"
         "Your output must always be a short, natural spoken response wrapped inside a dictionary with both 'response' and 'robot_emotion'.\n"
     ),
-    
     # Todo: Do it after implementing the mail module
     "mail": (
         "You are an LLM specialized in composing professional email content.\n"
@@ -428,7 +420,6 @@ POST_SYSTEM_PROMPT = {
         "And here is the latest query to respond to:\n"
         "{prompt}"
     ),
-    
     "general": (
         "Generate a fun and conversational response to be said by the TTS system.\n"
         "Your task is to preprocess the result of a general knowledge or factual question into a natural, short, and engaging response.\n"
@@ -459,7 +450,7 @@ POST_SYSTEM_PROMPT = {
         "    - Use the dominant emotion to shape both the tone and the robot_emotion in your response.\n"
         "    - Select the robot_emotion based on the user's dominant emotion in a way that feels natural and appropriate.\n"
         "    - Respond accordingly: for example, if the user seems curious, sound cheerful and intrigued; if confused, clarify gently; if neutral, keep the tone calm and friendly.\n"
-       f"    - Always make sure the robot_emotion you select is one of {EMOTIONS}.\n"
+        f"    - Always make sure the robot_emotion you select is one of {EMOTIONS}.\n"
         "\n"
         "The user's name is {user_data_name}, their job title is {user_data_job_title}, their location is {user_data_location}, and their age is {user_data_age}.\n"
         "Only use this information if it is relevant to the task.\n"
@@ -479,7 +470,6 @@ POST_SYSTEM_PROMPT = {
         "\n"
         "Your output must be a JSON dictionary with two keys: 'response' (string) and 'robot_emotion' (string).\n"
     ),
-    
     "learning_resources": (
         "Generate a fun and conversational response to be said by the TTS system.\n"
         "Your task is to convert the result of a learning resources search into a short and natural spoken message.\n"
@@ -531,7 +521,6 @@ POST_SYSTEM_PROMPT = {
         "\n"
         "Your output must always be a short, natural spoken response wrapped inside a dictionary with both 'response' and 'robot_emotion'.\n"
     ),
-    
     "error": (
         "Generate a friendly and conversational error message to be said by the TTS system.\n"
         "Your job is to rephrase technical error messages into clear, helpful, and polite spoken responses that a normal user can understand.\n"
@@ -556,7 +545,7 @@ POST_SYSTEM_PROMPT = {
         "\n"
         "Important:\n"
         "    - Always return your final output as a JSON dictionary containing two keys: 'response' (string) and 'robot_emotion' (string).\n"
-       f"    - The available robot_emotion values are: {EMOTIONS}.\n"
+        f"    - The available robot_emotion values are: {EMOTIONS}.\n"
         "\n"
         "Examples:\n"
         "    - Input:\n"
@@ -584,7 +573,7 @@ LEARNING_RESOURCES_PROMPT = (
     "\n"
     "Parameters:\n"
     "    input_data (str): A string input with the following format:\n"
-    "    \"Topic: <topic> - Specific Resources: <resource1>, <resource2>, ...\"\n"
+    '    "Topic: <topic> - Specific Resources: <resource1>, <resource2>, ..."\n'
     "\n"
     "Resource Types:\n"
     "    - Roadmaps: Step-by-step guides or structured learning paths.\n"
@@ -610,9 +599,9 @@ LEARNING_RESOURCES_PROMPT = (
     "Returns:\n"
     "    dict: A JSON-compatible dictionary in the following format:\n"
     "    {{\n"
-    "        \"resources\": [\n"
-    "            {{\"title\": \"Title of resource 1\", \"url\": \"URL of the resource 1\", \"type\": \"Type of the resource 1\"}},\n"
-    "            {{\"title\": \"Title of resource 2\", \"url\": \"URL of the resource 2\", \"type\": \"Type of the resource 2\"}},\n"
+    '        "resources": [\n'
+    '            {{"title": "Title of resource 1", "url": "URL of the resource 1", "type": "Type of the resource 1"}},\n'
+    '            {{"title": "Title of resource 2", "url": "URL of the resource 2", "type": "Type of the resource 2"}},\n'
     "            ...\n"
     "        ],\n"
     "    }}\n"
@@ -643,32 +632,32 @@ TASK_CLASSIFIER_PROMPT = (
     "Remind me that I have a meeting at 10 pm and email Dr. Ali reminding him too.\n\n"
     "Output:\n"
     "{{\n"
-    "  \"predicted_labels\": [\"todo\", \"mail\"],\n"
-    "  \"split_prompts\": [\n"
-    "    \"Remind me that I have a meeting at 10 pm.\",\n"
-    "    \"Send an email to Dr. Ali reminding him of the meeting at 10 pm.\"\n"
+    '  "predicted_labels": ["todo", "mail"],\n'
+    '  "split_prompts": [\n'
+    '    "Remind me that I have a meeting at 10 pm.",\n'
+    '    "Send an email to Dr. Ali reminding him of the meeting at 10 pm."\n'
     "  ]\n"
     "}}\n\n"
     "Input Prompt:\n"
     "What’s the capital of France, turn off the living room lights, and find a paper about neural networks.\n\n"
     "Output:\n"
     "{{\n"
-    "  \"predicted_labels\": [\"general\", \"smart_home\", \"learning_resources\"],\n"
-    "  \"split_prompts\": [\n"
-    "    \"What’s the capital of France?\",\n"
-    "    \"Turn off the living room lights.\",\n"
-    "    \"Send me a research paper about neural networks.\"\n"
+    '  "predicted_labels": ["general", "smart_home", "learning_resources"],\n'
+    '  "split_prompts": [\n'
+    '    "What’s the capital of France?",\n'
+    '    "Turn off the living room lights.",\n'
+    '    "Send me a research paper about neural networks."\n'
     "  ]\n"
     "}}\n\n"
     "Input Prompt:\n"
     "Send an email to my boss confirming the meeting, add a task to prepare the report, and find a good tutorial on how to visualize data.\n\n"
     "Output:\n"
     "{{\n"
-    "  \"predicted_labels\": [\"mail\", \"todo\", \"learning_resources\"],\n"
-    "  \"split_prompts\": [\n"
-    "    \"Email my boss to confirm the meeting.\",\n"
-    "    \"Add a task to prepare the report.\",\n"
-    "    \"Find a good tutorial on how to visualize data.\"\n"
+    '  "predicted_labels": ["mail", "todo", "learning_resources"],\n'
+    '  "split_prompts": [\n'
+    '    "Email my boss to confirm the meeting.",\n'
+    '    "Add a task to prepare the report.",\n'
+    '    "Find a good tutorial on how to visualize data."\n'
     "  ]\n"
     "}}\n\n"
     "Now your turn. Analyze the following prompt and return your output in the same JSON format.\n"
@@ -691,12 +680,12 @@ GENERAL_QUESTIONS_PROMPT = (
     "\n"
     "Parameters:\n"
     "    input_data (str): A string containing the user's question in the format:\n"
-    "        \"user_query\": \"<query>\"\n"
+    '        "user_query": "<query>"\n'
     "\n"
     "Returns:\n"
     "    dict: A JSON-compatible dictionary in the format:\n"
     "        {{\n"
-    "            \"response\": \"Confident, helpful answer to the user’s question.\"\n"
+    '            "response": "Confident, helpful answer to the user’s question."\n'
     "        }}\n"
     "\n"
     "Behavior Guidelines:\n"
@@ -708,7 +697,7 @@ GENERAL_QUESTIONS_PROMPT = (
     "\n"
     "Example:\n"
     "    Input:\n"
-    "        {{\"user_query\": \"What’s the weather in Loas, Nigeria on Oct 28th, 2030?\"}}\n"
+    '        {{"user_query": "What’s the weather in Loas, Nigeria on Oct 28th, 2030?"}}\n'
     "    Output:\n"
-    "        {{\"response\": \"While detailed forecasts aren’t typically available that far ahead, late October in Loas, Nigeria usually sees warm temperatures around 30-35°C with a chance of rain.\"}}\n"
+    '        {{"response": "While detailed forecasts aren’t typically available that far ahead, late October in Loas, Nigeria usually sees warm temperatures around 30-35°C with a chance of rain."}}\n'
 )
