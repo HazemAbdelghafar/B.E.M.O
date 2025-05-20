@@ -1,7 +1,7 @@
 import os
 import pickle
 
-from smtplib import SMTP_SSL 
+from smtplib import SMTP_SSL
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -10,7 +10,13 @@ from scopes import SCOPES
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(filename)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="./logging.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+)
 
 
 console_handler = logging.StreamHandler()
@@ -26,6 +32,7 @@ SMTP_HOSTS = {
     "yahoo": "smtp.mail.yahoo.com",
 }
 SMTP_PORT = 465
+
 
 def new_user_google(id: str) -> Credentials:
     """
@@ -49,7 +56,8 @@ def new_user_google(id: str) -> Credentials:
 
     auth_url, _ = flow.authorization_url(prompt="consent")
 
-    logger.info("Please go to this URL if you are not redirected: ", auth_url)
+    logger.info("Please go to this URL if you are not redirected: ")
+    logger.info(str(auth_url))
 
     creds = flow.run_local_server(
         open_browser=True,
@@ -104,9 +112,9 @@ def init_user_google(id: str) -> Credentials:
 
     return creds
 
+
 # Test the functions
 if __name__ == "__main__":
     input = input("Enter your user id: ")
     creds = init_user_google(input)
     logger.info(creds)
-    
