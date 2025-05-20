@@ -1,3 +1,4 @@
 pyttsx3==2.98
 gtts==2.5.4
 pygame==2.6.1
+elevenlabs==0.2.24 
