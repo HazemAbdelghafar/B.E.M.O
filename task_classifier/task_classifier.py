@@ -26,31 +26,38 @@ NAME = "task_classifier"
 SUB_TOPIC = "task_classifier/prompt"
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(filename)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="./logging.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+)
 
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
+
 
 class TaskClassifier(BaseMQTTHandler):
     """
     TaskClassifier is a class for classifying tasks based on a given prompt.
     """
-    
-    def __init__(self, use_llm: bool = True):
 
+    def __init__(self, use_llm: bool = True):
         """
         Initialize the TaskClassifier object.
         """
-        
+
         # Initialize the BaseMQTTHandler object
         super().__init__(SUB_TOPIC, NAME)
-        
-        
+
         self.use_llm = use_llm
 
         if self.use_llm:
             # Initialize the LLM model here if needed
-            os.environ["GOOGLE_API_KEY"] = dotenv_values(find_dotenv())["GEMINI_API_KEY_TEST"] #! Test
+            os.environ["GOOGLE_API_KEY"] = dotenv_values(find_dotenv())[
+                "GEMINI_API_KEY_TEST"
+            ]  #! Test
             self.__llm = ChatGoogleGenerativeAI(
                 model="gemini-1.5-flash",
                 temperature=0,
@@ -84,7 +91,7 @@ class TaskClassifier(BaseMQTTHandler):
                 ("placeholder", "{messages}"),
             ]
         )
-        
+
     def _init_chain(self) -> chain:
         """
         Initializes the chain of runnables for the LLM to generate responses
@@ -98,24 +105,22 @@ class TaskClassifier(BaseMQTTHandler):
         """
         return self.__prompt | self.__llm
 
-
-        
     def execute_main(self, input_data: dict) -> dict:
         """
         Executes the main functionality of the class.
-        
+
         Args:
             input_data (dict): The input data to process.
-        
+
         Returns:
             dict: The result of the classification.
         """
-        prompt = input_data.get("prompt") # Get the prompt from the input data
+        prompt = input_data.get("prompt")  # Get the prompt from the input data
         if not prompt:
             return {"error": "Prompt not provided", "level": 1}
-        
-        prompt = self.preprocess_prompt(prompt) # Preprocess the prompt
-        
+
+        prompt = self.preprocess_prompt(prompt)  # Preprocess the prompt
+
         if self.use_llm:
 
             @chain
@@ -132,12 +137,12 @@ class TaskClassifier(BaseMQTTHandler):
                     raise ValueError("Error parsing LLM output") from e
 
                 return parsed_output
-            
+
             try:
                 result = tool_chain.invoke(prompt)
             except Exception as e:
                 return {"error": str(e), "level": 2}
-            
+
             labels = result.get("predicted_labels")
             if not labels:
                 return {"error": "No labels found in the response", "level": 2}
@@ -146,49 +151,51 @@ class TaskClassifier(BaseMQTTHandler):
                 return {"error": "No prompts found in the response", "level": 2}
             if len(labels) != len(prompts):
                 return {"error": "Mismatch between labels and prompts", "level": 2}
-            
+
             # Create a dictionary to store the results
             result_dict = {"predicted_labels": labels, "split_prompts": prompts}
-            
+
             return result_dict
 
         else:
             try:
-                prediction = self.__model.predict([prompt])[0] # Make a prediction using the model
-                
+                prediction = self.__model.predict([prompt])[
+                    0
+                ]  # Make a prediction using the model
+
                 # Get the predicted labels based on the prediction
-                predicted_labels = [self.__labels[i] for i, val in enumerate(prediction) if val == 1]
+                predicted_labels = [
+                    self.__labels[i] for i, val in enumerate(prediction) if val == 1
+                ]
             except Exception as e:
                 return {"error": str(e), "level": 2}
-                
+
             # Return the predicted labels
             return {"predicted_labels": predicted_labels}
-        
+
     def preprocess_prompt(self, prompt: str) -> str:
         """
         Preprocess the prompt for classification.
-        
+
         Args:
             prompt (str): The prompt to preprocess.
-        
+
         Returns:
             str: The preprocessed prompt.
         """
-        
+
         # Remove punctuation
-        prompt = prompt.translate(str.maketrans('', '', string.punctuation))
-        
+        prompt = prompt.translate(str.maketrans("", "", string.punctuation))
+
         # Lowercase
         prompt = prompt.lower()
-                        
+
         # Remove extra spaces
         prompt = " ".join(prompt.split())
-        
+
         return prompt
-            
+
+
 if __name__ == "__main__":
     tc = TaskClassifier()
     tc.start_mqtt()
-
-
-

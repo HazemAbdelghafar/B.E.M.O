@@ -5,14 +5,17 @@ import json
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s',
-                    datefmt='%m/%d/%Y %I:%M:%S %p',
-                    filename='./logging.log',
-                    encoding='utf-8',
-                    level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(filename)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="./logging.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+)
 
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
+
 
 # Todo: Add Threading
 class BaseMQTTHandler:
@@ -28,35 +31,39 @@ class BaseMQTTHandler:
             sub_topic (str): MQTT topic to subscribe to.
             name (str): Name for the MQTT client.
         """
-        
+
         # Define the broker address and port
         BROKER = "localhost"
         PORT = 1883
         SERVER_PUB_TOPIC = "main/main"
 
         self._result = {}  # Initialize the result variable
-        
+
         # Set the input and output topics and the name of the MQTT client
-        self.__pub_topic = SERVER_PUB_TOPIC 
+        self.__pub_topic = SERVER_PUB_TOPIC
         self.__sub_topic = sub_topic
         self.__name = name
         self.__qos = 1  # Quality of Service level
-        
+
         # Create a new MQTT client instance
         try:
             self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, self.__name)
         except Exception:
             self.client = mqtt.Client(self.__name)
-        
+
         self.client.on_message = self.__callback  # Set the on_message callback function
-        self.client.on_connect = self.__on_connect  # Set the on_connect callback function
-    
+        self.client.on_connect = (
+            self.__on_connect
+        )  # Set the on_connect callback function
+
         self.client.connect(BROKER, PORT, 60)  # Connect to the broker
-        
-        self.client.subscribe(self.__sub_topic, self.__qos) # Subscribe to the input topic
+
+        self.client.subscribe(
+            self.__sub_topic, self.__qos
+        )  # Subscribe to the input topic
 
         logger.info(f"{self.__name} initialized successfully!")
-    
+
     def __built_in_run(self, input_data: dict):
         """
         Executes the main functionality of the class.
@@ -71,13 +78,13 @@ class BaseMQTTHandler:
             logger.error(f"Error in executing main function: {e}")
             self._result = {"error": str(e), "level": 2}
         end = time.time()  # End the timer
-        
+
         logger.info(f"Execution time for {self.__name}: {end - start} seconds")
-        
+
         # Publish the result after execution
         if self._result:
             self.publish_result(self._result)
-        
+
     def __on_connect(self, client: mqtt.Client, userdata: any, flags: dict, rc: int):
         """
         Callback function for when the client connects to the broker.
@@ -93,7 +100,7 @@ class BaseMQTTHandler:
         else:
             logger.error(f"Failed to connect, return code {rc}")
             is_connected = False
-            
+
             while not is_connected:
                 # Try to reconnect if the connection fails
                 try:
@@ -105,9 +112,11 @@ class BaseMQTTHandler:
                 else:
                     is_connected = True
                     logger.info("Reconnected to broker!")
-                    self.client.subscribe(self.__sub_topic, self.__qos)  # Resubscribe to the topic
+                    self.client.subscribe(
+                        self.__sub_topic, self.__qos
+                    )  # Resubscribe to the topic
                     logger.info(f"Subscribed to topic '{self.__sub_topic}'")
-    
+
     def __callback(self, client: mqtt.Client, userdata: any, msg: mqtt.MQTTMessage):
         """
         Callback function for when a message is received.
@@ -126,7 +135,7 @@ class BaseMQTTHandler:
             input_data_parsed = literal_eval(input_data)
         except:
             input_data_parsed = json.loads(input_data)
-            
+
         logger.info(f"Received message: {input_data_parsed}")
 
         # Run the built-in function in a separate thread
@@ -144,7 +153,7 @@ class BaseMQTTHandler:
             dict: The result of the main function.
         """
         raise NotImplementedError("This method should be overridden by child classes.")
-    
+
     def get_result(self) -> dict:
         """
         Returns the result of the last executed main function.
@@ -153,7 +162,7 @@ class BaseMQTTHandler:
             dict: The result of the last executed main function.
         """
         return self._result
-    
+
     def publish_result(self, result: dict, topic: str = None):
         """
         Publishes the result to the specified MQTT topic.
@@ -172,9 +181,9 @@ class BaseMQTTHandler:
             except Exception as e:
                 logger.error(f"Error publishing result: {e}")
                 return
-            
+
             logger.info(f"Published result to topic '{topic}': {str_result}")
-    
+
     def start_mqtt(self):
         """
         Starts the MQTT client loop.

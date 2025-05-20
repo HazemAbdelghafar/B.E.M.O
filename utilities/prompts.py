@@ -162,6 +162,8 @@ PRE_SYSTEM_PROMPT = {
         "- If the user doesn't provide a location but asks something like 'what's the weather like?', 'any events happening nearby?', or 'what’s popular to visit?', you must assume they mean their current location and rewrite the question to explicitly include {user_data_location}.\n"
         "- The user's location is the default location unless the user specifies otherwise.\n"
         "- If the user asks something like 'Is it normal to feel tired at my age?', use their age to clarify the question.\n"
+        "- You can combine the user's location and the current date to make the question more specific.\n"
+        "- For example, if the user asks 'what's the weather like tomorrow?', you can rewrite it as 'what's the weather like in {user_data_location} on <tomorrow's date>?'\n"
         "\n"
         "Your output should be a well-structured JSON object suitable for processing.\n"
         "\n"

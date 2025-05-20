@@ -18,7 +18,7 @@ ERROR_RESPONSES = [
     "Oh no, I couldn't complete that. Let me know how I can help.",
     "Oops, I got stuck. Want to check and try again?",
     "Hmm, that's on me. How about we try a different approach?",
-    "Something didn't work out. Let's retry and get it right!"
+    "Something didn't work out. Let's retry and get it right!",
 ]
 
 AUTH_RESPONSES = [
@@ -31,7 +31,7 @@ AUTH_RESPONSES = [
     "Let's get you in! Face the camera, please!",
     "I’m ready when you are — just look at the camera!",
     "Almost there! Just need you to face the camera!",
-    "Please show me your face to get started!"
+    "Please show me your face to get started!",
 ]
 
 NO_FACE_RESPONSES = [
@@ -44,7 +44,7 @@ NO_FACE_RESPONSES = [
     "Still waiting to catch your face. Give me a good look!",
     "No face showing up! Maybe adjust your position a little?",
     "I'm scanning, but I need your face right in front of me!",
-    "Almost there, but I still can't see you clearly!"
+    "Almost there, but I still can't see you clearly!",
 ]
 
 NO_FACE_RESPONSES_FINAL = [
@@ -57,7 +57,7 @@ NO_FACE_RESPONSES_FINAL = [
     "Still couldn't spot you. We'll have to pause for now!",
     "Face not found after several attempts. Let's pick this up later!",
     "I couldn't detect you, buddy. Try again when you're ready!",
-    "No face found after multiple tries. I'll be waiting when you come back!"
+    "No face found after multiple tries. I'll be waiting when you come back!",
 ]
 
 
@@ -76,7 +76,7 @@ BAD_FACE_RESPONSES = [
     "I see someone sneaky, but it’s not you, my friend!",
     "Hmm, that face doesn’t match, partner. Are you sure it's you?",
     "Not the right face, champ! You sure you're the one I'm looking for?",
-    "Impostor detected, buddy! Just kidding, but you're not the one I'm looking for!"
+    "Impostor detected, buddy! Just kidding, but you're not the one I'm looking for!",
 ]
 
 BAD_FACE_RESPONSES_FINAL = [
@@ -89,7 +89,7 @@ BAD_FACE_RESPONSES_FINAL = [
     "Repeated face detection failures. You are blocked from making further requests for 15 minutes.",
     "Too many unsuccessful attempts. A 15-minute block has been applied to your requests.",
     "Suspicious activity detected. Requests are blocked for the next 15 minutes.",
-    "Access denied due to multiple failed attempts. You are blocked for 15 minutes."
+    "Access denied due to multiple failed attempts. You are blocked for 15 minutes.",
 ]
 
 BLOCKED_RESPONSES = [
@@ -102,7 +102,5 @@ BLOCKED_RESPONSES = [
     "Currently unable to connect to your robot. The access is blocked for now.",
     "Your robot is temporarily out of reach due to restrictions. Please try again later.",
     "The robot is blocked from access right now. Please wait and try again soon.",
-    "Connection to your robot is temporarily blocked. You’ll need to wait before trying again."
+    "Connection to your robot is temporarily blocked. You’ll need to wait before trying again.",
 ]
-
-

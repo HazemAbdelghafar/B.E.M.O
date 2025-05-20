@@ -27,10 +27,17 @@ DEFAULT_PATH = os.path.dirname(__file__)
 random.seed(time.time())
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(filename)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="./logging.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+)
 
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
+
 
 class FindLearningResources(BaseMQTTHandler):
     """
@@ -59,7 +66,9 @@ class FindLearningResources(BaseMQTTHandler):
             None
         """
         # Initialize BaseMQTTHandler with MQTT topics
-        super().__init__(sub_topic="task_handler/learning_resources", name="learning_resources")
+        super().__init__(
+            sub_topic="task_handler/learning_resources", name="learning_resources"
+        )
 
         # Set the parameters for the class
         self.use_llm = use_llm
@@ -69,10 +78,14 @@ class FindLearningResources(BaseMQTTHandler):
         self.confidence_threshold = confidence_threshold / 100
 
         # Load API keys from .env file
-        self.tavily_api_key = dotenv_values(find_dotenv())["TAVILY_API_KEY_TEST"] #! Test
+        self.tavily_api_key = dotenv_values(find_dotenv())[
+            "TAVILY_API_KEY_TEST"
+        ]  #! Test
 
         if self.use_llm:
-            self.gemini_api_key = dotenv_values(find_dotenv())["GEMINI_API_KEY_TEST"] #! Test
+            self.gemini_api_key = dotenv_values(find_dotenv())[
+                "GEMINI_API_KEY_TEST"
+            ]  #! Test
 
         # Set the API keys as environment variables
         if self.use_llm:
@@ -276,16 +289,16 @@ class FindLearningResources(BaseMQTTHandler):
         """
         topic = input_data.get("topic")
         specific_resources = input_data.get("specific_resources", [])
-        
+
         if not topic:
             logger.info("Topic is empty or not provided.")
             result = {"error": "Topic is empty or not provided.", "level": 2}
-            
+
         else:
             try:
                 result = self.find_resources(topic, specific_resources)
                 logger.info(f"Result is: {result}")
-            except Exception as e:                
+            except Exception as e:
                 # Detect if the error from the llm
                 if self.use_llm and "LLM" in str(e):
                     self.use_llm = False
@@ -301,9 +314,8 @@ class FindLearningResources(BaseMQTTHandler):
 
         # Publish the result to the MQTT topic
         self.publish_result(result, "task_handler/main")
-        
-        return None
 
+        return None
 
     def _init_prompt(self) -> ChatPromptTemplate:
         """

@@ -27,7 +27,8 @@ logging.basicConfig(
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
-AUTH_TASKS = ["todo", "mail"]
+# AUTH_TASKS = ["todo", "mail"]
+AUTH_TASKS = []  # ! For testing
 
 # Define the name of the module and the topics
 NAME = "main"

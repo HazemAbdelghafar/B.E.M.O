@@ -12,7 +12,13 @@ from utilities import BaseMQTTHandler
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(filename)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="./logging.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+)
 
 
 console_handler = logging.StreamHandler()
@@ -25,6 +31,7 @@ API_REGION = os.getenv("API_REGION")
 ACCESS_ID = os.getenv("ACCESS_ID")
 ACCESS_KEY = os.getenv("ACCESS_KEY")
 DEVICE_ID = os.getenv("DEVICE_ID")
+
 
 class SmartHomeAutomation(BaseMQTTHandler):
     """
@@ -44,12 +51,14 @@ class SmartHomeAutomation(BaseMQTTHandler):
 
         # Initialize Tuya Cloud
         self.cloud = tinytuya.Cloud(
-            apiRegion=self.API_REGION, apiKey=self.ACCESS_ID, apiSecret=self.ACCESS_KEY, apiDeviceID=self.DEVICE_ID
+            apiRegion=self.API_REGION,
+            apiKey=self.ACCESS_ID,
+            apiSecret=self.ACCESS_KEY,
+            apiDeviceID=self.DEVICE_ID,
         )
 
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/smart_home", name="smart_home")
-        
 
     def control_device(self, switch_id, status):
         """
@@ -64,7 +73,8 @@ class SmartHomeAutomation(BaseMQTTHandler):
         """
         try:
             result = self.cloud.sendcommand(
-                self.DEVICE_ID, {"commands": [{"code": switch_id, "value": status == "on"}]}
+                self.DEVICE_ID,
+                {"commands": [{"code": switch_id, "value": status == "on"}]},
             )
             return result.get("success", False)
         except Exception as e:
@@ -83,37 +93,41 @@ class SmartHomeAutomation(BaseMQTTHandler):
         """
         switches = input_data.get("switch", [])
         statuses = input_data.get("status", [])
-        
+
         if not switches or not statuses:
             logger.error("Switches or statuses are empty.")
-            self.publish_result({"error": "Switches or statuses are empty.", "level": 2}, "task_handler/main")
+            self.publish_result(
+                {"error": "Switches or statuses are empty.", "level": 2},
+                "task_handler/main",
+            )
             return None
 
         if not isinstance(switches, list) or not isinstance(statuses, list):
             switches = [switches]
             statuses = [statuses]
-            
+
         if len(switches) != len(statuses):
             logger.error("Length of switches and statuses do not match.")
             # Make them the same length
             min_length = min(len(switches), len(statuses))
             switches = switches[:min_length]
             statuses = statuses[:min_length]
-            
+
         results = []
         for switch, status in zip(switches, statuses):
             status = status.lower()
             if status not in ["on", "off"]:
                 logger.error(f"Invalid status: {status}")
                 continue
-                
+
             success = self.control_device(switch, status)
             results.append({"switch": switch, "status": status, "success": success})
 
         self.publish_result({"statuses": results}, "task_handler/main")
-        
+
         return None
+
 
 if __name__ == "__main__":
     smart_home = SmartHomeAutomation()
-    smart_home.start_mqtt() 
+    smart_home.start_mqtt()

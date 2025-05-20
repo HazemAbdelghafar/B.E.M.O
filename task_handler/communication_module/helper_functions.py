@@ -10,7 +10,13 @@ sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 from utilities import UserData
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(filename)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="./logging.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+)
 
 
 console_handler = logging.StreamHandler()

@@ -7,7 +7,13 @@ import logging
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from utilities import BaseMQTTHandler
 
-logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(filename)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="./logging.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+)
 logger = logging.getLogger(__name__)
 
 
@@ -18,13 +24,14 @@ logger.addHandler(console_handler)
 NAME = "task_handler"
 SUB_TOPIC = "task_handler/main"
 
+
 class TaskHandler(BaseMQTTHandler):
     def __init__(self):
         """
         Initialize the TaskHandler object.
         """
         super().__init__(sub_topic=SUB_TOPIC, name=NAME)
-        
+
     def execute_main(self, input_data):
         """
         Execute the main functionality of the TaskHandler class.
@@ -37,10 +44,10 @@ class TaskHandler(BaseMQTTHandler):
         """
         # Check if input_data is a list
         preprocessed_data = input_data.get("preprocessed_data")
-        
+
         if preprocessed_data:
             logger.info(f"Processing {len(preprocessed_data)} tasks")
-                        
+
             # Iterate through each item in the list
             for item in preprocessed_data:
                 method = item.get("method")
@@ -59,15 +66,15 @@ class TaskHandler(BaseMQTTHandler):
                     logger.error(f"Unknown method: {method}")
                     self.publish_result({"error": "Unknown method", "level": 1})
                     continue
-                
+
                 # Publish the input data to the appropriate topic
                 self.publish_result(item, topic)
         else:
             # if input data is not a list, send it to the main topic
             logger.info(f"Processing single task")
-                            
+
             self.publish_result({"results": input_data})
-             
+
         return None
 
 

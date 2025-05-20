@@ -16,13 +16,21 @@ from utilities import BaseMQTTHandler
 DEFAULT_PATH = os.path.dirname(__file__)
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(filename)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="./logging.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+)
 
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
+
 class ServerWebSocketClient(BaseMQTTHandler):
-    """ ServerWebSocketClient is a class for handling WebSocket communication with a server. """
+    """ServerWebSocketClient is a class for handling WebSocket communication with a server."""
+
     def __init__(self, max_retries: int = 5, retry_interval: int = 5):
         """
         Initialize the WebSocket server.
@@ -32,7 +40,7 @@ class ServerWebSocketClient(BaseMQTTHandler):
             retry_interval (int): Interval (in seconds) between connection retries.
         """
         super().__init__(sub_topic="server/main", name="server")
-        
+
         self.id = dotenv_values(find_dotenv())["SERVER_ID"]
         self.server_url = dotenv_values(find_dotenv())["URL"] + self.id
         self.ws = None
@@ -66,7 +74,9 @@ class ServerWebSocketClient(BaseMQTTHandler):
         logger.warning(f"Connection closed")
         if self.retry_count < self.max_retries:
             self.retry_count += 1
-            logger.warning(f"Attempting to reconnect ({self.retry_count}/{self.max_retries})...")
+            logger.warning(
+                f"Attempting to reconnect ({self.retry_count}/{self.max_retries})..."
+            )
             time.sleep(self.retry_interval)
             self.start_connection()
         else:
@@ -81,7 +91,7 @@ class ServerWebSocketClient(BaseMQTTHandler):
             on_open=self.on_open,
             on_message=self.on_message,
             on_error=self.on_error,
-            on_close=self.on_close
+            on_close=self.on_close,
         )
 
         thread = threading.Thread(target=ws.run_forever)
@@ -131,7 +141,7 @@ class ServerWebSocketClient(BaseMQTTHandler):
         """
         thread_name = threading.current_thread().name
         logger.info(f"[{thread_name}] Publishing message: {message}")
-        
+
         # Convert message to JSON
         try:
             data = json.loads(message)
@@ -139,11 +149,11 @@ class ServerWebSocketClient(BaseMQTTHandler):
         except json.JSONDecodeError:
             logger.error(f"[{thread_name}] Invalid JSON format")
             return
-        
-        self.publish_result(data) # Publish the result to the MQTT broker
-        
+
+        self.publish_result(data)  # Publish the result to the MQTT broker
+
         logger.info(f"[{thread_name}] Published message: {message}")
-        
+
     def execute_main(self, input_data: dict):
         """
         Execute the main function of the class.
@@ -157,7 +167,7 @@ class ServerWebSocketClient(BaseMQTTHandler):
         """
         self.send_data(input_data)
         return None
-        
+
 
 if __name__ == "__main__":
     server_client = ServerWebSocketClient()

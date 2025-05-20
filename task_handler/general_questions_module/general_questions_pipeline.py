@@ -20,47 +20,58 @@ load_dotenv()
 DEFAULT_PATH = os.path.dirname(__file__)
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s %(filename)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', filename='./logging.log', encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(
+    format="%(asctime)s %(filename)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %I:%M:%S %p",
+    filename="./logging.log",
+    encoding="utf-8",
+    level=logging.DEBUG,
+)
 
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
+
 
 class GeneralQuestions(BaseMQTTHandler):
     """
     GeneralQuestions is a class for handling general knowledge or factual queries.
     """
 
-    def __init__(self,
-                use_llm: bool = True,
-                max_results_per_type: int = 5,
-                check_status_code: bool = False,
-                clean_resources: bool = True,
-                confidence_threshold: int = 80):
+    def __init__(
+        self,
+        use_llm: bool = True,
+        max_results_per_type: int = 5,
+        check_status_code: bool = False,
+        clean_resources: bool = True,
+        confidence_threshold: int = 80,
+    ):
         """
         Initialize the GeneralQuestions object.
         """
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/general", name="general")
-        
-        
+
         self.use_llm = use_llm
         self.max_results_per_type = max_results_per_type
         self.check_status_code = check_status_code
         self.clean_resources = clean_resources
         self.confidence_threshold = confidence_threshold / 100
-        
-        self.__tavily_api_key = os.getenv("TAVILY_API_KEY_TEST") #! Change API key at deployment
+
+        self.__tavily_api_key = os.getenv(
+            "TAVILY_API_KEY_TEST"
+        )  #! Change API key at deployment
         self.tavily_temp = TavilyClient(api_key=self.__tavily_api_key)
-        
+
         if self.use_llm:
-            self.__gemini_api_key = os.getenv("GEMINI_API_KEY_TEST") #! Change API key at deployment
-                  
+            self.__gemini_api_key = os.getenv(
+                "GEMINI_API_KEY_TEST"
+            )  #! Change API key at deployment
+
         # Set the API keys as environment variables
         if self.use_llm:
             os.environ["TAVILY_API_KEY"] = self.__tavily_api_key
             os.environ["GOOGLE_API_KEY"] = self.__gemini_api_key
-        
-        
+
         # Initialize the Tavily and Google Chat API
         if self.use_llm:
             self.tavily = TavilySearchResults(
@@ -73,16 +84,15 @@ class GeneralQuestions(BaseMQTTHandler):
                 exclude_domains=[],
             )
 
-
         if self.use_llm:
             self.llm = ChatGoogleGenerativeAI(
                 model="gemini-1.5-flash",
                 temperature=0,
                 max_tokens=None,
                 timeout=None,
-                max_retries=2
+                max_retries=2,
             )
-            
+
         if self.use_llm:
             self.prompt: ChatPromptTemplate = self._init_prompt()
 
@@ -104,12 +114,14 @@ class GeneralQuestions(BaseMQTTHandler):
         return cleaned_answer
 
     def _init_prompt(self) -> ChatPromptTemplate:
-        return ChatPromptTemplate.from_messages([
-        ("system", GENERAL_QUESTIONS_PROMPT),
-        ("human", "{user_input}"),
-        ("placeholder", "{messages}")
-    ])
-        
+        return ChatPromptTemplate.from_messages(
+            [
+                ("system", GENERAL_QUESTIONS_PROMPT),
+                ("human", "{user_input}"),
+                ("placeholder", "{messages}"),
+            ]
+        )
+
     def _init_chain(self) -> chain:
         """
         Initializes the chain of runnables for the LLM to generate responses
@@ -137,29 +149,34 @@ class GeneralQuestions(BaseMQTTHandler):
         """
         query = input_data.get("query")
         topic = input_data.get("topic", "general")
-        
+
         if not query:
             logger.error("Query is empty or not provided.")
             result = {"error": "Query is empty or not provided.", "level": 2}
 
         else:
+
             @chain
             def tool_chain(user_input: str, config: RunnableConfig):
                 input_ = {"user_input": user_input}
                 try:
-                    ai_msg = self.chain.invoke(input_, config=config)                   
+                    ai_msg = self.chain.invoke(input_, config=config)
                     tool_msgs = self.tavily.batch(ai_msg.tool_calls, config=config)
-                    tavily_response = self.chain.invoke({**input_, "messages": [ai_msg, *tool_msgs]}, config=config)
+                    tavily_response = self.chain.invoke(
+                        {**input_, "messages": [ai_msg, *tool_msgs]}, config=config
+                    )
 
-                    return {'response': tavily_response.content}
-                    
+                    return {"response": tavily_response.content}
+
                 except Exception as e:
                     response = {"error": str(e)}
                     return response
-                
+
             if self.use_llm == False:
                 try:
-                    response = self.tavily_temp.search(query, include_answer=True, topic=topic)
+                    response = self.tavily_temp.search(
+                        query, include_answer=True, topic=topic
+                    )
                     logger.info(f"Response from Tavily API: {response}")
                 except Exception as e:
                     logger.error(f"Error in Tavily API: {e}")
@@ -173,7 +190,7 @@ class GeneralQuestions(BaseMQTTHandler):
                     }
             else:
                 try:
-                    input_ = (f"{{\"user_query\": \"{query}\"}}")
+                    input_ = f'{{"user_query": "{query}"}}'
                     response = tool_chain.invoke(input_)
                     logger.info(f"Response from Tavily API: {response}")
                 except Exception as e:
@@ -187,11 +204,12 @@ class GeneralQuestions(BaseMQTTHandler):
                         "topic": topic,
                     }
 
-
-            if result.get('answer','') == '':
+            if result.get("answer", "") == "":
                 self.use_llm = False
                 try:
-                    response = self.tavily_temp.search(query, include_answer=True, topic=topic)
+                    response = self.tavily_temp.search(
+                        query, include_answer=True, topic=topic
+                    )
                     logger.info(f"Response from Tavily API: {response}")
                 except Exception as e:
                     logger.error(f"Error in Tavily API: {e}")
@@ -203,10 +221,11 @@ class GeneralQuestions(BaseMQTTHandler):
                         "answer": answer,
                         "topic": topic,
                     }
-     
+
         self.publish_result(result, "task_handler/main")
-        
+
         return None
+
 
 if __name__ == "__main__":
     general_questions = GeneralQuestions()
