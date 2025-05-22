@@ -1,0 +1,49 @@
+Timing Analysis Results:
+--------------------------------------------------
+PRE:
+  Average time: 1.295 seconds
+  Min time: 0.000 seconds
+  Max time: 6.162 seconds
+  Standard deviation: 0.809 seconds
+
+POST:
+  Average time: 1.274 seconds
+  Min time: 0.000 seconds
+  Max time: 7.655 seconds
+  Standard deviation: 0.981 seconds
+
+TASK_CLASSIFIER:
+  Average time: 0.808 seconds
+  Min time: 0.001 seconds
+  Max time: 11.146 seconds
+  Standard deviation: 1.218 seconds
+
+TASK_HANDLER:
+  Average time: 0.000 seconds
+  Min time: 0.000 seconds
+  Max time: 0.002 seconds
+  Standard deviation: 0.000 seconds
+
+SMART_HOME:
+  Average time: 0.374 seconds
+  Min time: 0.000 seconds
+  Max time: 0.840 seconds
+  Standard deviation: 0.291 seconds
+
+TODO:
+  Average time: 1.186 seconds
+  Min time: 0.001 seconds
+  Max time: 4.744 seconds
+  Standard deviation: 1.029 seconds
+
+LEARNING_RESOURCES:
+  Average time: 0.870 seconds
+  Min time: 0.000 seconds
+  Max time: 23.690 seconds
+  Standard deviation: 3.324 seconds
+
+ALL:
+  Average time: 6.588 seconds
+  Min time: 0.704 seconds
+  Max time: 28.027 seconds
+  Standard deviation: 4.679 seconds
