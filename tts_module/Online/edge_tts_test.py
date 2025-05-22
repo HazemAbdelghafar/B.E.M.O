@@ -74,4 +74,4 @@ class EdgeTTS:
 # Example usage
 if __name__ == "__main__":
     tts = EdgeTTS()
-    tts.speak("Hello! I am BEEMO and this is the last sound check!", "bemo_intro.wav") 
+    tts.speak("Hello! I am BEEMO and this is a test without internet connection", "bemo_intro.wav") 
