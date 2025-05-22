@@ -5,10 +5,15 @@ import pygame
 from elevenlabs import generate, set_api_key
 import hashlib
 import json
+from dotenv import load_dotenv
 
-# Set your ElevenLabs API key
-# You can get it from https://elevenlabs.io
-ELEVENLABS_API_KEY = "sk_5b0f4ed6168d33823a6aa64cea4d026280fc1b46fff5ec49"
+# Load environment variables
+load_dotenv()
+
+# Set your ElevenLabs API key from environment variable
+ELEVENLABS_API_KEY = os.getenv('EL_Token')
+if not ELEVENLABS_API_KEY:
+    raise ValueError("EL_Token not found in environment variables")
 set_api_key(ELEVENLABS_API_KEY)
 
 # Initialize pygame mixer
