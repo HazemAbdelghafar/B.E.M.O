@@ -79,9 +79,11 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                         }
                     )
                 )
+                await websocket.close()
             except Exception as e:
-                logger.error(f"Failed to send server down message: {e}")
-            await websocket.close()
+                logger.error(
+                    f"Failed to send server down message or close websocket: {e}"
+                )
             return
 
         logger.info(f"Robot connected: {id}")
