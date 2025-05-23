@@ -67,6 +67,9 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             connected_devices.pop(id, None)
 
     else:
+        logger.info(f"Robot connected: {id}")
+        connected_devices[id] = websocket
+
         # Check if the server is connected
         if SERVER_ID not in connected_devices:
             logger.error("Server is not connected. Cannot proceed.")
@@ -77,11 +80,8 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     }
                 )
             )
-            await websocket.close()
             return
 
-        logger.info(f"Robot connected: {id}")
-        connected_devices[id] = websocket
         try:
             while websocket.client_state == WebSocketState.CONNECTED:
                 message = await websocket.receive_text()
