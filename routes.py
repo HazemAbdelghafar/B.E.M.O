@@ -20,9 +20,9 @@ connected_devices: Dict[str, WebSocket] = {}
 @router.websocket("/ws/{id}")
 async def websocket_endpoint(websocket: WebSocket, id: str):
     logger.info(f"New connection: {id}")
-    await websocket.accept()
 
     if id == "server":
+        await websocket.accept()
         # Check if the server is already connected
         if SERVER_ID in connected_devices:
             logger.error("Server is already connected.")
@@ -67,10 +67,10 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             connected_devices.pop(id, None)
 
     else:
-        await websocket.accept()
         # Check if the server is connected BEFORE accepting the connection
         if SERVER_ID not in connected_devices:
             logger.error("Server is not connected. Cannot proceed.")
+            await websocket.accept()
             try:
                 await websocket.send_text(
                     json.dumps(
@@ -85,6 +85,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             return
 
         logger.info(f"Robot connected: {id}")
+        await websocket.accept()
         connected_devices[id] = websocket
         try:
             while websocket.client_state == WebSocketState.CONNECTED:
