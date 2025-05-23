@@ -80,34 +80,36 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     }
                 )
             )
-            return
+            await websocket.close()
 
-        try:
-            while websocket.client_state == WebSocketState.CONNECTED:
-                message = await websocket.receive_text()
-                logger.info(f"{id} sent: {message}")
+        else:
+            logger.info("Server connected")
+            try:
+                while websocket.client_state == WebSocketState.CONNECTED:
+                    message = await websocket.receive_text()
+                    logger.info(f"{id} sent: {message}")
 
-                try:
-                    # Assuming the message is JSON formatted
-                    data = json.loads(message)
-                except json.JSONDecodeError:
-                    logger.error("Invalid JSON format")
-                    await websocket.send_text(
-                        json.dumps(
-                            {
-                                "is_server_down": True,
-                            }
+                    try:
+                        # Assuming the message is JSON formatted
+                        data = json.loads(message)
+                    except json.JSONDecodeError:
+                        logger.error("Invalid JSON format")
+                        await websocket.send_text(
+                            json.dumps(
+                                {
+                                    "is_server_down": True,
+                                }
+                            )
                         )
-                    )
-                    continue
+                        continue
 
-                if data:
-                    # Forward the message to the server
-                    await connected_devices[SERVER_ID].send_text(message)
-                    logger.info(f"Forwarded message to server: {message}")
-                else:
-                    logger.warning("No data received from robot.")
-                    continue
-        except WebSocketDisconnect:
-            logger.warning(f"{id} disconnected")
-            connected_devices.pop(id, None)
+                    if data:
+                        # Forward the message to the server
+                        await connected_devices[SERVER_ID].send_text(message)
+                        logger.info(f"Forwarded message to server: {message}")
+                    else:
+                        logger.warning("No data received from robot.")
+                        continue
+            except WebSocketDisconnect:
+                logger.warning(f"{id} disconnected")
+                connected_devices.pop(id, None)
