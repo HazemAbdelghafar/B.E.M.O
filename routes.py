@@ -67,49 +67,51 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             connected_devices.pop(id, None)
 
     else:
-        logger.info(f"Robot connected: {id}")
-        connected_devices[id] = websocket
-
-        # Check if the server is connected
+        await websocket.accept()
+        # Check if the server is connected BEFORE accepting the connection
         if SERVER_ID not in connected_devices:
             logger.error("Server is not connected. Cannot proceed.")
-            await websocket.send_text(
-                json.dumps(
-                    {
-                        "is_server_down": True,
-                    }
-                )
-            )
-            await websocket.close()
-
-        else:
-            logger.info("Server connected")
             try:
-                while websocket.client_state == WebSocketState.CONNECTED:
-                    message = await websocket.receive_text()
-                    logger.info(f"{id} sent: {message}")
+                await websocket.send_text(
+                    json.dumps(
+                        {
+                            "is_server_down": True,
+                        }
+                    )
+                )
+            except Exception as e:
+                logger.error(f"Failed to send server down message: {e}")
+            await websocket.close()
+            return
 
-                    try:
-                        # Assuming the message is JSON formatted
-                        data = json.loads(message)
-                    except json.JSONDecodeError:
-                        logger.error("Invalid JSON format")
-                        await websocket.send_text(
-                            json.dumps(
-                                {
-                                    "is_server_down": True,
-                                }
-                            )
+        logger.info(f"Robot connected: {id}")
+        connected_devices[id] = websocket
+        try:
+            while websocket.client_state == WebSocketState.CONNECTED:
+                message = await websocket.receive_text()
+                logger.info(f"{id} sent: {message}")
+
+                try:
+                    # Assuming the message is JSON formatted
+                    data = json.loads(message)
+                except json.JSONDecodeError:
+                    logger.error("Invalid JSON format")
+                    await websocket.send_text(
+                        json.dumps(
+                            {
+                                "is_server_down": True,
+                            }
                         )
-                        continue
+                    )
+                    continue
 
-                    if data:
-                        # Forward the message to the server
-                        await connected_devices[SERVER_ID].send_text(message)
-                        logger.info(f"Forwarded message to server: {message}")
-                    else:
-                        logger.warning("No data received from robot.")
-                        continue
-            except WebSocketDisconnect:
-                logger.warning(f"{id} disconnected")
-                connected_devices.pop(id, None)
+                if data:
+                    # Forward the message to the server
+                    await connected_devices[SERVER_ID].send_text(message)
+                    logger.info(f"Forwarded message to server: {message}")
+                else:
+                    logger.warning("No data received from robot.")
+                    continue
+        except WebSocketDisconnect:
+            logger.warning(f"{id} disconnected")
+            connected_devices.pop(id, None)
