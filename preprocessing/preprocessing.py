@@ -2,11 +2,11 @@ import os
 import json
 from dotenv import load_dotenv, find_dotenv
 import google.generativeai as gai
-from datetime import datetime as dt 
+from datetime import datetime as dt
 
 load_dotenv(find_dotenv())
 
-SYSTEM_INSTRUCTION= """
+SYSTEM_INSTRUCTION = """
 System Instructions for Preprocessing LLM:
 
 The LLM preprocesses query strings into response dictionaries for various methods, namely "rapid questions," "smart home," "todo," and "mail." Follow the rules below to process queries and generate appropriate response dictionaries.
@@ -121,29 +121,32 @@ Process queries accurately, ensuring strict adherence to these rules and formats
 
 
 class Preprocessing:
-    def __init__(self, SYSTEM_INSTRUCTION=SYSTEM_INSTRUCTION, model_name = 'gemini-1.5-flash-8b'):
+    def __init__(
+        self, SYSTEM_INSTRUCTION=SYSTEM_INSTRUCTION, model_name="gemini-1.5-flash-8b"
+    ):
         self.SYSTEM_INSTRUCTION = SYSTEM_INSTRUCTION
-        gai.configure(api_key=os.getenv('GEMINI_API_KEY'))
-        self.model = gai.GenerativeModel(model_name, system_instruction=SYSTEM_INSTRUCTION)
-        
+        gai.configure(api_key=os.getenv("GEMINI_API_KEY_TEST"))  #! Test
+        self.model = gai.GenerativeModel(
+            model_name, system_instruction=SYSTEM_INSTRUCTION
+        )
+
     def generate_response(self, request: str):
         print("Generating response")
         try:
-            request = request + ' ' + dt.now().strftime('%Y-%m-%dT%H:%M:%S')
+            request = request + " " + dt.now().strftime("%Y-%m-%dT%H:%M:%S")
             response = self.model.generate_content(request)
         except:
-            response = "" 
+            response = ""
         try:
-          response = json.loads(response.text[8:-4])
+            response = json.loads(response.text[8:-4])
         except:
-          response = response.text
+            response = response.text
         return response
-                     
-            
-        
+
+
 if __name__ == "__main__":
     llm = Preprocessing()
     test_request = input("Enter your prompt: ")
     response = llm.generate_response(test_request)
-    
+
     print(response)
