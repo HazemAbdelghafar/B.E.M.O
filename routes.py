@@ -64,6 +64,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         # Check if the server is connected
         if SERVER_ID not in connected_devices:
             logger.error("Server is not connected. Cannot proceed.")
+            # TODO: Send message to server that robot is not connected
             await websocket.close()
             return
 
