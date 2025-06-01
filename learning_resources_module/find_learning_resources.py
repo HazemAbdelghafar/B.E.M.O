@@ -51,10 +51,10 @@ class FindLearningResources:
         self.confidence_threshold = confidence_threshold / 100
 
         # Load API keys from .env file
-        self.tavily_api_key = dotenv_values(find_dotenv())["TAVILY_API_KEY"]
+        self.tavily_api_key = dotenv_values(find_dotenv())["TAVILY_API_KEY_TEST"]
 
         if self.use_llm:
-            self.gemini_api_key = dotenv_values(find_dotenv())["GEMINI_API_KEY"]
+            self.gemini_api_key = dotenv_values(find_dotenv())["GEMINI_API_KEY_TEST"]
 
         # Set the API keys as environment variables
         if self.use_llm:
