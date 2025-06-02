@@ -1,7 +1,0 @@
-requests==2.32.3
-tavily-python==0.5.0
-langchain==0.3.8
-langchain-community==0.3.8
-langchain-core==0.3.21
-langchain-google-genai==2.0.5
-python-dotenv==1.0.1

@@ -1,6 +1,0 @@
-// This file contains the sample request for general questions module.
-
-{
-    "query": "Why and when did the first world war start?", // The question that the user wants to ask. (Required)
-    "topic": "general" // The topic of the question. (general, news) (Required)
-}
