@@ -3,11 +3,11 @@ import base64
 import requests
 from dotenv import load_dotenv
 from email.mime.text import MIMEText
-from msal import PublicClientApplication, SerializableTokenCache
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
+from msal import PublicClientApplication, SerializableTokenCache
 
 load_dotenv()
 
@@ -24,10 +24,10 @@ class BEMOMail:
             self.SCOPES = [
                 'https://www.googleapis.com/auth/gmail.send',
                 'https://www.googleapis.com/auth/gmail.modify',
-                'https://www.googleapis.com/auth/gmail.labels',
+                # 'https://www.googleapis.com/auth/gmail.labels',
             ]
         elif self.provider == 'outlook':
-            self.SCOPES = ['Mail.Read', 'Mail.Send']
+            self.SCOPES = ['Mail.ReadWrite', 'Mail.Send']
         else:
             raise ValueError("Unsupported provider. Use 'gmail' or 'outlook'.")
 
@@ -89,14 +89,19 @@ class BEMOMail:
         else:
             raise Exception(f"Failed to acquire Outlook token: {result.get('error_description')}")
 
-    def send_email(self, to_email, subject, body):
+    def send_email(self, to_email: str | list[str], subject: str, body: str):
+        if isinstance(to_email, str):
+            recipients = [to_email]
+        else:
+            recipients = to_email
+
         if self.provider == 'gmail':
             message = MIMEText(body)
-            message['to'] = to_email
+            message['to'] = ", ".join(recipients)
             message['subject'] = subject
             raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
             return self.service.users().messages().send(userId='me', body={'raw': raw}).execute()
-        
+
         elif self.provider == 'outlook':
             url = 'https://graph.microsoft.com/v1.0/me/sendMail'
             headers = {
@@ -111,13 +116,12 @@ class BEMOMail:
                         "content": body
                     },
                     "toRecipients": [
-                        {"emailAddress": {"address": to_email}}
+                        {"emailAddress": {"address": email}} for email in recipients
                     ]
                 }
             }
             response = requests.post(url, headers=headers, json=data)
 
-            # Microsoft Graph returns 202 Accepted with no content on success
             if response.status_code == 202:
                 print("Email sent successfully.")
                 return {"status": "success"}
@@ -128,7 +132,11 @@ class BEMOMail:
                 try:
                     return response.json()
                 except requests.exceptions.JSONDecodeError:
-                    return {"error": "Non-JSON response", "status_code": response.status_code, "text": response.text}
+                    return {
+                        "error": "Non-JSON response",
+                        "status_code": response.status_code,
+                        "text": response.text
+                    }
 
     def fetch_latest_emails(self, count=3):
         emails = []
@@ -347,7 +355,7 @@ class BEMOMail:
                     body = "(Failed to fetch email body)"
 
                 emails.append((sender, subject, body, message_id))
-
+        self.mark_emails_as_read([email[3] for email in emails])
         return emails
 
     def delete_email(self, subject=None, message_id=None):
@@ -358,7 +366,7 @@ class BEMOMail:
         if self.provider == 'gmail':
             if message_id:
                 try:
-                    self.service.users().messages().delete(userId='me', id=message_id).execute()
+                    self.service.users().messages().trash(userId='me', id=message_id).execute()
                     print(f"Gmail: Deleted email with ID: {message_id}")
                     return True
                 except Exception as e:
@@ -373,7 +381,7 @@ class BEMOMail:
                     return False
                 for msg in messages:
                     try:
-                        self.service.users().messages().delete(userId='me', id=msg['id']).execute()
+                        self.service.users().messages().trash(userId='me', id=msg['id']).execute()
                         print(f"Gmail: Deleted email with subject: {subject}")
                     except Exception as e:
                         print("Failed to delete Gmail email:", e)
@@ -383,6 +391,7 @@ class BEMOMail:
             headers = {'Authorization': f'Bearer {self.graph_token}'}
 
             if message_id:
+                print('id')
                 url = f'https://graph.microsoft.com/v1.0/me/messages/{message_id}'
                 response = requests.delete(url, headers=headers)
                 if response.status_code == 204:
@@ -394,6 +403,7 @@ class BEMOMail:
                     return False
 
             elif subject:
+                print('subject')
                 search_url = f'https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$search="{subject}"'
                 search_headers = headers.copy()
                 search_headers["ConsistencyLevel"] = "eventual"
@@ -422,11 +432,209 @@ class BEMOMail:
         print("Unknown provider or error.")
         return False
 
+    def reply_to_email(self, message_id, reply_body):
+        if self.provider == 'gmail':
+            try:
+                # Get original message details
+                message = self.service.users().messages().get(userId='me', id=message_id, format='metadata', metadataHeaders=['Subject', 'From']).execute()
+                headers = message['payload']['headers']
+                subject = next((h['value'] for h in headers if h['name'] == 'Subject'), '')
+                sender = next((h['value'] for h in headers if h['name'] == 'From'), '')
+
+                # Create reply message
+                reply = MIMEText(reply_body)
+                reply['To'] = sender
+                reply['Subject'] = "Re: " + subject
+                reply['In-Reply-To'] = message_id
+                reply['References'] = message_id
+
+                raw = base64.urlsafe_b64encode(reply.as_bytes()).decode()
+                body = {'raw': raw, 'threadId': message['threadId']}
+
+                sent = self.service.users().messages().send(userId='me', body=body).execute()
+                print("Reply sent to Gmail successfully.")
+                return sent
+            except Exception as e:
+                print(f"Failed to reply to Gmail email: {e}")
+                return None
+
+        elif self.provider == 'outlook':
+            try:
+                # Get original message
+                url = f'https://graph.microsoft.com/v1.0/me/messages/{message_id}'
+                headers = {'Authorization': f'Bearer {self.graph_token}'}
+                response = requests.get(url, headers=headers)
+
+                if response.status_code != 200:
+                    print(f"Failed to get original message. Status: {response.status_code}")
+                    return None
+
+                msg_data = response.json()
+                reply_url = f"https://graph.microsoft.com/v1.0/me/messages/{message_id}/createReply"
+
+                # Step 1: Create the draft reply
+                create_response = requests.post(reply_url, headers=headers)
+                if create_response.status_code != 201:
+                    print(f"Failed to create reply draft: {create_response.status_code}")
+                    return None
+
+                draft = create_response.json()
+                draft_id = draft['id']
+
+                # Step 2: Set the body of the reply
+                update_url = f"https://graph.microsoft.com/v1.0/me/messages/{draft_id}"
+                updated = {
+                    "body": {
+                        "contentType": "Text",
+                        "content": reply_body
+                    }
+                }
+                patch_response = requests.patch(update_url, headers=headers, json=updated)
+
+                if patch_response.status_code not in [200, 202]:
+                    print(f"Failed to update reply draft body: {patch_response.status_code}")
+                    return None
+
+                # Step 3: Send the reply
+                send_url = f"https://graph.microsoft.com/v1.0/me/messages/{draft_id}/send"
+                send_response = requests.post(send_url, headers=headers)
+                if send_response.status_code == 202:
+                    print("Reply sent to Outlook successfully.")
+                    return {"status": "success"}
+                else:
+                    print(f"Failed to send reply: {send_response.status_code}")
+                    return None
+            except Exception as e:
+                print(f"Failed to reply to Outlook email: {e}")
+                return None
+
+    def mark_emails_as_read(self, message_ids: list[str]):
+        if self.provider == 'gmail':
+            try:
+                # Bulk modify messages to remove the 'UNREAD' label
+                self.service.users().messages().batchModify(
+                    userId='me',
+                    body={
+                        'ids': message_ids,
+                        'removeLabelIds': ['UNREAD']
+                    }
+                ).execute()
+                return {"status": "success", "message": f"{len(message_ids)} emails marked as read in Gmail."}
+            except Exception as e:
+                return {"status": "error", "message": f"Gmail error: {str(e)}"}
+
+        elif self.provider == 'outlook':
+            success_count = 0
+            errors = []
+
+            for message_id in message_ids:
+                try:
+                    url = f'https://graph.microsoft.com/v1.0/me/messages/{message_id}'
+                    headers = {
+                        'Authorization': f'Bearer {self.graph_token}',
+                        'Content-Type': 'application/json'
+                    }
+                    data = {"isRead": True}
+                    response = requests.patch(url, headers=headers, json=data)
+
+                    if response.status_code == 200:
+                        success_count += 1
+                    else:
+                        errors.append({
+                            "message_id": message_id,
+                            "status_code": response.status_code,
+                            "text": response.text
+                        })
+                except Exception as e:
+                    errors.append({"message_id": message_id, "exception": str(e)})
+
+            return {
+                "status": "partial" if errors else "success",
+                "message": f"{success_count} of {len(message_ids)} emails marked as read in Outlook.",
+                "errors": errors if errors else None
+            }
+
+    def mark_emails_as_spam(self, sender: str = None, subject_keyword: str = None):
+        if not sender and not subject_keyword:
+            return {"status": "error", "message": "Please provide at least a sender or subject keyword."}
+
+        if self.provider == 'gmail':
+            query_parts = []
+            if sender:
+                query_parts.append(f'from:{sender}')
+            if subject_keyword:
+                query_parts.append(f'subject:{subject_keyword}')
+            query = ' '.join(query_parts)
+
+            try:
+                results = self.service.users().messages().list(userId='me', q=query).execute()
+                messages = results.get('messages', [])
+                if not messages:
+                    return {"status": "success", "message": "No matching Gmail messages found."}
+                
+                message_ids = [msg['id'] for msg in messages]
+
+                # Add SPAM label
+                self.service.users().messages().batchModify(
+                    userId='me',
+                    body={
+                        'ids': message_ids,
+                        'addLabelIds': ['SPAM']
+                    }
+                ).execute()
+
+                return {"status": "success", "message": f"{len(message_ids)} Gmail messages moved to Spam."}
+            except Exception as e:
+                return {"status": "error", "message": f"Gmail error: {str(e)}"}
+
+        elif self.provider == 'outlook':
+            try:
+                url = "https://graph.microsoft.com/v1.0/me/messages"
+                headers = {
+                    'Authorization': f'Bearer {self.graph_token}',
+                    'Content-Type': 'application/json'
+                }
+                matched_ids = []
+                skip = 0
+                batch_size = 50  # fetch emails in pages of 50
+
+                while True:
+                    params = {'$top': batch_size, '$skip': skip}
+                    response = requests.get(url, headers=headers, params=params)
+                    emails = response.json().get('value', [])
+                    if not emails:
+                        break
+
+                    for email in emails:
+                        email_sender = email.get('from', {}).get('emailAddress', {}).get('address', '').lower()
+                        email_subject = email.get('subject', '').lower()
+
+                        sender_match = sender.lower() in email_sender if sender else True
+                        subject_match = subject_keyword.lower() in email_subject if subject_keyword else True
+
+                        if sender_match and subject_match:
+                            matched_ids.append(email['id'])
+
+                    skip += batch_size
+
+                if not matched_ids:
+                    return {"status": "success", "message": "No matching Outlook messages found."}
+
+                for msg_id in matched_ids:
+                    move_url = f"https://graph.microsoft.com/v1.0/me/messages/{msg_id}/move"
+                    data = {"destinationId": "junkemail"}
+                    requests.post(move_url, headers=headers, json=data)
+
+                return {"status": "success", "message": f"{len(matched_ids)} Outlook messages moved to Junk."}
+            except Exception as e:
+                return {"status": "error", "message": f"Outlook error: {str(e)}"}
+
 
 if __name__ == "__main__":
     # Choose provider: 'gmail' or 'outlook'
-    mail = BEMOMail(provider='gmail')  # or 'outlook'
+    mail = BEMOMail(provider='outlook')
     mail.authenticate()
+    # print('Authenticated')
 
     # Send an email
     # mail.send_email("hazem.metwalli23@gmail.com", "Done ya se3adet el liwa", "B2olak done")
@@ -438,12 +646,14 @@ if __name__ == "__main__":
     #     print(f"Email {idx}: From {sender} - Subject: {subject}")
     
     # Search for emails
-    # search_results = mail.search_emails(sender="hazem.metwalli23@gmail.com")
+    # search_results = mail.search_emails(sender="hazem.metwalli23@outlook.com")
     # for result in search_results:
     #     print(f"Sender: {result['sender']}")
     #     print(f"Subject: {result['subject']}")
     #     print(f"Body: {result['body']}")
     #     print(f"Message ID: {result['message_id']}")
+    #     test_id = result['message_id']
+    #     mail.reply_to_email(test_id, "Hello, this is a test test reply.")
     #     print("\n")
     
     # Fetch unread emails
@@ -457,5 +667,8 @@ if __name__ == "__main__":
     #     print("\n")
     
     # Delete email
-    mail.delete_email(subject="se3adet el liwa")
+    # mail.delete_email(subject="Testing hazem for mail module")
     
+    # Mark emails as spam
+    # output = mail.mark_emails_as_spam(sender="hazem.metwalli23@gmail.com", subject_keyword="testing")
+    # print(output)
