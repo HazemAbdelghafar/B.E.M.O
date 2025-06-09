@@ -168,10 +168,7 @@ class PostProcessing(BaseMQTTHandler):
                 "current_time": datetime.now(),
                 "user_emotions": emotions,
                 "switch_mapping": self.__switch_mapping,
-                "user_data_name": self.__user_data["name"],
-                "user_data_job_title": self.__user_data["job_title"],
-                "user_data_location": self.__user_data["location"],
-                "user_data_age": self.__user_data["age"],
+                "user_data": self.__user_data,
             }
 
         try:
