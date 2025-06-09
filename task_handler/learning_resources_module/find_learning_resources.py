@@ -89,8 +89,8 @@ class FindLearningResources(BaseMQTTHandler):
 
         # Set the API keys as environment variables
         if self.use_llm:
-            os.environ["TAVILY_API_KEY_TEST"] = self.tavily_api_key
-            os.environ["GEMINI_API_KEY_TEST"] = self.gemini_api_key
+            os.environ["TAVILY_API_KEY"] = self.tavily_api_key
+            os.environ["GOOGLE_API_KEY"] = self.gemini_api_key
 
         # Initialize the Tavily and Google Chat API
         if self.use_llm:
