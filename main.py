@@ -20,6 +20,7 @@ import time
 # Constants
 # =========================
 DEFAULT_PATH = os.path.dirname(__file__)
+# AUTH_TASKS = ["todo", "mail"]
 AUTH_TASKS = []  # ! For testing
 NAME = "main"
 SUB_TOPIC = "main/main"
@@ -109,13 +110,14 @@ class Main(BaseMQTTHandler):
         self.response = ""
         self.robot_emotion = "neutral"
         self.task_results = {}
-        self.error_dict = {}
         self.start_time = 0
-        self.end_time = 0
+        self.execution_time = 0
         self.need_auth = False
         self.no_face_counter = 0
         self.bad_face_counter = 0
         self.is_blocked = False
+        self.user_id = "" # Todo
+        
         random.seed(time.time())
 
     def execute_main(self, input_data: dict) -> dict:
@@ -124,15 +126,11 @@ class Main(BaseMQTTHandler):
         """
         module_name = input_data.get("module_name")
         error = input_data.get("error", None)
-        level = input_data.get("level", None)
-
-        if not module_name:
-            return self._handle_missing_module_name(input_data)
-
+        
         logger.info(f"Module name: {module_name}")
-
-        if error or self.error_dict:
-            return self._handle_error(error, level)
+            
+        if not module_name or error:
+            self._handle_error(input_data)
 
         if module_name == "server":
             return self._handle_server_module(input_data)
@@ -144,76 +142,70 @@ class Main(BaseMQTTHandler):
             return self._handle_task_handler_module(input_data)
         if module_name == "postprocessing":
             return self._handle_postprocessing_module(input_data)
-        return None
 
-    def _handle_missing_module_name(self, input_data: dict):
-        self.error_dict = {
-            "error": "Module name is missing, cannot identify the module",
-            "level": 2,
-        }
-        logger.error("Module name is missing")
-        robot_id = input_data.get("src_robot_id")
-        if robot_id:
-            self.robot_id = robot_id
-            logger.info(f"Robot ID: {self.robot_id}")
-            self.is_blocked = check_is_blocked(self.robot_id)
-            if self.is_blocked:
-                self.publish_result(
-                    {
-                        "is_error": False,
-                        "response": random.choice(BLOCKED_RESPONSES),
-                        "target_robot_id": self.robot_id,
-                        "screen": "blocked",
-                    },
-                    topic="server/main",
-                )
-        else:
-            logger.error("Robot ID is missing")
-            return None
-        return None
+        # Todo: DB
 
-    def _handle_error(self, error, level):
+        return None
+    
+    def _handle_error(self, input_data: dict):        
+        module_name = input_data.get("module_name", None)
+        
+        if not module_name:
+            error_dict = {
+                "error": "Module name is missing, cannot identify the module",
+                "level": 2,
+            }
+            logger.error("Module name is missing")
+        
+        error = input_data.get("error", None)
+        level = input_data.get("level", None)
+        
         if error:
-            self.error_dict = {"error": error, "level": level}
-        logger.error(f"Error: {self.error_dict}")
-        if self.error_dict["level"] == 4:
+            error_dict = {"error": error, "level": level}
+            logger.error(f"Error: {error_dict}")
+        
+        if error_dict["level"] == 4:
+            if not self.robot_id:
+                self.robot_id = input_data.get("src_robot_id", "")
+        
+            if not self.robot_id:
+                logger.error("Robot ID is missing")
+                return None
+
+            self.execution_time = time.time() - self.start_time
             self.publish_result(
                 {
                     "is_error": True,
                     "response": random.choice(ERROR_RESPONSES),
                     "target_robot_id": self.robot_id,
                     "screen": "error",
+                    "time_taken": self.execution_time,
                 },
                 topic="server/main",
             )
-            self.end_time = time.time()
-            logger.info(
-                f"Execution time (All): {self.end_time - self.start_time} seconds"
-            )
         else:
-            self.publish_result(self.error_dict, topic="postprocessing/data")
-        self.error_dict = {}
+            self.publish_result(error_dict, topic="postprocessing/data")
         return None
-
+    
     def _handle_server_module(self, input_data: dict):
         self.start_time = time.time()
         logger.info("Received server module data")
         message = input_data.get("message")
         if not message:
-            self.error_dict = {
+            error_dict = {
                 "error": "Prompt is missing from the server",
                 "level": 2,
             }
-            self.publish_result(self.error_dict, topic="postprocessing/data")
+            self.publish_result(error_dict, topic="postprocessing/data")
             logger.error("Prompt is missing")
             return None
         message = " ".join(message.split())
         if message in [":|", ":)", ":("]:
-            return self._handle_face_message(message)
+            return self._handle_face_recognition(message)
         else:
             return self._handle_prompt_message(input_data, message)
 
-    def _handle_face_message(self, message: str):
+    def _handle_face_recognition(self, message: str):
         if message == ":)":
             logger.info("Face detected")
             self.publish_result(
@@ -223,11 +215,13 @@ class Main(BaseMQTTHandler):
                 },
                 topic="preprocessing/data",
             )
+            self.execution_time = time.time() - self.start_time
             self.publish_result(
                 {
                     "is_error": False,
                     "target_robot_id": self.robot_id,
                     "screen": "good_face",
+                    "time_taken": self.execution_time,
                 },
                 topic="server/main",
             )
@@ -240,18 +234,21 @@ class Main(BaseMQTTHandler):
                 self.no_face_counter = 0
                 self.bad_face_counter = 0
                 self.need_auth = False
+                self.execution_time = time.time() - self.start_time
                 self.publish_result(
                     {
                         "is_error": False,
                         "target_robot_id": self.robot_id,
                         "response": random.choice(NO_FACE_RESPONSES_FINAL),
                         "screen": "error",
+                        "time_taken": self.execution_time,
                     },
                     topic="server/main",
                 )
             else:
                 self.no_face_counter += 1
                 self.need_auth = True
+                self.execution_time = time.time() - self.start_time
                 self.publish_result(
                     {
                         "is_error": False,
@@ -259,6 +256,7 @@ class Main(BaseMQTTHandler):
                         "target_robot_id": self.robot_id,
                         "response": random.choice(NO_FACE_RESPONSES),
                         "screen": "no_face",
+                        "time_taken": self.execution_time,
                     },
                     topic="server/main",
                 )
@@ -268,20 +266,24 @@ class Main(BaseMQTTHandler):
                 block_id(self.robot_id)
                 self.is_blocked = check_is_blocked(self.robot_id)
                 self.need_auth = False
+                self.execution_time = time.time() - self.start_time
                 self.publish_result(
                     {
                         "is_error": False,
                         "target_robot_id": self.robot_id,
                         "response": random.choice(BAD_FACE_RESPONSES_FINAL),
                         "screen": "blocked",
+                        "time_taken": self.execution_time,
                     },
                     topic="server/main",
                 )
+                # TODO: Send email to check the robot
                 self.bad_face_counter = 0
                 self.no_face_counter = 0
             else:
                 self.bad_face_counter += 1
                 self.need_auth = True
+                self.execution_time = time.time() - self.start_time
                 self.publish_result(
                     {
                         "is_error": False,
@@ -289,6 +291,7 @@ class Main(BaseMQTTHandler):
                         "target_robot_id": self.robot_id,
                         "response": random.choice(BAD_FACE_RESPONSES),
                         "screen": "bad_face",
+                        "time_taken": self.execution_time,
                     },
                     topic="server/main",
                 )
@@ -312,12 +315,14 @@ class Main(BaseMQTTHandler):
         logger.info(f"Robot ID: {self.robot_id}")
         self.is_blocked = check_is_blocked(self.robot_id)
         if self.is_blocked:
+            self.execution_time = time.time() - self.start_time
             self.publish_result(
                 {
                     "is_error": False,
                     "response": random.choice(BLOCKED_RESPONSES),
                     "target_robot_id": self.robot_id,
                     "screen": "blocked",
+                    "time_taken": self.execution_time,
                 },
                 topic="server/main",
             )
@@ -353,6 +358,7 @@ class Main(BaseMQTTHandler):
             )
         else:
             logger.info(f"Authentication required for label: {auth_label}")
+            self.execution_time = time.time() - self.start_time
             self.publish_result(
                 {
                     "is_error": False,
@@ -360,6 +366,7 @@ class Main(BaseMQTTHandler):
                     "target_robot_id": self.robot_id,
                     "response": random.choice(AUTH_RESPONSES),
                     "screen": "auth",
+                    "time_taken": self.execution_time,
                 },
                 topic="server/main",
             )
@@ -371,11 +378,11 @@ class Main(BaseMQTTHandler):
         self.preprocessed_data = [input_data]
         task_name = input_data.get("method")
         if not task_name:
-            self.error_dict = {
+            error_dict = {
                 "error": "Method is missing from the preprocessing module",
                 "level": 2,
             }
-            self.publish_result(self.error_dict, topic="postprocessing/data")
+            self.publish_result(error_dict, topic="postprocessing/data")
             logger.error("Method is missing")
             return None
         logger.info(f"Task name received from preprocessing: {task_name}")
@@ -393,46 +400,44 @@ class Main(BaseMQTTHandler):
         self.robot_emotion = input_data.get("robot_emotion", "neutral")
         self.robot_emotion = self.robot_emotion.lower()
         if not self.response:
+            self.execution_time = time.time() - self.start_time
             self.publish_result(
                 {
                     "is_error": True,
                     "response": random.choice(ERROR_RESPONSES),
                     "target_robot_id": self.robot_id,
                     "screen": "error",
+                    "time_taken": self.execution_time,
                 },
                 topic="server/main",
-            )
-            self.end_time = time.time()
-            logger.info(
-                f"Execution time (All): {self.end_time - self.start_time} seconds"
             )
             logger.error("Response is missing in the others method")
             return None
         logger.info("Returning the others method result to the server")
         logger.info(f"Response: {self.response}")
         logger.info(f"Robot emotion: {self.robot_emotion}")
+        self.execution_time = time.time() - self.start_time
         self.publish_result(
             {
                 "status": "success",
                 "response": self.response,
                 "target_robot_id": self.robot_id,
                 "screen": self.robot_emotion,
+                "time_taken": self.execution_time,       
             },
             topic="server/main",
         )
-        self.end_time = time.time()
-        logger.info(f"Execution time (All): {self.end_time - self.start_time} seconds")
         return None
 
     def _handle_task_handler_module(self, input_data: dict):
         logger.info("Received task_handler module data")
         self.task_results = input_data.get("results")
         if not self.task_results:
-            self.error_dict = {
+            error_dict = {
                 "error": "Task results are missing from the task_handler module",
                 "level": 2,
             }
-            self.publish_result(self.error_dict, topic="postprocessing/data")
+            self.publish_result(error_dict, topic="postprocessing/data")
             logger.error("Task results are missing")
             return None
         logger.info(f"Task results: {self.task_results}")
@@ -455,18 +460,16 @@ class Main(BaseMQTTHandler):
         self.robot_emotion = self.robot_emotion.lower()
         is_error = input_data.get("is_error")
         if not self.response:
+            self.execution_time = time.time() - self.start_time
             self.publish_result(
                 {
                     "is_error": True,
                     "response": random.choice(ERROR_RESPONSES),
                     "target_robot_id": self.robot_id,
                     "screen": "error",
+                    "time_taken": self.execution_time,    
                 },
                 topic="server/main",
-            )
-            self.end_time = time.time()
-            logger.info(
-                f"Execution time (All): {self.end_time - self.start_time} seconds"
             )
             logger.error("Response is missing in the preprocessing method")
             return None
@@ -475,27 +478,29 @@ class Main(BaseMQTTHandler):
         logger.info(f"Robot emotion: {self.robot_emotion}")
         logger.info(f"Is error: {is_error}")
         if is_error:
+            self.execution_time = time.time() - self.start_time
             self.publish_result(
                 {
                     "is_error": is_error,
                     "response": self.response,
                     "target_robot_id": self.robot_id,
                     "screen": "error",
+                    "time_taken": self.execution_time,    
                 },
                 topic="server/main",
             )
         else:
+            self.execution_time = time.time() - self.start_time
             self.publish_result(
                 {
                     "is_error": is_error,
                     "response": self.response,
                     "target_robot_id": self.robot_id,
                     "screen": self.robot_emotion,
+                    "time_taken": self.execution_time,    
                 },
                 topic="server/main",
             )
-        self.end_time = time.time()
-        logger.info(f"Execution time (All): {self.end_time - self.start_time} seconds")
         return None
 
 
