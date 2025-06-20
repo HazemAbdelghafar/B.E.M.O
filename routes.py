@@ -2,7 +2,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from fastapi.websockets import WebSocketState
 from fastapi.responses import JSONResponse
 from typing import Dict
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 import json
 
@@ -19,11 +19,17 @@ SERVER_ID = "server"
 connected_devices: Dict[str, WebSocket] = {}
 device_metadata: Dict[str, Dict] = {}
 
+# === Utility ===
 
-# === Utility functions ===
+def now_utc_iso():
+    return datetime.now(timezone.utc).isoformat()
+
+def get_duration_seconds(connected_at_iso: str):
+    connected_at = datetime.fromisoformat(connected_at_iso)
+    now = datetime.now(timezone.utc)
+    return int((now - connected_at).total_seconds())
 
 async def send_safe(ws: WebSocket, data: dict):
-    """Send JSON safely over a WebSocket."""
     if ws.client_state == WebSocketState.CONNECTED:
         try:
             await ws.send_text(json.dumps(data))
@@ -32,9 +38,7 @@ async def send_safe(ws: WebSocket, data: dict):
     else:
         logger.warning("Attempted to send on a closed socket.")
 
-
 async def forward_message(sender_id: str, target_id: str, message: str):
-    """Forward a message to another connected client."""
     if target_id in connected_devices:
         await send_safe(connected_devices[target_id], json.loads(message))
         logger.info(f"Forwarded from {sender_id} to {target_id}: {message}")
@@ -47,7 +51,6 @@ async def forward_message(sender_id: str, target_id: str, message: str):
             "to": target_id,
         })
 
-
 # === WebSocket Endpoint ===
 
 @router.websocket("/ws/{id}")
@@ -56,7 +59,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
     await websocket.accept()
 
     ip = websocket.client.host
-    connected_at = datetime.utcnow().isoformat() + "Z"
+    connected_at = now_utc_iso()
 
     # === SERVER CONNECTING ===
     if id == SERVER_ID:
@@ -96,6 +99,26 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         except WebSocketDisconnect:
             logger.warning("Server disconnected.")
         finally:
+            logger.warning("Cleaning up all robot connections since server disconnected.")
+            robot_ids = [rid for rid in connected_devices if rid != SERVER_ID]
+            for rid in robot_ids:
+                try:
+                    await send_safe(connected_devices[rid], {
+                        "warning": "Server disconnected. Closing robot connection.",
+                        "level": 2
+                    })
+                    await connected_devices[rid].close()
+                    logger.info(f"Disconnected robot: {rid}")
+                except Exception as e:
+                    logger.error(f"Failed to disconnect robot {rid}: {e}")
+                finally:
+                    connected_devices.pop(rid, None)
+                    device_metadata.pop(rid, None)
+
+            # Log connection duration
+            duration = get_duration_seconds(device_metadata[SERVER_ID]["connected_at"])
+            logger.info(f"Server was connected for {duration} seconds")
+
             connected_devices.pop(SERVER_ID, None)
             device_metadata.pop(SERVER_ID, None)
 
@@ -136,17 +159,25 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         except WebSocketDisconnect:
             logger.warning(f"Robot '{id}' disconnected.")
         finally:
+            # Log duration
+            duration = get_duration_seconds(device_metadata[id]["connected_at"])
+            logger.info(f"Robot '{id}' was connected for {duration} seconds")
             connected_devices.pop(id, None)
             device_metadata.pop(id, None)
 
-
-# === REST API Endpoint ===
+# === REST Endpoint for status ===
 
 @router.get("/connected-devices")
 async def get_connected_devices():
-    """Return info about currently connected devices."""
+    def format_device(device_id, info):
+        return {
+            "ip": info["ip"],
+            "connected_at": info["connected_at"],
+            "duration_seconds": get_duration_seconds(info["connected_at"]),
+        }
+
     robots = {
-        device_id: info
+        device_id: format_device(device_id, info)
         for device_id, info in device_metadata.items()
         if device_id != SERVER_ID
     }
@@ -154,7 +185,10 @@ async def get_connected_devices():
     return JSONResponse(
         content={
             "server_connected": SERVER_ID in connected_devices,
-            "server_info": device_metadata.get(SERVER_ID),
+            "server_info": (
+                format_device(SERVER_ID, device_metadata[SERVER_ID])
+                if SERVER_ID in device_metadata else None
+            ),
             "robots_connected": robots,
             "robot_count": len(robots)
         }
