@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, FastAPI
 from fastapi.websockets import WebSocketState
 from fastapi.responses import JSONResponse
 from typing import Dict
@@ -9,11 +9,9 @@ import json
 # === Logging ===
 logger = logging.getLogger("uvicorn")
 
-# === Router setup ===
-router = APIRouter(prefix="/api")
-
 # === Constants ===
 SERVER_ID = "server"
+router = APIRouter(prefix="/api")
 
 # === Connection tracking ===
 connected_devices: Dict[str, WebSocket] = {}
@@ -61,7 +59,6 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
     ip = websocket.client.host
     connected_at = now_utc_iso()
 
-    # === SERVER CONNECTING ===
     if id == SERVER_ID:
         if SERVER_ID in connected_devices:
             old_ws = connected_devices[SERVER_ID]
@@ -99,7 +96,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         except WebSocketDisconnect:
             logger.warning("Server disconnected.")
         finally:
-            logger.warning("Cleaning up all robot connections since server disconnected.")
+            logger.warning("Disconnecting all robots since server went offline.")
             robot_ids = [rid for rid in connected_devices if rid != SERVER_ID]
             for rid in robot_ids:
                 try:
@@ -115,14 +112,11 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     connected_devices.pop(rid, None)
                     device_metadata.pop(rid, None)
 
-            # Log connection duration
             duration = get_duration_seconds(device_metadata[SERVER_ID]["connected_at"])
             logger.info(f"Server was connected for {duration} seconds")
-
             connected_devices.pop(SERVER_ID, None)
             device_metadata.pop(SERVER_ID, None)
 
-    # === ROBOT CONNECTING ===
     else:
         if SERVER_ID not in connected_devices:
             logger.error("Server not connected. Rejecting robot.")
@@ -159,13 +153,12 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         except WebSocketDisconnect:
             logger.warning(f"Robot '{id}' disconnected.")
         finally:
-            # Log duration
             duration = get_duration_seconds(device_metadata[id]["connected_at"])
             logger.info(f"Robot '{id}' was connected for {duration} seconds")
             connected_devices.pop(id, None)
             device_metadata.pop(id, None)
 
-# === REST Endpoint for status ===
+# === REST Endpoint for Monitoring ===
 
 @router.get("/connected-devices")
 async def get_connected_devices():
@@ -193,3 +186,23 @@ async def get_connected_devices():
             "robot_count": len(robots)
         }
     )
+
+# === Graceful Shutdown ===
+
+def register_shutdown_handler(app: FastAPI):
+    @app.on_event("shutdown")
+    async def disconnect_all():
+        logger.warning("FastAPI shutting down. Disconnecting all devices...")
+        for device_id, websocket in list(connected_devices.items()):
+            try:
+                await send_safe(websocket, {
+                    "warning": "Server shutting down. Disconnecting.",
+                    "level": 2
+                })
+                await websocket.close(code=1001, reason="Server shutdown")
+                logger.info(f"Disconnected {device_id}")
+            except Exception as e:
+                logger.error(f"Failed to disconnect {device_id}: {e}")
+            finally:
+                connected_devices.pop(device_id, None)
+                device_metadata.pop(device_id, None)
