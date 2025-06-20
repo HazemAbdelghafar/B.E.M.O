@@ -32,7 +32,7 @@ logging.basicConfig(
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
-class BEMOMail(BaseMQTTHandler):
+class Mail(BaseMQTTHandler):
     def __init__(self, provider, config_path='secrets', token_path='tokens'):
         super().__init__(sub_topic="task_handler/mail", name="mail")
 
@@ -61,6 +61,7 @@ class BEMOMail(BaseMQTTHandler):
             return self._auth_outlook()
 
     def _auth_gmail(self):
+        # Todo: Add multiple accounts support
         token_file = os.path.join(self.token_path, 'gmail_token.json')
         creds_file = os.path.join(self.config_path, 'gmail_client_secret.json')
 
@@ -654,7 +655,7 @@ class BEMOMail(BaseMQTTHandler):
                 return {"status": "error", "message": f"Outlook error: {str(e)}"}
 
     def execute_main(self, input_data: dict) -> dict:
-        function_name = input_data.get("function_name")
+        function_name = input_data.get("function")
         if function_name == "send_email":
             result = self.send_email(input_data.get("to_email"), input_data.get("subject"), input_data.get("body"))
         elif function_name == "fetch_latest_emails":
@@ -678,52 +679,6 @@ class BEMOMail(BaseMQTTHandler):
 
 if __name__ == "__main__":
     # Choose provider: 'gmail' or 'outlook'
-    # mail = BEMOMail(provider='outlook')
-    # mail.authenticate()
-    # print('Authenticated')
-
-    # Send an email
-    # mail.send_email("hazem.metwalli23@gmail.com", "Done ya se3adet el liwa", "B2olak done")
-
-    # Read latest emails
-    # latest = mail.fetch_latest_emails()
-    # for idx, (sender, subject, content) in enumerate(latest, 1):
-    #     # print(f"Email {idx}: From {sender} - Subject: {subject} - Content: {content}")
-    #     print(f"Email {idx}: From {sender} - Subject: {subject}")
-    
-    # Search for emails
-    # search_results = mail.search_emails(sender="hazem.metwalli23@outlook.com")
-    # for result in search_results:
-    #     print(f"Sender: {result['sender']}")
-    #     print(f"Subject: {result['subject']}")
-    #     print(f"Body: {result['body']}")
-    #     print(f"Message ID: {result['message_id']}")
-    #     test_id = result['message_id']
-    #     mail.reply_to_email(test_id, "Hello, this is a test test reply.")
-    #     print("\n")
-    
-    # Fetch unread emails
-    # unread_emails = mail.fetch_unread_emails()
-    # for idx, (sender, subject, body, message_id) in enumerate(unread_emails, 1):
-    #     print(f"Unread Email {idx}:")
-    #     print(f"From: {sender}")
-    #     print(f"Subject: {subject}")
-    #     print(f"Body: {body}")
-    #     print(f"Message ID: {message_id}")
-    #     print("\n")
-    
-    # Delete email
-    # mail.delete_email(subject="Testing hazem for mail module")
-    
-    # Mark emails as spam
-    # output = mail.mark_emails_as_spam(sender="hazem.metwalli23@gmail.com", subject_keyword="testing")
-    # print(output)
-
-
-    # Choose provider: 'gmail' or 'outlook'
-    mail = BEMOMail(provider='outlook')
+    mail = Mail(provider='outlook') # Todo: Make it dynamic
     mail.authenticate()
     mail.start_mqtt()
-    # print('Authenticated')
-
-    # mail.execute_main({"function_name": "fetch_latest_emails", "count": 2})
