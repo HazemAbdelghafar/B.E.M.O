@@ -31,7 +31,6 @@ logging.basicConfig(
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
-
 class GeneralQuestions(BaseMQTTHandler):
     """
     GeneralQuestions is a class for handling general knowledge or factual queries.
@@ -39,7 +38,7 @@ class GeneralQuestions(BaseMQTTHandler):
 
     def __init__(
         self,
-        use_llm: bool = True,
+        use_llm: bool = False,
         max_results_per_type: int = 5,
         check_status_code: bool = False,
         clean_resources: bool = True,
@@ -155,7 +154,8 @@ class GeneralQuestions(BaseMQTTHandler):
             result = {"error": "Query is empty or not provided.", "level": 2}
 
         else:
-
+            
+            # Todo: Fix
             @chain
             def tool_chain(user_input: str, config: RunnableConfig):
                 input_ = {"user_input": user_input}
@@ -177,7 +177,7 @@ class GeneralQuestions(BaseMQTTHandler):
                     response = self.tavily_temp.search(
                         query, include_answer=True, topic=topic
                     )
-                    logger.info(f"Response from Tavily API: {response}")
+                    logger.info(f"1 Response from Tavily API: {response}")
                 except Exception as e:
                     logger.error(f"Error in Tavily API: {e}")
                     result = {"error": f"Error in Tavily API: {e}", "level": 2}
@@ -192,7 +192,7 @@ class GeneralQuestions(BaseMQTTHandler):
                 try:
                     input_ = f'{{"user_query": "{query}"}}'
                     response = tool_chain.invoke(input_)
-                    logger.info(f"Response from Tavily API: {response}")
+                    logger.info(f"2 Response from Tavily API: {response}")
                 except Exception as e:
                     logger.error(f"Error in Chain Response: {e}")
                     result = {"error": f"Error in Chain Response: {e}", "level": 2}
@@ -210,7 +210,7 @@ class GeneralQuestions(BaseMQTTHandler):
                     response = self.tavily_temp.search(
                         query, include_answer=True, topic=topic
                     )
-                    logger.info(f"Response from Tavily API: {response}")
+                    logger.info(f"3 Response from Tavily API: {response}")
                 except Exception as e:
                     logger.error(f"Error in Tavily API: {e}")
                     result = {"error": f"Error in Tavily API: {e}", "level": 2}
