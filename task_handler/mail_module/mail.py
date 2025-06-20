@@ -678,8 +678,8 @@ class BEMOMail(BaseMQTTHandler):
 
 if __name__ == "__main__":
     # Choose provider: 'gmail' or 'outlook'
-    mail = BEMOMail(provider='outlook')
-    mail.authenticate()
+    # mail = BEMOMail(provider='outlook')
+    # mail.authenticate()
     # print('Authenticated')
 
     # Send an email
@@ -718,3 +718,12 @@ if __name__ == "__main__":
     # Mark emails as spam
     # output = mail.mark_emails_as_spam(sender="hazem.metwalli23@gmail.com", subject_keyword="testing")
     # print(output)
+
+
+    # Choose provider: 'gmail' or 'outlook'
+    mail = BEMOMail(provider='outlook')
+    mail.authenticate()
+    mail.start_mqtt()
+    # print('Authenticated')
+
+    # mail.execute_main({"function_name": "fetch_latest_emails", "count": 2})
