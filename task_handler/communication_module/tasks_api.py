@@ -1164,5 +1164,5 @@ class TasksApi(BaseMQTTHandler):
 
 
 if __name__ == "__main__":
-    tasks_api = TasksApi("0")
+    tasks_api = TasksApi("0") # Todo: Make ids for user and connect it the robot id
     tasks_api.start_mqtt()
