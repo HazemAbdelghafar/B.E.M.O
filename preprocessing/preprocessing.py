@@ -40,7 +40,7 @@ LIMITS = {
     "mail": 7,
     "general": 10,
     "learning_resources": 3,
-    "others": 3,
+    "others": 10,
 }
 
 
@@ -71,7 +71,7 @@ class PreProcessing(BaseMQTTHandler):
         self.__output_parser = JsonOutputParser()
         self.__system_prompts = self.__initialize_prompts()
         self.__chains = self.__initialize_chains()
-        self.__chat_history = self.initialize_chat_history()
+        self.__chat_history = self.initialize_chat_history()  # TODO: Make it better
         self.__switch_mapping = SwitchMapping().get_all_mappings()
         self.__user_data = UserData().get_all_user_data()
 
