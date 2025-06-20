@@ -21,8 +21,18 @@
         },
         "output": {
             "emails": [
-                {"sender": "test@test.com", "subject": "Test Subject", "body": "Test Body", "message_id":123},
-                {"sender": "test2@test.com", "subject": "Test Subject 2", "body": "Test Body 2", "message_id":124}
+                {
+                    "sender": "test@test.com",
+                    "subject": "Test Subject",
+                    "body": "Test Body",
+                    "message_id": 123
+                },
+                {
+                    "sender": "test2@test.com",
+                    "subject": "Test Subject 2",
+                    "body": "Test Body 2",
+                    "message_id": 124
+                }
             ]
         }
     },
@@ -37,8 +47,18 @@
         },
         "output": {
             "emails": [
-                {"sender": "test@test.com", "subject": "Test Subject", "body": "Test Body", "message_id":123},
-                {"sender": "test2@test.com", "subject": "Test Subject 2", "body": "Test Body 2", "message_id":124}
+                {
+                    "sender": "test@test.com",
+                    "subject": "Test Subject",
+                    "body": "Test Body",
+                    "message_id": 123
+                },
+                {
+                    "sender": "test2@test.com",
+                    "subject": "Test Subject 2",
+                    "body": "Test Body 2",
+                    "message_id": 124
+                }
             ]
         }
     },
@@ -50,7 +70,14 @@
             "count": 1
         },
         "output": {
-            "emails": [{"sender": "test@test.com", "subject": "Test Subject", "body": "Test Body", "message_id":123}]
+            "emails": [
+                {
+                    "sender": "test@test.com",
+                    "subject": "Test Subject",
+                    "body": "Test Body",
+                    "message_id": 123
+                }
+            ]
         }
     },
 
@@ -105,3 +132,25 @@
         }
     }
 ]
+
+// def execute_main(self, input_data: dict) -> dict:
+//     function_name = input_data.get("function")
+//     if function_name == "send_email":
+//         result = self.send_email(input_data.get("to_email"), input_data.get("subject"), input_data.get("body"))
+//     elif function_name == "fetch_latest_emails":
+//         result = self.fetch_latest_emails(input_data.get("count"))
+//     elif function_name == "search_emails":
+//         result = self.search_emails(input_data.get("keyword"), input_data.get("sender"), input_data.get("max_results"))
+//     elif function_name == "fetch_unread_emails":
+//         result = self.fetch_unread_emails(input_data.get("count"))
+//     elif function_name == "delete_email":
+//         result = self.delete_email(input_data.get("subject"), input_data.get("message_id"))
+//     elif function_name == "reply_to_email":
+//         result = self.reply_to_email(input_data.get("message_id"), input_data.get("reply_body"))
+//     elif function_name == "mark_emails_as_read":
+//         result = self.mark_emails_as_read(input_data.get("message_ids"))
+//     elif function_name == "mark_emails_as_spam":
+//         result = self.mark_emails_as_spam(input_data.get("sender"), input_data.get("subject_keyword"))
+
+//     self.publish_result(result, "task_handler/main")
+//     return None
