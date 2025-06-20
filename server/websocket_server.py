@@ -50,7 +50,10 @@ class ServerWebSocketClient(BaseMQTTHandler):
 
     def on_open(self, socket: WebSocket):
         self.ws = socket
-        logger.info(f"Connected to render {self.id}")
+        self.end_time = time.time()
+        logger.info(
+            f"Connected to forwarding server in {self.end_time - self.start_time} seconds"
+        )
 
     def on_message(self, socket: WebSocket, message: str):
         """
@@ -97,6 +100,7 @@ class ServerWebSocketClient(BaseMQTTHandler):
         thread = threading.Thread(target=ws.run_forever)
         thread.daemon = True
         thread.start()
+        self.start_time = time.time()
         time.sleep(1)
 
     def send_data(self, payload: dict):
