@@ -1,0 +1,107 @@
+[
+    // 1. Send Email
+    {
+        "function": "send_email",
+        "input": {
+            "recipients": ["test@test.com", "test2@test.com"],
+            "subject": "Test Subject",
+            "body": "Test Body"
+        },
+        "output": {
+            "status": "success"
+        }
+    },
+
+    // 2. Fetch Latest Emails
+
+    {
+        "function": "fetch_latest_emails",
+        "input": {
+            "count": 2
+        },
+        "output": {
+            "emails": [
+                {"sender": "test@test.com", "subject": "Test Subject", "body": "Test Body", "message_id":123},
+                {"sender": "test2@test.com", "subject": "Test Subject 2", "body": "Test Body 2", "message_id":124}
+            ]
+        }
+    },
+
+    // 3. Search Emails
+    {
+        "function": "search_emails",
+        "input": {
+            "keyword": "Test Keyword",
+            "sender": "test@test.com",
+            "max_results": 2
+        },
+        "output": {
+            "emails": [
+                {"sender": "test@test.com", "subject": "Test Subject", "body": "Test Body", "message_id":123},
+                {"sender": "test2@test.com", "subject": "Test Subject 2", "body": "Test Body 2", "message_id":124}
+            ]
+        }
+    },
+
+    // 4. Fetch Unread Emails
+    {
+        "function": "fetch_unread_emails",
+        "input": {
+            "count": 1
+        },
+        "output": {
+            "emails": [{"sender": "test@test.com", "subject": "Test Subject", "body": "Test Body", "message_id":123}]
+        }
+    },
+
+    // 5. Delete Email
+    {
+        "function": "delete_email",
+        "input": {
+            "subject": "Test Subject",
+            "message_id": 123
+        },
+        "output": {
+            "status": "success",
+            "message": "Email deleted successfully"
+        }
+    },
+
+    // 6. Reply to Email
+    {
+        "function": "reply_to_email",
+        "input": {
+            "message_id": 123,
+            "reply_body": "Test Reply Body"
+        },
+        "output": {
+            "status": "success",
+            "message": "Email replied successfully"
+        }
+    },
+
+    // 7. Mark Emails as Read
+    {
+        "function": "mark_emails_as_read",
+        "input": {
+            "message_ids": ["123", "124"]
+        },
+        "output": {
+            "status": "success",
+            "message": "Emails marked as read successfully"
+        }
+    },
+
+    // 8. Mark Emails as Spam
+    {
+        "function": "mark_emails_as_spam",
+        "input": {
+            "sender": "test@test.com",
+            "subject_keyword": "Test Subject"
+        },
+        "output": {
+            "status": "success",
+            "message": "Emails marked as spam successfully"
+        }
+    }
+]
