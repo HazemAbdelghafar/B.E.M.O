@@ -41,7 +41,9 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     data = json.loads(message)
                 except json.JSONDecodeError:
                     logger.error("Invalid JSON format")
-                    await websocket.send_text("Invalid JSON format.")
+                    await websocket.send_text(
+                        json.dumps({"is_server_error": True, "target_robot_id": id})
+                    )
                     continue
 
                 if data:
@@ -64,7 +66,9 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         # Check if the server is connected
         if SERVER_ID not in connected_devices:
             logger.error("Server is not connected. Cannot proceed.")
-            # TODO: Send message to server that robot is not connected
+            await websocket.send_text(
+                json.dumps({"is_server_error": True, "target_robot_id": id})
+            )
             await websocket.close()
             return
 
@@ -80,7 +84,9 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     data = json.loads(message)
                 except json.JSONDecodeError:
                     logger.error("Invalid JSON format")
-                    await websocket.send_text("Invalid JSON format.")
+                    await websocket.send_text(
+                        json.dumps({"is_server_error": True, "target_robot_id": id})
+                    )
                     continue
 
                 if data:
