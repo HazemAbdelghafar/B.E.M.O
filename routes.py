@@ -4,98 +4,121 @@ from typing import Dict
 import logging
 import json
 
-# Set up logging
 logger = logging.getLogger("uvicorn")
-
-# Define the name of the module and the topics
-SERVER_ID = "server"
-
-# Initialize the router
 router = APIRouter(prefix="/api")
 
-# Dictionary to keep track of connected devices
+SERVER_ID = "server"
 connected_devices: Dict[str, WebSocket] = {}
 
+
+# === Utility Functions ===
+
+async def send_safe(ws: WebSocket, data: dict):
+    """Safely send JSON data over a WebSocket."""
+    if ws.client_state == WebSocketState.CONNECTED:
+        try:
+            await ws.send_text(json.dumps(data))
+        except Exception as e:
+            logger.error(f"Failed to send message: {e}")
+    else:
+        logger.warning("Attempted to send message to a closed socket.")
+
+
+async def forward_message(sender_id: str, target_id: str, message: str):
+    """Forward message to the target client."""
+    if target_id in connected_devices:
+        await send_safe(connected_devices[target_id], json.loads(message))
+        logger.info(f"Forwarded message from {sender_id} to {target_id}: {message}")
+    else:
+        logger.warning(f"Target '{target_id}' not connected.")
+        await send_safe(connected_devices[sender_id], {
+            "error": f"Target '{target_id}' not connected.",
+            "level": 2,
+            "from": sender_id,
+            "to": target_id,
+        })
+
+
+# === Main WebSocket Handler ===
 
 @router.websocket("/ws/{id}")
 async def websocket_endpoint(websocket: WebSocket, id: str):
     logger.info(f"New connection: {id}")
     await websocket.accept()
 
-    if id == "server":
-        # Check if the server is already connected
+    # === SERVER CONNECTING ===
+    if id == SERVER_ID:
         if SERVER_ID in connected_devices:
-            logger.error("Server is already connected.")
-            await websocket.close()
-            return
+            old_server = connected_devices[SERVER_ID]
+            logger.warning("Previous server is already connected. Replacing it.")
+            try:
+                await send_safe(old_server, {
+                    "warning": "Another server connection has replaced this one.",
+                    "level": 2
+                })
+                await old_server.close()
+            except Exception as e:
+                logger.error(f"Failed to close old server connection: {e}")
 
-        logger.info("Server connected")
-        connected_devices[id] = websocket
+        connected_devices[SERVER_ID] = websocket
+        logger.info("Server connected and ready.")
+
         try:
             while websocket.client_state == WebSocketState.CONNECTED:
-                message = await websocket.receive_text()
-                logger.info(f"Server sent: {message}")
-
                 try:
-                    # Assuming the message is JSON formatted
+                    message = await websocket.receive_text()
+                    logger.info(f"Server sent: {message}")
                     data = json.loads(message)
                 except json.JSONDecodeError:
-                    logger.error("Invalid JSON format")
-                    await websocket.send_text(
-                        json.dumps({"is_server_error": True, "target_robot_id": id})
-                    )
+                    logger.error("Invalid JSON from server.")
+                    await send_safe(websocket, {"error": "Invalid JSON Format", "level": 3})
                     continue
 
-                if data:
-                    target_robot_id = data.get("target_robot_id")
-                    if target_robot_id in connected_devices:
-                        await connected_devices[target_robot_id].send_text(message)
-                        logger.info(
-                            f"Forwarded message to {target_robot_id}: {message}"
-                        )
-                    else:
-                        logger.warning(f"Robot {target_robot_id} not connected.")
+                target_id = data.get("target_robot_id")
+                if target_id:
+                    await forward_message(SERVER_ID, target_id, message)
                 else:
-                    logger.warning("No data received from server.")
+                    logger.warning("No 'target_robot_id' in server message.")
 
         except WebSocketDisconnect:
-            logger.warning("Server disconnected")
-            connected_devices.pop(id, None)
+            logger.warning("Server disconnected.")
+        finally:
+            connected_devices.pop(SERVER_ID, None)
 
+    # === ROBOT CONNECTING ===
     else:
-        # Check if the server is connected
         if SERVER_ID not in connected_devices:
-            logger.error("Server is not connected. Cannot proceed.")
-            await websocket.send_text(
-                json.dumps({"is_server_error": True, "target_robot_id": id})
-            )
+            logger.error("Server not connected. Rejecting robot.")
+            await send_safe(websocket, {
+                "error": "Server not connected.",
+                "level": 3,
+                "target_robot_id": id
+            })
             await websocket.close()
             return
 
-        logger.info(f"Robot connected: {id}")
         connected_devices[id] = websocket
+        logger.info(f"Robot connected: {id}")
+
         try:
             while websocket.client_state == WebSocketState.CONNECTED:
-                message = await websocket.receive_text()
-                logger.info(f"{id} sent: {message}")
-
                 try:
-                    # Assuming the message is JSON formatted
+                    message = await websocket.receive_text()
+                    logger.info(f"{id} sent: {message}")
                     data = json.loads(message)
                 except json.JSONDecodeError:
-                    logger.error("Invalid JSON format")
-                    await websocket.send_text(
-                        json.dumps({"is_server_error": True, "target_robot_id": id})
-                    )
+                    logger.error(f"Invalid JSON from robot {id}.")
+                    await send_safe(websocket, {
+                        "error": "Invalid JSON Format",
+                        "level": 3,
+                        "target_robot_id": id
+                    })
                     continue
 
-                if data:
-                    # Forward the message to the server
-                    await connected_devices[SERVER_ID].send_text(message)
-                    logger.info(f"Forwarded message to server: {message}")
-                else:
-                    logger.warning("No data received from robot.")
-                    continue
+                await send_safe(connected_devices[SERVER_ID], data)
+                logger.info(f"Forwarded message from {id} to server.")
+
         except WebSocketDisconnect:
-            logger.warning(f"{id} disconnected")
+            logger.warning(f"Robot '{id}' disconnected.")
+        finally:
             connected_devices.pop(id, None)
