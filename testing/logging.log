@@ -1137,3 +1137,8 @@
 05/03/2025 12:14:16 AM test_server.py INFO: [server] MQTT loop started.
 05/03/2025 12:14:16 AM test_server.py INFO: [server] Successfully connected to broker.
 05/03/2025 12:14:24 AM test_server.py INFO: [server] Received message: {'is_error': False, 'response': "Hmm, interesting!  Tomorrow's weather is a bit tricky to predict so far out.  One forecast mentions misty weather with 22.6 degrees Celsius in the Philippines, while another suggests cloudy skies and a chance of rain in New York City. It really depends on where you are!", 'target_robot_id': 'bemo-MK1', 'screen': 'happy', 'module_name': 'main'}
+06/20/2025 07:16:01 AM test_server.py INFO: [server] Connected and listening to 'server/main'
+06/20/2025 07:16:01 AM test_server.py INFO: [server] Published to 'main/main': {"message": "Check on my tasks", "top_label": "curiosity", "top_label_prob": 0.6451504230499268, "second_top_label": "neutral", "second_top_label_prob": 0.32930633425712585, "Third_top_label": "confusion", "Third_top_label_prob": 0.05925249680876732, "module_name": "server", "src_robot_id": "bemo-MK1"}
+06/20/2025 07:16:01 AM test_server.py INFO: [server] MQTT loop started.
+06/20/2025 07:16:01 AM test_server.py INFO: [server] Successfully connected to broker.
+06/20/2025 07:16:06 AM test_server.py INFO: [server] Received message: {'is_error': False, 'response': "Hmm, interesting!  It looks like you have one task in your 'My Tasks' list: Clean The Dishes.  It's been on there for a while, though!  Ready to tackle it?", 'target_robot_id': 'bemo-MK1', 'screen': 'curious', 'module_name': 'main'}
