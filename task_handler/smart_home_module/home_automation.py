@@ -76,6 +76,7 @@ class SmartHomeAutomation(BaseMQTTHandler):
                 self.DEVICE_ID,
                 {"commands": [{"code": switch_id, "value": status == "on"}]},
             )
+            logger.info(f"Result: {result}")
             return result.get("success", False)
         except Exception as e:
             logger.error(f"Error controlling device: {e}")
