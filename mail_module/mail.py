@@ -153,7 +153,7 @@ class BEMOMail:
                 headers = msg_data['payload']['headers']
                 subject = next((h['value'] for h in headers if h['name'] == 'Subject'), "(No Subject)")
                 sender = next((h['value'] for h in headers if h['name'] == 'From'), "(Unknown Sender)")
-
+                message_id = msg['id']
                 # Decode the actual message body
                 body = ""
                 payload = msg_data.get('payload', {})
@@ -169,7 +169,7 @@ class BEMOMail:
                     if data:
                         body = base64.urlsafe_b64decode(data).decode()
 
-                emails.append((sender, subject, body))
+                emails.append({"sender": sender, "subject": subject, "body": body, "message_id": message_id})
 
         
         elif self.provider == 'outlook':
@@ -188,6 +188,7 @@ class BEMOMail:
             for msg in data.get('value', []):
                 sender = msg['from']['emailAddress']['name']
                 subject = msg.get('subject', '(No Subject)')
+                message_id = msg['id']
                 
                 message_id = msg['id']
                 detailed_url = f'https://graph.microsoft.com/v1.0/me/messages/{message_id}'
@@ -199,8 +200,7 @@ class BEMOMail:
                 else:
                     body = "(Failed to fetch email body)"
                     
-                emails.append((sender, subject, body))
-
+                emails.append({"sender": sender, "subject": subject, "body": body, "message_id": message_id})
         return emails
 
     def search_emails(self, keyword=None, sender=None, max_results=5):
@@ -226,6 +226,7 @@ class BEMOMail:
                 headers = msg_data['payload']['headers']
                 subject = next((h['value'] for h in headers if h['name'] == 'Subject'), "(No Subject)")
                 sender_email = next((h['value'] for h in headers if h['name'] == 'From'), "(Unknown Sender)")
+                message_id = msg['id']
 
                 body = ""
                 payload = msg_data.get('payload', {})
@@ -245,7 +246,7 @@ class BEMOMail:
                     "sender": sender_email,
                     "subject": subject,
                     "body": body,
-                    "message_id": msg['id']
+                    "message_id": message_id
                 })
 
         elif self.provider == 'outlook':
@@ -361,31 +362,31 @@ class BEMOMail:
     def delete_email(self, subject=None, message_id=None):
         if not subject and not message_id:
             print("Please provide either a subject or a message ID to delete an email.")
-            return False
+            return {"status": "error", "message": "Please provide either a subject or a message ID to delete an email."}
 
         if self.provider == 'gmail':
             if message_id:
                 try:
                     self.service.users().messages().trash(userId='me', id=message_id).execute()
                     print(f"Gmail: Deleted email with ID: {message_id}")
-                    return True
+                    return {"status": "success", "message": "Email deleted successfully"}
                 except Exception as e:
                     print("Failed to delete Gmail email by ID:", e)
-                    return False
+                    return {"status": "error", "message": "Failed to delete Gmail email by ID"}
             elif subject:
                 # Search by subject
                 results = self.service.users().messages().list(userId='me', q=f'subject:"{subject}"').execute()
                 messages = results.get('messages', [])
                 if not messages:
                     print("No Gmail email found with that subject.")
-                    return False
+                    return {"status": "error", "message": "No Gmail email found with that subject."}
                 for msg in messages:
                     try:
                         self.service.users().messages().trash(userId='me', id=msg['id']).execute()
                         print(f"Gmail: Deleted email with subject: {subject}")
                     except Exception as e:
                         print("Failed to delete Gmail email:", e)
-                return True
+                return {"status": "success", "message": "Email deleted successfully"}
 
         elif self.provider == 'outlook':
             headers = {'Authorization': f'Bearer {self.graph_token}'}
@@ -396,11 +397,11 @@ class BEMOMail:
                 response = requests.delete(url, headers=headers)
                 if response.status_code == 204:
                     print(f"Outlook: Deleted email with ID: {message_id}")
-                    return True
+                    return {"status": "success", "message": "Email deleted successfully"}
                 else:
                     print("Failed to delete Outlook email by ID.")
                     print("Status Code:", response.status_code)
-                    return False
+                    return {"status": "error", "message": "Failed to delete Outlook email by ID"}
 
             elif subject:
                 print('subject')
@@ -412,12 +413,12 @@ class BEMOMail:
                 if search_resp.status_code != 200:
                     print("Outlook: Failed to search email by subject.")
                     print("Status Code:", search_resp.status_code)
-                    return False
+                    return {"status": "error", "message": "Failed to search Outlook email by subject."}
 
                 emails = search_resp.json().get('value', [])
                 if not emails:
                     print("No Outlook email found with that subject.")
-                    return False
+                    return {"status": "error", "message": "No Outlook email found with that subject."}
 
                 for email in emails:
                     del_url = f"https://graph.microsoft.com/v1.0/me/messages/{email['id']}"
@@ -427,10 +428,10 @@ class BEMOMail:
                     else:
                         print(f"Failed to delete Outlook email with ID: {email['id']}")
 
-                return True
+                return {"status": "success", "message": "Email deleted successfully"}
 
         print("Unknown provider or error.")
-        return False
+        return {"status": "error", "message": "Unknown provider or error."}
 
     def reply_to_email(self, message_id, reply_body):
         if self.provider == 'gmail':
@@ -453,10 +454,10 @@ class BEMOMail:
 
                 sent = self.service.users().messages().send(userId='me', body=body).execute()
                 print("Reply sent to Gmail successfully.")
-                return sent
+                return {"status": "success", "message": "Email replied successfully"}
             except Exception as e:
                 print(f"Failed to reply to Gmail email: {e}")
-                return None
+                return {"status": "error", "message": "Failed to reply to Gmail email"}
 
         elif self.provider == 'outlook':
             try:
@@ -467,7 +468,7 @@ class BEMOMail:
 
                 if response.status_code != 200:
                     print(f"Failed to get original message. Status: {response.status_code}")
-                    return None
+                    return {"status": "error", "message": "Failed to get original message."}
 
                 msg_data = response.json()
                 reply_url = f"https://graph.microsoft.com/v1.0/me/messages/{message_id}/createReply"
@@ -476,7 +477,7 @@ class BEMOMail:
                 create_response = requests.post(reply_url, headers=headers)
                 if create_response.status_code != 201:
                     print(f"Failed to create reply draft: {create_response.status_code}")
-                    return None
+                    return {"status": "error", "message": "Failed to create reply draft."}
 
                 draft = create_response.json()
                 draft_id = draft['id']
@@ -493,20 +494,20 @@ class BEMOMail:
 
                 if patch_response.status_code not in [200, 202]:
                     print(f"Failed to update reply draft body: {patch_response.status_code}")
-                    return None
+                    return {"status": "error", "message": "Failed to update reply draft body."}
 
                 # Step 3: Send the reply
                 send_url = f"https://graph.microsoft.com/v1.0/me/messages/{draft_id}/send"
                 send_response = requests.post(send_url, headers=headers)
                 if send_response.status_code == 202:
                     print("Reply sent to Outlook successfully.")
-                    return {"status": "success"}
+                    return {"status": "success", "message": "Email replied successfully"}
                 else:
                     print(f"Failed to send reply: {send_response.status_code}")
-                    return None
+                    return {"status": "error", "message": "Failed to send reply."}
             except Exception as e:
                 print(f"Failed to reply to Outlook email: {e}")
-                return None
+                return {"status": "error", "message": "Failed to reply to Outlook email."}
 
     def mark_emails_as_read(self, message_ids: list[str]):
         if self.provider == 'gmail':
