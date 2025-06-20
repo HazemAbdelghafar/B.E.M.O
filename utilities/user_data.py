@@ -1,9 +1,10 @@
 DEFAULT_USER_DATA = {
+    "name": "Mohamed Youssef Abdelnasser",
+    "age": "21",
+    "date_of_birth": "28/10/2003",  # Day/Month/Year
+    "job_title": "NLP Engineer",
     "location": "Alamein, Egypt",
     "timezone": "Africa/Cairo",
-    "name": "Mohamed Youssef Abdelnasser",
-    "job_title": "NLP Engineer",
-    "age": "21",
 }
 
 
