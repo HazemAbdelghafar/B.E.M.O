@@ -1,9 +1,7 @@
 DEFAULT_MAPPING = {
-    "switch_1": "living room lights",
-    "switch_2": "fan",
-    "switch_3": "television",
-    "switch_4": "air conditioner",
-    "switch_5": "speaker",
+    "switch_1": "edge light",
+    "switch_2": "middle light",
+    "switch_3": "green light",
 }
 
 
