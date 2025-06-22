@@ -33,12 +33,13 @@ console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
 class Mail(BaseMQTTHandler):
-    def __init__(self, provider, config_path='secrets', token_path='tokens'):
+    def __init__(self, provider : str, robot_id : str, config_path='secrets', token_path='tokens'):
         super().__init__(sub_topic="task_handler/mail", name="mail")
 
         self.provider = provider.lower()
         self.config_path = config_path
         self.token_path = token_path
+        self.robot_id = robot_id
         self.creds = None
 
         os.makedirs(self.token_path, exist_ok=True)
@@ -61,8 +62,7 @@ class Mail(BaseMQTTHandler):
             return self._auth_outlook()
 
     def _auth_gmail(self):
-        # Todo: Add multiple accounts support
-        token_file = os.path.join(self.token_path, 'gmail_token.json')
+        token_file = os.path.join(self.token_path, f'{self.robot_id}_gmail_token.json')
         creds_file = os.path.join(self.config_path, 'gmail_client_secret.json')
 
         if os.path.exists(token_file):
@@ -80,7 +80,7 @@ class Mail(BaseMQTTHandler):
         self.service = build('gmail', 'v1', credentials=self.creds)
 
     def _auth_outlook(self):
-        token_file = os.path.join(self.token_path, 'outlook_token.json')
+        token_file = os.path.join(self.token_path, f'{self.robot_id}_outlook_token.json')
         client_id = os.environ.get('OUTLOOK_CLIENT_ID')
 
         if not client_id:
@@ -679,6 +679,6 @@ class Mail(BaseMQTTHandler):
 
 if __name__ == "__main__":
     # Choose provider: 'gmail' or 'outlook'
-    mail = Mail(provider='outlook') # Todo: Make it dynamic
+    mail = Mail(provider='outlook', robot_id='bemo-MK1') # Todo: Make it dynamic
     mail.authenticate()
     mail.start_mqtt()
