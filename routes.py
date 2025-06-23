@@ -6,7 +6,7 @@ import logging
 import json
 from fastapi.responses import HTMLResponse
 from jinja2 import Template
-
+import asyncio
 
 # === Logging ===
 logger = logging.getLogger("uvicorn")
@@ -40,19 +40,31 @@ async def send_safe(ws: WebSocket, data: dict):
     else:
         logger.warning("Attempted to send on a closed socket.")
 
-async def forward_message(sender_id: str, target_id: str, message: str):
+async def forward_message_to_robot(target_id: str, message: str):
+    sender_id = SERVER_ID
+    
     if target_id in connected_devices:
         await send_safe(connected_devices[target_id], json.loads(message))
         logger.info(f"Forwarded from {sender_id} to {target_id}: {message}")
     else:
         logger.warning(f"Target '{target_id}' not connected.")
+       
         await send_safe(connected_devices[sender_id], {
             "error": f"Target '{target_id}' not connected.",
             "level": 3,
-            "from": sender_id,
-            "to": target_id,
+            "src_robot_id": target_id,
             "is_server_error": True
         })
+
+
+async def start_ping_loop(ws: WebSocket, device_id: str, interval: int = 30):
+    try:
+        while ws.client_state == WebSocketState.CONNECTED:
+            await asyncio.sleep(interval)
+            if device_id in connected_devices:
+                await send_safe(connected_devices[device_id], {"type": "ping"})
+    except Exception as e:
+        logger.warning(f"Ping loop error for {device_id}: {e}")
 
 # === WebSocket Endpoint ===
 
@@ -64,7 +76,8 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
     ip = websocket.client.host
     connected_at = now_utc_iso()
 
-    # === SERVER CONNECTING ===
+    asyncio.create_task(start_ping_loop(websocket, id))  # Start ping task
+
     if id == SERVER_ID:
         if SERVER_ID in connected_devices:
             old_ws = connected_devices[SERVER_ID]
@@ -92,9 +105,12 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     await send_safe(websocket, {"error": "Invalid JSON Format", "level": 3})
                     continue
 
+                if data.get("type") == "ping":
+                    continue  # Ignore pings
+
                 target_id = data.get("target_robot_id")
                 if target_id:
-                    await forward_message(SERVER_ID, target_id, message)
+                    await forward_message_to_robot(target_id, message)
                 else:
                     logger.warning("No 'target_robot_id' in message.")
 
@@ -118,14 +134,12 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     connected_devices.pop(rid, None)
                     device_metadata.pop(rid, None)
 
-            # Log connection duration
             duration = get_duration_seconds(device_metadata[SERVER_ID]["connected_at"])
             logger.info(f"Server was connected for {duration} seconds")
 
             connected_devices.pop(SERVER_ID, None)
             device_metadata.pop(SERVER_ID, None)
-    
-    # === ROBOT CONNECTING ===
+
     else:
         if SERVER_ID not in connected_devices:
             logger.error("Server not connected. Rejecting robot.")
@@ -158,6 +172,9 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     })
                     continue
 
+                if data.get("type") == "ping":
+                    continue  # Ignore pings
+
                 await send_safe(connected_devices[SERVER_ID], data)
                 logger.info(f"Forwarded message from {id} to server.")
 
@@ -174,8 +191,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                 logger.warning(f"No 'connected_at' info for robot '{id}'")
 
             connected_devices.pop(id, None)
-            device_metadata.pop(id, None)
-            
+            device_metadata.pop(id, None)            
 # === REST Endpoint for status ===
 
 @router.get("/connected-devices", response_class=HTMLResponse)
