@@ -7,7 +7,6 @@ import logging
 import json
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.requests import Request
-import asyncio
 
 # === Logging ===
 logger = logging.getLogger("uvicorn")
@@ -61,15 +60,6 @@ async def forward_message_to_robot(target_id: str, message: str):
         })
 
 
-# async def start_ping_loop(ws: WebSocket, device_id: str, interval: int = 30):
-#     try:
-#         while ws.client_state == WebSocketState.CONNECTED:
-#             await asyncio.sleep(interval)
-#             if device_id in connected_devices:
-#                 await send_safe(connected_devices[device_id], {"type": "ping"})
-#     except Exception as e:
-#         logger.warning(f"Ping loop error for {device_id}: {e}")
-
 # === WebSocket Endpoint ===
 
 @router.websocket("/ws/{id}")
@@ -79,8 +69,6 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
 
     ip = websocket.client.host
     connected_at = now_utc_iso()
-
-    # asyncio.create_task(start_ping_loop(websocket, id))  # Start ping task
 
     if id == SERVER_ID:
         if SERVER_ID in connected_devices:
@@ -95,7 +83,14 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                 logger.error(f"Error closing old server connection: {e}")
 
         connected_devices[SERVER_ID] = websocket
-        device_metadata[SERVER_ID] = {"ip": ip, "connected_at": connected_at}
+        device_metadata[SERVER_ID] = {
+            "ip": ip,
+            "connected_at": connected_at,
+            "last_seen": connected_at,
+            "last_message": None,
+            "status": "connected",
+            "last_disconnected": None
+        }
         logger.info(f"Server connected from {ip}")
 
         try:
@@ -108,10 +103,11 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     logger.error("Invalid JSON from server.")
                     await send_safe(websocket, {"error": "Invalid JSON Format", "level": 3})
                     continue
+                
+                device_metadata[SERVER_ID]["last_seen"] = now_utc_iso()
+                device_metadata[SERVER_ID]["last_message"] = data
 
-                # if data.get("type") == "ping":
-                #     continue  # Ignore pings
-
+                
                 target_id = data.get("target_robot_id")
                 if target_id:
                     await forward_message_to_robot(target_id, message)
@@ -137,7 +133,10 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                 finally:
                     connected_devices.pop(rid, None)
                     device_metadata.pop(rid, None)
-
+            
+            device_metadata[SERVER_ID]["status"] = "disconnected"
+            device_metadata[SERVER_ID]["last_disconnected"] = now_utc_iso()
+            
             metadata = device_metadata.get(SERVER_ID, {})
             connected_at = metadata.get("connected_at")
 
@@ -163,15 +162,26 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             return
 
         connected_devices[id] = websocket
-        device_metadata[id] = {"ip": ip, "connected_at": connected_at}
+        device_metadata[id] = {
+            "ip": ip,
+            "connected_at": connected_at,
+            "last_seen": connected_at,
+            "last_message": None,
+            "status": "connected",
+            "last_disconnected": None
+        }
+
         logger.info(f"Robot '{id}' connected from {ip}")
 
         try:
             while websocket.client_state == WebSocketState.CONNECTED:
                 try:
                     message = await websocket.receive_text()
+
                     logger.info(f"{id} sent: {message}")
                     data = json.loads(message)
+                    device_metadata[id]["last_seen"] = now_utc_iso()
+                    device_metadata[id]["last_message"] = data
                 except json.JSONDecodeError:
                     logger.error(f"Invalid JSON from robot {id}.")
                     await send_safe(websocket, {
@@ -182,15 +192,15 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     })
                     continue
 
-                # if data.get("type") == "ping":
-                #     continue  # Ignore pings
-
                 await send_safe(connected_devices[SERVER_ID], data)
                 logger.info(f"Forwarded message from {id} to server.")
 
         except WebSocketDisconnect:
             logger.warning(f"Robot '{id}' disconnected.")
         finally:
+            device_metadata[id]["status"] = "disconnected"
+            device_metadata[id]["last_disconnected"] = now_utc_iso()
+            
             metadata = device_metadata.get(id, {})
             connected_at = metadata.get("connected_at")
 
@@ -206,58 +216,41 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
 
 # === REST Endpoint for status ===
 
+def format_device(device_id, info):
+    return {
+        "id": device_id,
+        "ip": info["ip"],
+        "connected_at": info["connected_at"],
+        "duration": get_duration_seconds(info["connected_at"]),
+        "status": info.get("status", "unknown"),
+        "last_seen": info.get("last_seen"),
+        "last_message": info.get("last_message"),
+        "last_disconnected": info.get("last_disconnected"),
+    }
+
 @router.get("/connected-devices/json", response_class=JSONResponse)
 async def get_connected_devices_json():
-    def format_device(device_id, info):
-        return {
-            "id": device_id,
-            "ip": info["ip"],
-            "connected_at": info["connected_at"],
-            "duration": get_duration_seconds(info["connected_at"])
-        }
-
-    server_info = (
-        format_device(SERVER_ID, device_metadata[SERVER_ID])
-        if SERVER_ID in device_metadata else None
-    )
-
-    robots = [
-        format_device(device_id, info)
-        for device_id, info in device_metadata.items()
-        if device_id != SERVER_ID
-    ]
-
     return JSONResponse(content={
-        "server": server_info,
-        "robots": robots
+        "server": format_device(SERVER_ID, device_metadata[SERVER_ID])
+        if SERVER_ID in device_metadata else None,
+        "robots": [
+            format_device(device_id, info)
+            for device_id, info in device_metadata.items()
+            if device_id != SERVER_ID
+        ]
     })
-
+    
 @router.get("/connected-devices", response_class=HTMLResponse)
 async def get_connected_devices(request: Request):
-    def format_device(device_id, info):
-        duration = get_duration_seconds(info["connected_at"])
-        return {
-            "id": device_id,
-            "ip": info["ip"],
-            "connected_at": info["connected_at"],
-            "duration": duration
-        }
-
-    server_info = (
-        format_device(SERVER_ID, device_metadata[SERVER_ID])
-        if SERVER_ID in device_metadata else None
-    )
-
-    robots = [
-        format_device(device_id, info)
-        for device_id, info in device_metadata.items()
-        if device_id != SERVER_ID
-    ]
-
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
-        "server": server_info,
-        "robots": robots
+        "server": format_device(SERVER_ID, device_metadata[SERVER_ID])
+        if SERVER_ID in device_metadata else None,
+        "robots": [
+            format_device(device_id, info)
+            for device_id, info in device_metadata.items()
+            if device_id != SERVER_ID
+        ]
     })
-    
-    
+
+
