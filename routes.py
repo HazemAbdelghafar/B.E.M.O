@@ -46,9 +46,10 @@ async def forward_message(sender_id: str, target_id: str, message: str):
         logger.warning(f"Target '{target_id}' not connected.")
         await send_safe(connected_devices[sender_id], {
             "error": f"Target '{target_id}' not connected.",
-            "level": 2,
+            "level": 3,
             "from": sender_id,
             "to": target_id,
+            "is_server_error": True
         })
 
 # === WebSocket Endpoint ===
@@ -69,7 +70,6 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             try:
                 await send_safe(old_ws, {
                     "warning": "Another server has replaced this connection.",
-                    "level": 2
                 })
                 await old_ws.close()
             except Exception as e:
@@ -104,8 +104,9 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             for rid in robot_ids:
                 try:
                     await send_safe(connected_devices[rid], {
-                        "warning": "Server disconnected. Closing robot connection.",
-                        "level": 2
+                        "error": "Server disconnected. Closing robot connection.",
+                        "level": 3,
+                        "is_server_error": True
                     })
                     await connected_devices[rid].close()
                     logger.info(f"Disconnected robot: {rid}")
@@ -121,7 +122,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
 
             connected_devices.pop(SERVER_ID, None)
             device_metadata.pop(SERVER_ID, None)
-
+    
     # === ROBOT CONNECTING ===
     else:
         if SERVER_ID not in connected_devices:
@@ -129,7 +130,8 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             await send_safe(websocket, {
                 "error": "Server not connected.",
                 "level": 3,
-                "target_robot_id": id
+                "target_robot_id": id,
+                "is_server_error": True
             })
             await websocket.close()
             return
@@ -149,7 +151,8 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     await send_safe(websocket, {
                         "error": "Invalid JSON Format",
                         "level": 3,
-                        "target_robot_id": id
+                        "target_robot_id": id,
+                        "is_server_error": True
                     })
                     continue
 
