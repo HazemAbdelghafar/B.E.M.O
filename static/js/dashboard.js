@@ -54,6 +54,6 @@ function updatePage(data) {
     document.getElementById("robots").innerHTML = robotsHtml;
 }
 
-// Call initially and then every 5 minutes
+// Call initially and then every 10 seconds
 fetchDeviceData();
-setInterval(fetchDeviceData, 300000); // 5 minutes
+setInterval(fetchDeviceData, 10000);
