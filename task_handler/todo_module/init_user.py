@@ -1,7 +1,4 @@
 import os
-import pickle
-
-from smtplib import SMTP_SSL
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -23,8 +20,8 @@ console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
 DEFAULT_PATH = os.path.dirname(__file__)
-USER_DATA_PATH = os.path.join(DEFAULT_PATH, "user_data")
-SECRET_PATH = os.path.join(DEFAULT_PATH, "credentials_tasks.json")
+USER_DATA_PATH = os.path.join(DEFAULT_PATH, "tokens")
+SECRET_PATH = os.path.join(DEFAULT_PATH, "secrets/credentials_tasks.json")
 SMTP_HOSTS = {
     "gmail": "smtp.gmail.com",
     "hotmail": "smtp-mail.outlook.com",
@@ -46,6 +43,8 @@ def new_user_google(id: str) -> Credentials:
     """
 
     logger.info("Creating a new user...")
+    
+    token_file = f"{USER_DATA_PATH}/{id}_todo_token.json"
 
     # Initialize the credentials
     creds = None
@@ -53,11 +52,6 @@ def new_user_google(id: str) -> Credentials:
     flow = InstalledAppFlow.from_client_secrets_file(
         SECRET_PATH, SCOPES, redirect_uri="urn:ietf:wg:oauth:2.0:oob"
     )
-
-    auth_url, _ = flow.authorization_url(prompt="consent")
-
-    logger.info("Please go to this URL if you are not redirected: ")
-    logger.info(str(auth_url))
 
     creds = flow.run_local_server(
         open_browser=True,
@@ -67,8 +61,8 @@ def new_user_google(id: str) -> Credentials:
     )
 
     # Save the credentials for the next run
-    with open(f"{USER_DATA_PATH}/token_{id}.pkl", "wb") as token:
-        pickle.dump(creds, token)
+    with open(token_file, "w") as token:
+        token.write(creds.to_json())
 
     return creds
 
@@ -86,16 +80,16 @@ def init_user_google(id: str) -> Credentials:
 
     # Initialize the credentials
     creds = None
+    token_file = f"{USER_DATA_PATH}/{id}_todo_token.json"
 
     # If the user is new (no id), create a new user
-    if id is None:
+    if not id:
         return new_user_google(id)
-
+    
     # If the user is not new, load the token file
-    if os.path.exists(f"{USER_DATA_PATH}/token_{id}.pkl"):
+    if os.path.exists(token_file):
         logger.info("Loading existing user...")
-        with open(f"{USER_DATA_PATH}/token_{id}.pkl", "rb") as token:
-            creds = pickle.load(token)
+        creds = Credentials.from_authorized_user_file(token_file, SCOPES)
 
     # If there are credentials but they are not valid, refresh the token
     if creds and creds.expired and creds.refresh_token:
