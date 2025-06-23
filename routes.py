@@ -1,11 +1,12 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi.templating import Jinja2Templates
 from fastapi.websockets import WebSocketState
 from typing import Dict
 from datetime import datetime, timezone
 import logging
 import json
 from fastapi.responses import HTMLResponse
-from jinja2 import Template
+from fastapi.requests import Request
 import asyncio
 
 # === Logging ===
@@ -20,6 +21,9 @@ SERVER_ID = "server"
 # === Connection tracking ===
 connected_devices: Dict[str, WebSocket] = {}
 device_metadata: Dict[str, Dict] = {}
+
+# === Templates ===
+templates = Jinja2Templates(directory="templates")
 
 # === Utility ===
 
@@ -192,10 +196,12 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
 
             connected_devices.pop(id, None)
             device_metadata.pop(id, None)            
+
+
 # === REST Endpoint for status ===
 
 @router.get("/connected-devices", response_class=HTMLResponse)
-async def get_connected_devices():
+async def get_connected_devices(request: Request):
     def format_device(device_id, info):
         duration = get_duration_seconds(info["connected_at"])
         return {
@@ -216,64 +222,8 @@ async def get_connected_devices():
         if device_id != SERVER_ID
     ]
 
-    html_template = Template("""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>BEMO Connected Devices</title>
-        <meta http-equiv="refresh" content="5">
-        <style>
-            body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 30px; }
-            h1 { color: #333; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
-            th { background-color: #eee; }
-            .status-ok { color: green; font-weight: bold; }
-            .status-bad { color: red; font-weight: bold; }
-            .meta { margin-top: 10px; font-size: 14px; color: #555; }
-        </style>
-    </head>
-    <body>
-        <h1>BEMO Connection Dashboard</h1>
-
-        <h2>Server</h2>
-        {% if server %}
-            <div class="meta">
-                <strong>Status:</strong> <span class="status-ok">Connected</span><br>
-                <strong>IP:</strong> {{ server.ip }}<br>
-                <strong>Connected at:</strong> {{ server.connected_at }}<br>
-                <strong>Duration:</strong> {{ server.duration }} sec
-            </div>
-        {% else %}
-            <div class="meta">
-                <strong>Status:</strong> <span class="status-bad">Disconnected</span>
-            </div>
-        {% endif %}
-
-        <h2>Robots ({{ robots|length }})</h2>
-        {% if robots %}
-        <table>
-            <tr>
-                <th>ID</th>
-                <th>IP</th>
-                <th>Connected At</th>
-                <th>Duration (sec)</th>
-            </tr>
-            {% for robot in robots %}
-            <tr>
-                <td>{{ robot.id }}</td>
-                <td>{{ robot.ip }}</td>
-                <td>{{ robot.connected_at }}</td>
-                <td>{{ robot.duration }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-        <p>No robots connected.</p>
-        {% endif %}
-    </body>
-    </html>
-    """)
-
-    html = html_template.render(server=server_info, robots=robots)
-    return HTMLResponse(content=html)
+    return templates.TemplateResponse("dashboard.html", {
+        "request": request,
+        "server": server_info,
+        "robots": robots
+    })
