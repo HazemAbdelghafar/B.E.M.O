@@ -37,8 +37,8 @@ class Mail(BaseMQTTHandler):
         super().__init__(sub_topic="task_handler/mail", name="mail")
 
         self.provider = provider.lower()
-        self.config_path = config_path
-        self.token_path = token_path
+        self.config_path = os.path.join(DEFAULT_PATH, config_path)
+        self.token_path = os.path.join(DEFAULT_PATH, token_path)
         self.robot_id = robot_id
         self.creds = None
 
@@ -73,7 +73,13 @@ class Mail(BaseMQTTHandler):
                 self.creds.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(creds_file, self.SCOPES)
-                self.creds = flow.run_local_server(port=0)
+                
+                self.creds = flow.run_local_server(
+                    port=0,
+                    success_message="You have successfully authenticated the user to B.E.M.O, you can now safely close this tab.",
+                    open_browser=True,
+                    authorization_prompt_message="",
+                )
             with open(token_file, 'w') as token:
                 token.write(self.creds.to_json())
         
@@ -679,6 +685,6 @@ class Mail(BaseMQTTHandler):
 
 if __name__ == "__main__":
     # Choose provider: 'gmail' or 'outlook'
-    mail = Mail(provider='outlook', robot_id='bemo-MK1') # Todo: Make it dynamic
+    mail = Mail(provider='gmail', robot_id='bemo-MK1') # Todo: Make it dynamic
     mail.authenticate()
     mail.start_mqtt()
