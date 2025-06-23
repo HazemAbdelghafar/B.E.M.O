@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>BEMO Connected Devices</title>
+    <!-- <meta http-equiv="refresh" content="5"> -->
+    <link rel="stylesheet" href="/static/css/dashboard-style.css">
+</head>
+
+<body>
+    <h1>BEMO Connection Dashboard</h1>
+
+    <h2>Server</h2>
+    {% if server %}
+    <div class="meta">
+        <strong>Status:</strong> <span class="status-ok">Connected</span><br>
+        <strong>IP:</strong> {{ server.ip }}<br>
+        <strong>Connected at:</strong> {{ server.connected_at }}<br>
+        <strong>Duration:</strong> {{ server.duration }} sec
+    </div>
+    {% else %}
+    <div class="meta">
+        <strong>Status:</strong> <span class="status-bad">Disconnected</span>
+    </div>
+    {% endif %}
+
+    <h2>Robots ({{ robots|length }})</h2>
+    {% if robots %}
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>IP</th>
+            <th>Connected At</th>
+            <th>Duration (sec)</th>
+        </tr>
+        {% for robot in robots %}
+        <tr>
+            <td>{{ robot.id }}</td>
+            <td>{{ robot.ip }}</td>
+            <td>{{ robot.connected_at }}</td>
+            <td>{{ robot.duration }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No robots connected.</p>
+    {% endif %}
+</body>
+
+</html>
