@@ -1,0 +1,42 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    padding: 30px;
+}
+
+h1 {
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th,
+td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+th {
+    background-color: #eee;
+}
+
+.status-ok {
+    color: green;
+    font-weight: bold;
+}
+
+.status-bad {
+    color: red;
+    font-weight: bold;
+}
+
+.meta {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
