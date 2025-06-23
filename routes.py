@@ -138,8 +138,14 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     connected_devices.pop(rid, None)
                     device_metadata.pop(rid, None)
 
-            duration = get_duration_seconds(device_metadata[SERVER_ID]["connected_at"])
-            logger.info(f"Server was connected for {duration} seconds")
+            metadata = device_metadata.get(SERVER_ID, {})
+            connected_at = metadata.get("connected_at")
+
+            if connected_at:
+                duration = get_duration_seconds(connected_at)
+                logger.info(f"Server was connected for {duration} seconds")
+            else:
+                logger.warning("No 'connected_at' info for server")
 
             connected_devices.pop(SERVER_ID, None)
             device_metadata.pop(SERVER_ID, None)
