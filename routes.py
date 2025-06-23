@@ -5,7 +5,7 @@ from typing import Dict
 from datetime import datetime, timezone
 import logging
 import json
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.requests import Request
 import asyncio
 
@@ -61,14 +61,14 @@ async def forward_message_to_robot(target_id: str, message: str):
         })
 
 
-async def start_ping_loop(ws: WebSocket, device_id: str, interval: int = 30):
-    try:
-        while ws.client_state == WebSocketState.CONNECTED:
-            await asyncio.sleep(interval)
-            if device_id in connected_devices:
-                await send_safe(connected_devices[device_id], {"type": "ping"})
-    except Exception as e:
-        logger.warning(f"Ping loop error for {device_id}: {e}")
+# async def start_ping_loop(ws: WebSocket, device_id: str, interval: int = 30):
+#     try:
+#         while ws.client_state == WebSocketState.CONNECTED:
+#             await asyncio.sleep(interval)
+#             if device_id in connected_devices:
+#                 await send_safe(connected_devices[device_id], {"type": "ping"})
+#     except Exception as e:
+#         logger.warning(f"Ping loop error for {device_id}: {e}")
 
 # === WebSocket Endpoint ===
 
@@ -80,7 +80,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
     ip = websocket.client.host
     connected_at = now_utc_iso()
 
-    asyncio.create_task(start_ping_loop(websocket, id))  # Start ping task
+    # asyncio.create_task(start_ping_loop(websocket, id))  # Start ping task
 
     if id == SERVER_ID:
         if SERVER_ID in connected_devices:
@@ -109,8 +109,8 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     await send_safe(websocket, {"error": "Invalid JSON Format", "level": 3})
                     continue
 
-                if data.get("type") == "ping":
-                    continue  # Ignore pings
+                # if data.get("type") == "ping":
+                #     continue  # Ignore pings
 
                 target_id = data.get("target_robot_id")
                 if target_id:
@@ -176,8 +176,8 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     })
                     continue
 
-                if data.get("type") == "ping":
-                    continue  # Ignore pings
+                # if data.get("type") == "ping":
+                #     continue  # Ignore pings
 
                 await send_safe(connected_devices[SERVER_ID], data)
                 logger.info(f"Forwarded message from {id} to server.")
@@ -199,6 +199,32 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
 
 
 # === REST Endpoint for status ===
+
+@router.get("/connected-devices/json", response_class=JSONResponse)
+async def get_connected_devices_json():
+    def format_device(device_id, info):
+        return {
+            "id": device_id,
+            "ip": info["ip"],
+            "connected_at": info["connected_at"],
+            "duration": get_duration_seconds(info["connected_at"])
+        }
+
+    server_info = (
+        format_device(SERVER_ID, device_metadata[SERVER_ID])
+        if SERVER_ID in device_metadata else None
+    )
+
+    robots = [
+        format_device(device_id, info)
+        for device_id, info in device_metadata.items()
+        if device_id != SERVER_ID
+    ]
+
+    return JSONResponse(content={
+        "server": server_info,
+        "robots": robots
+    })
 
 @router.get("/connected-devices", response_class=HTMLResponse)
 async def get_connected_devices(request: Request):
@@ -227,3 +253,5 @@ async def get_connected_devices(request: Request):
         "server": server_info,
         "robots": robots
     })
+    
+    
