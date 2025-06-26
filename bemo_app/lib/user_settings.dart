@@ -5,90 +5,106 @@ class UserSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
+    final Size screenSize = MediaQuery.of(context).size;
+    // Use a base size similar to your design, e.g., 1600x900
+    const double baseWidth = 1600;
+    const double baseHeight = 900;
     return Scaffold(
       backgroundColor: const Color(0xFF191919),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Image.asset(
-                'assets/Images/Background.png',
-                fit: BoxFit.cover,
-              ),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/Images/Background.png',
+              fit: BoxFit.cover,
             ),
-            Center(
-              child: SingleChildScrollView(
-                child: Container(
-                  width: screenWidth * 0.95,
-                  padding: const EdgeInsets.all(32),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+          ),
+          Center(
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: SizedBox(
+                width: baseWidth,
+                height: baseHeight,
+                child: SafeArea(
+                  child: Stack(
                     children: [
-                      // Top navigation with back button and separator
-                      Column(
-                        children: [
-                          Row(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 28),
-                                onPressed: () {
-                                  Navigator.of(context).maybePop();
-                                },
-                                padding: const EdgeInsets.only(right: 24),
-                              ),
-                              Expanded(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                      Center(
+                        child: SingleChildScrollView(
+                          child: Container(
+                            width: baseWidth * 0.95,
+                            padding: const EdgeInsets.all(32),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                // Top navigation with back button and separator
+                                Column(
                                   children: [
-                                    _TabButton(label: 'APP SETTINGS', selected: false),
-                                    const SizedBox(width: 32),
-                                    _TabButton(label: 'USER SETTINGS', selected: true),
-                                    const SizedBox(width: 32),
-                                    _TabButton(label: 'ROBOT SETTINGS', selected: false),
+                                    Row(
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 28),
+                                          onPressed: () {
+                                            Navigator.of(context).maybePop();
+                                          },
+                                          padding: const EdgeInsets.only(right: 24),
+                                        ),
+                                        Expanded(
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              _TabButton(label: 'APP SETTINGS', selected: false),
+                                              const SizedBox(width: 32),
+                                              _TabButton(label: 'USER SETTINGS', selected: true),
+                                              const SizedBox(width: 32),
+                                              _TabButton(label: 'ROBOT SETTINGS', selected: false),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Container(
+                                      width: double.infinity,
+                                      height: 2,
+                                      color: Colors.white,
+                                    ),
                                   ],
                                 ),
-                              ),
-                            ],
+                                const SizedBox(height: 32),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Profile Settings
+                                    Expanded(
+                                      flex: 2,
+                                      child: _ProfileSettings(),
+                                    ),
+                                    const SizedBox(width: 32),
+                                    // Account Settings
+                                    Expanded(
+                                      flex: 3,
+                                      child: _AccountSettingsRefined(),
+                                    ),
+                                    const SizedBox(width: 32),
+                                    // Linked Accounts
+                                    Expanded(
+                                      flex: 2,
+                                      child: _LinkedAccounts(),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 8),
-                          Container(
-                            width: double.infinity,
-                            height: 2,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Profile Settings
-                          Expanded(
-                            flex: 2,
-                            child: _ProfileSettings(),
-                          ),
-                          const SizedBox(width: 32),
-                          // Account Settings
-                          Expanded(
-                            flex: 3,
-                            child: _AccountSettingsRefined(),
-                          ),
-                          const SizedBox(width: 32),
-                          // Linked Accounts
-                          Expanded(
-                            flex: 2,
-                            child: _LinkedAccounts(),
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
