@@ -4,6 +4,7 @@ import threading
 import time
 import sys
 from pathlib import Path
+from ast import literal_eval
 
 import os
 from dotenv import find_dotenv, dotenv_values
@@ -31,7 +32,7 @@ logger.addHandler(console_handler)
 class ServerWebSocketClient(BaseMQTTHandler):
     """ServerWebSocketClient is a class for handling WebSocket communication with a server."""
 
-    def __init__(self, max_retries: int = 5, retry_interval: int = 5):
+    def __init__(self, max_retries: int = 3, retry_interval: int = 10):
         """
         Initialize the WebSocket server.
 
@@ -62,11 +63,7 @@ class ServerWebSocketClient(BaseMQTTHandler):
         Args:
             socket (WebSocket): The WebSocket object representing the client connection.
             message (str): The message received from the client.
-
-        Returns:
-            None
-        """
-        logger.info(f"Message received: {message}")
+        """      
         thread = threading.Thread(target=self.process_message, args=(message,))
         thread.start()
 
@@ -97,7 +94,7 @@ class ServerWebSocketClient(BaseMQTTHandler):
             on_close=self.on_close,
         )
 
-        thread = threading.Thread(target=ws.run_forever)
+        thread = threading.Thread(target=lambda: ws.run_forever(ping_interval=60, ping_timeout=10))
         thread.daemon = True
         thread.start()
         self.start_time = time.time()
@@ -144,19 +141,21 @@ class ServerWebSocketClient(BaseMQTTHandler):
             message (str): The message to process.
         """
         thread_name = threading.current_thread().name
-        logger.info(f"[{thread_name}] Publishing message: {message}")
-
-        # Convert message to JSON
+        
+        logger.info(f"[{thread_name}] Received message: {message}")
+        
         try:
             data = json.loads(message)
-            logger.info(f"[{thread_name}] Data: {data}")
         except json.JSONDecodeError:
-            logger.error(f"[{thread_name}] Invalid JSON format")
-            return
+            try:
+                data = literal_eval(message)
+            except Exception as e:
+                logger.error(f"Invalid JSON format: {e}")
+                return
 
         self.publish_result(data)  # Publish the result to the MQTT broker
 
-        logger.info(f"[{thread_name}] Published message: {message}")
+        logger.info(f"[{thread_name}] Published message: {data}")
 
     def execute_main(self, input_data: dict):
         """
