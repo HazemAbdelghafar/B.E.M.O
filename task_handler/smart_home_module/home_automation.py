@@ -48,17 +48,28 @@ class SmartHomeAutomation(BaseMQTTHandler):
         self.ACCESS_ID = os.getenv("ACCESS_ID")
         self.ACCESS_KEY = os.getenv("ACCESS_KEY")
         self.DEVICE_ID = os.getenv("DEVICE_ID")
-
-        # Initialize Tuya Cloud
-        self.cloud = tinytuya.Cloud(
-            apiRegion=self.API_REGION,
-            apiKey=self.ACCESS_ID,
-            apiSecret=self.ACCESS_KEY,
-            apiDeviceID=self.DEVICE_ID,
-        )
+        self.is_initialized = False
 
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/smart_home", name="smart_home")
+
+        # Initialize Tuya Cloud
+        self.init_cloud()
+        
+    def init_cloud(self):
+        try:
+            self.cloud = tinytuya.Cloud(
+                apiRegion=self.API_REGION,
+                apiKey=self.ACCESS_ID,
+                apiSecret=self.ACCESS_KEY,
+                apiDeviceID=self.DEVICE_ID,
+            )
+        except Exception as e:
+            logger.error(f"Error initializing Tuya Cloud: {e}")
+            self.is_initialized = False
+            return
+
+        self.is_initialized = True
 
     def control_device(self, switch_id, status):
         """
@@ -92,6 +103,10 @@ class SmartHomeAutomation(BaseMQTTHandler):
         Returns:
             dict: The result of the smart home operation.
         """
+        if not self.is_initialized:
+            logger.error("Tuya Cloud not initialized")
+            return {"error": "Tuya Cloud not initialized", "level": 2}
+        
         switches = input_data.get("switch", [])
         statuses = input_data.get("status", [])
 
