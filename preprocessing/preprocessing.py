@@ -15,7 +15,7 @@ import logging
 
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from utilities import BaseMQTTHandler, PRE_SYSTEM_PROMPT, SwitchMapping, UserData
+from utilities import BaseMQTTHandler, PRE_SYSTEM_PROMPT, SwitchMapping, UserData, EmailMapping
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -74,6 +74,7 @@ class PreProcessing(BaseMQTTHandler):
         self.__chat_history = self.initialize_chat_history()  # TODO: Make it better
         self.__switch_mapping = SwitchMapping().get_all_mappings()
         self.__user_data = UserData().get_all_user_data()
+        self.__email_mapping = EmailMapping().get_all_mappings()
 
     def initialize_chat_history(self) -> dict:
         """
@@ -192,6 +193,7 @@ class PreProcessing(BaseMQTTHandler):
                         "chat_history": self.__chat_history[label],
                         "switch_mapping": self.__switch_mapping,
                         "user_data": self.__user_data,
+                        "email_mapping": self.__email_mapping,
                     }
                 )
             except Exception as e:
