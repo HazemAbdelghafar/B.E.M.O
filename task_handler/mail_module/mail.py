@@ -41,6 +41,7 @@ class Mail(BaseMQTTHandler):
         self.token_path = os.path.join(DEFAULT_PATH, token_path)
         self.robot_id = robot_id
         self.creds = None
+        self.is_initialized = False
 
         os.makedirs(self.token_path, exist_ok=True)
 
@@ -54,13 +55,22 @@ class Mail(BaseMQTTHandler):
             self.SCOPES = ['Mail.ReadWrite', 'Mail.Send']
         else:
             raise ValueError("Unsupported provider. Use 'gmail' or 'outlook'.")
+        
+        self.authenticate()
 
     def authenticate(self):
-        if self.provider == 'gmail':
-            return self._auth_gmail()
-        elif self.provider == 'outlook':
-            return self._auth_outlook()
-
+        try:
+            if self.provider == 'gmail':
+                self._auth_gmail()
+            elif self.provider == 'outlook':
+                self._auth_outlook()
+        except Exception as e:
+            logger.error(f"Error authenticating: {e}")
+            self.is_initialized = False
+            return
+        
+        self.is_initialized = True
+        
     def _auth_gmail(self):
         token_file = os.path.join(self.token_path, f'{self.robot_id}_gmail_token.json')
         creds_file = os.path.join(self.config_path, 'gmail_client_secret.json')
@@ -661,6 +671,20 @@ class Mail(BaseMQTTHandler):
                 return {"status": "error", "message": f"Outlook error: {str(e)}"}
 
     def execute_main(self, input_data: dict) -> dict:
+        """
+        Executes the main functionality of the class.
+
+        Args:
+            input_data (dict): The input data to process.
+
+        Returns:
+            dict: The result of the processing.
+        """
+        
+        if not self.is_initialized:
+            logger.error("Mail module not initialized")
+            return {"error": "Mail module not initialized", "level": 2}
+        
         function_name = input_data.get("function")
         if function_name == "send_email":
             result = self.send_email(input_data.get("to_email"), input_data.get("subject"), input_data.get("body"))
@@ -686,5 +710,4 @@ class Mail(BaseMQTTHandler):
 if __name__ == "__main__":
     # Choose provider: 'gmail' or 'outlook'
     mail = Mail(provider='gmail', robot_id='bemo-MK1') # Todo: Make it dynamic
-    mail.authenticate()
     mail.start_mqtt()
