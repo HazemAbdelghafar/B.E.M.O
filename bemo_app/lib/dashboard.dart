@@ -134,7 +134,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const Text(
-                            'RECENT',
+                            'recent',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 22,
@@ -144,7 +144,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             textAlign: TextAlign.center,
                           ),
                           const Text(
-                            'NOTIFICATIONS',
+                            'notifications',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 22,
@@ -162,32 +162,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           ),
                           _NotificationItem(
                             iconAsset: 'assets/images/Notification.png',
-                            title: 'LEARNING RESOURCES',
+                            title: 'learning resources',
                             subtitle:
-                                'RESOURCES ON "PYTHON PROGRAMMING LANGUAGE" HAS BEEN S...',
+                                'resources on "python programming language" has been sent to your email',
                             time: 'JUST NOW',
                           ),
                           const SizedBox(height: 6),
                           _NotificationItem(
                             iconAsset: 'assets/images/At sign.png',
-                            title: 'LINKEDIN',
+                            title: 'linkedin',
                             subtitle:
-                                'COMPANIES LIKE SYSTEMS LIMITED EGYPT AND OTHERS IN YOUR NETWOR...',
+                                'companies like systems limited egypt and others in your network have been sent to your email',
                             time: '2 MINS AGO',
                           ),
                           const SizedBox(height: 6),
                           _NotificationItem(
                             iconAsset: 'assets/images/To Do List.png',
-                            title: 'WATER THE PLANTS',
+                            title: 'water the plants',
                             subtitle: '5 DROPS OF MINERAL WATER DUE IN 19 MINS',
                             time: '17 MINS AGO',
                           ),
                           const SizedBox(height: 6),
                           _NotificationItem(
                             iconAsset: 'assets/images/Cloud Folder.png',
-                            title: 'CLOUDSHELL',
+                            title: 'cloudshell',
                             subtitle:
-                                'DELETION NOTICE FOR YOUR GOOGLE CLOUD SHELL HOME DIRECTORY',
+                                'deletion notice for your google cloud shell home directory',
                             time: '2 HOURS AGO',
                           ),
                           const Spacer(),
@@ -196,13 +196,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             children: [
                               _NotifActionIcon(
                                   iconAsset: 'assets/images/Door Hanger.png',
-                                  label: 'DO NOT DISTURB: OFF'),
+                                  label: 'do not disturb: off'),
                               _NotifActionIcon(
                                   iconAsset: 'assets/images/Erase.png',
-                                  label: 'CLEAR NOTIFICATIONS'),
+                                  label: 'clear notifications'),
                               _NotifActionIcon(
                                   iconAsset: 'assets/images/Notification.png',
-                                  label: 'ALL NOTIFICATIONS'),
+                                  label: 'all notifications'),
                             ],
                           ),
                         ],
@@ -233,7 +233,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 left: 0,
                                 top: 0,
                                 child: Text(
-                                  'HELLO ENG. BEGAD',
+                                  'hello eng. begad'.toLowerCase(),
                                   style: TextStyle(
                                     color: Color(0xFFEFEFEF),
                                     fontSize: 40,
@@ -247,7 +247,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 left: 0,
                                 top: 60,
                                 child: Text(
-                                  'GOOD AFTERNOON!',
+                                  'good afternoon!',
                                   style: TextStyle(
                                     color: Color.fromRGBO(255, 255, 255, 0.8),
                                     fontSize: 24,
@@ -284,85 +284,79 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         child: Container(
                                           width: 980,
                                           height: 290,
-                                          child: Stack(
-                                            children: [
-                                              Positioned(
-                                                left: 0,
-                                                top: 0,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                  child: Opacity(
-                                                    opacity: 0.7,
-                                                    child: Image.asset(
-                                                      'assets/images/mail_task.png',
-                                                      width: 1016,
-                                                      height: 290,
-                                                      fit: BoxFit.cover,
-                                                    ),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(36),
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(36),
+                                            child: Opacity(
+                                              opacity: 0.95,
+                                              child: Image.asset(
+                                                'assets/images/mail_task.png',
+                                                width: 1016,
+                                                height: 290,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      // Featured text
+                                      Positioned(
+                                        left: 19,
+                                        top: 239,
+                                        child: SizedBox(
+                                          width: 585,
+                                          child: Text(
+                                            "try saying: hey bemo, read out my unread emails",
+                                            style: TextStyle(
+                                              color: Color(0xFFEFEFEF),
+                                              fontSize: 20,
+                                              fontFamily: 'Hyperion',
+                                              fontWeight: FontWeight.bold,
+                                              height: 1,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        left: 19,
+                                        top: 22,
+                                        child: SizedBox(
+                                          width: 367.25,
+                                          child: Text.rich(
+                                            TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text:
+                                                      'bemo mail assistant:\n',
+                                                  style: TextStyle(
+                                                    color:
+                                                        Color(0xFFEFEFEF),
+                                                    fontSize: 28,
+                                                    fontFamily:
+                                                        'Hyperion',
+                                                    fontWeight:
+                                                        FontWeight.bold,
+                                                    height: 1,
                                                   ),
                                                 ),
-                                              ),
-                                              // Featured text
-                                              Positioned(
-                                                left: 19,
-                                                top: 239,
-                                                child: SizedBox(
-                                                  width: 585,
-                                                  child: Text(
-                                                    "TRY SAYING: 'HEY BEMO, READ OUT MY UNREAD EMAILS'",
-                                                    style: TextStyle(
-                                                      color: Color(0xFFEFEFEF),
-                                                      fontSize: 20,
-                                                      fontFamily: 'Hyperion',
-                                                      fontWeight: FontWeight.bold,
-                                                      height: 1,
-                                                    ),
+                                                TextSpan(
+                                                  text:
+                                                      'hands-free email access',
+                                                  style: TextStyle(
+                                                    color:
+                                                        Color(0xFFEFEFEF),
+                                                    fontSize: 24,
+                                                    fontFamily:
+                                                        'Hyperion',
+                                                    fontWeight:
+                                                        FontWeight.bold,
+                                                    height: 1,
                                                   ),
                                                 ),
-                                              ),
-                                              Positioned(
-                                                left: 19,
-                                                top: 22,
-                                                child: SizedBox(
-                                                  width: 367.25,
-                                                  child: Text.rich(
-                                                    TextSpan(
-                                                      children: [
-                                                        TextSpan(
-                                                          text:
-                                                              'BEMO MAILASSIST:\n',
-                                                          style: TextStyle(
-                                                            color:
-                                                                Color(0xFFEFEFEF),
-                                                            fontSize: 28,
-                                                            fontFamily:
-                                                                'Hyperion',
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            height: 1,
-                                                          ),
-                                                        ),
-                                                        TextSpan(
-                                                          text:
-                                                              'HANDS-FREE EMAIL ACCESS',
-                                                          style: TextStyle(
-                                                            color:
-                                                                Color(0xFFEFEFEF),
-                                                            fontSize: 24,
-                                                            fontFamily:
-                                                                'Hyperion',
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            height: 1,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -377,7 +371,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 child: SizedBox(
                                   width: 215,
                                   child: Text(
-                                    'FEATURED',
+                                    'featured',
                                     style: TextStyle(
                                       color: Color(0xFFEFEFEF),
                                       fontSize: 32,
@@ -471,7 +465,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         child: SizedBox(
                                           width: 275,
                                           child: Text(
-                                            'NFLX STOCK\nPRICE PREDICTION',
+                                            'nflx stock\nprice prediction',
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 24,
@@ -488,7 +482,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         child: SizedBox(
                                           width: 265,
                                           child: Text(
-                                            'LAST OPENED: 4 HOURS AGO',
+                                            'last opened: 4 hours ago',
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 15,
@@ -506,7 +500,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           width: 96,
                                           height: 25,
                                           child: Text(
-                                            'OPEN WITH:',
+                                            'open with:',
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 16,
@@ -523,7 +517,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         child: SizedBox(
                                           width: 265,
                                           child: Text(
-                                            'SIZE ON DISK: 98.3 KB',
+                                            'size on disk: 98.3 kb',
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 15,
@@ -558,7 +552,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         child: SizedBox(
                                           width: 275,
                                           child: Text(
-                                            "REIMAGINING\nPEAR'S LOGO",
+                                            "reimagining\npear's logo",
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 24,
@@ -575,7 +569,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         child: SizedBox(
                                           width: 265,
                                           child: Text(
-                                            'LAST OPENED: 2 DAYS AGO',
+                                            'last opened: 2 days ago',
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 15,
@@ -593,7 +587,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           width: 96,
                                           height: 25,
                                           child: Text(
-                                            'OPEN WITH:',
+                                            'open with:',
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 16,
@@ -610,7 +604,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         child: SizedBox(
                                           width: 265,
                                           child: Text(
-                                            'SIZE ON DISK: 10.2 MB',
+                                            'size on disk: 10.2 mb',
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 15,
@@ -645,7 +639,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         child: SizedBox(
                                           width: 275,
                                           child: Text(
-                                            "DESIGNING\nBEMO'S BODY",
+                                            "designing\nbemo's body",
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 24,
@@ -662,7 +656,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         child: SizedBox(
                                           width: 265,
                                           child: Text(
-                                            'LAST OPENED: 1 MONTH AGO',
+                                            'last opened: 1 month ago',
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 15,
@@ -680,7 +674,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           width: 96,
                                           height: 25,
                                           child: Text(
-                                            'OPEN WITH:',
+                                            'open with:',
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 16,
@@ -697,7 +691,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         child: SizedBox(
                                           width: 265,
                                           child: Text(
-                                            'SIZE ON DISK: 0.8 GB',
+                                            'size on disk: 0.8 gb',
                                             style: TextStyle(
                                               color: Color(0xFFEFEFEF),
                                               fontSize: 15,
@@ -718,7 +712,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 left: 14,
                                 top: 0,
                                 child: Text(
-                                  'RECENT PROJECTS',
+                                  'recent projects',
                                   style: TextStyle(
                                     color: Color(0xFFEFEFEF),
                                     fontSize: 32,

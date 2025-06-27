@@ -13,6 +13,46 @@ enum BemoSection {
   settings,
 }
 
+class CalendarDayIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final int day = DateTime.now().day;
+    return Container(
+      width: 28,
+      height: 28,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(height: 2),
+          Container(
+            width: 16,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          SizedBox(height: 2),
+          Text(
+            day.toString(),
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w900,
+              fontSize: 11,
+              fontFamily: 'Hyperion',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class BemoSidebar extends StatelessWidget {
   final bool collapsed;
   final VoidCallback onToggle;
@@ -68,70 +108,71 @@ class BemoSidebar extends StatelessWidget {
             const SizedBox(height: 48),
             _SidebarNav(
               iconAsset: 'assets/images/Control Panel.png',
-              label: 'DASHBOARD',
+              label: 'dashboard',
               selected: currentSection == BemoSection.dashboard,
               onTap: () => onSectionTap(BemoSection.dashboard),
             ),
             const SizedBox(height: 8),
             _SidebarNav(
               iconAsset: 'assets/images/Idea.png',
-              label: 'PROJECTS',
+              label: 'projects',
               selected: currentSection == BemoSection.projects,
               onTap: () => onSectionTap(BemoSection.projects),
             ),
             const SizedBox(height: 8),
             _SidebarNav(
               iconAsset: 'assets/images/At sign.png',
-              label: 'E-MAIL',
+              label: 'e-mail',
               selected: currentSection == BemoSection.email,
               onTap: () => onSectionTap(BemoSection.email),
             ),
             const SizedBox(height: 8),
             _SidebarNav(
               iconAsset: 'assets/images/To Do List.png',
-              label: 'TASKS',
+              label: 'tasks',
               selected: currentSection == BemoSection.tasks,
               onTap: () => onSectionTap(BemoSection.tasks),
             ),
             const SizedBox(height: 8),
             _SidebarNav(
-              iconAsset: 'assets/images/Calendar 28.png',
-              label: 'CALENDAR',
+              iconAsset: null,
+              customIcon: CalendarDayIcon(),
+              label: 'calendar',
               selected: currentSection == BemoSection.calendar,
               onTap: () => onSectionTap(BemoSection.calendar),
             ),
             const SizedBox(height: 8),
             _SidebarNav(
               iconAsset: 'assets/images/Cloud Folder.png',
-              label: 'DRIVE',
+              label: 'drive',
               selected: currentSection == BemoSection.drive,
               onTap: () => onSectionTap(BemoSection.drive),
             ),
             const SizedBox(height: 8),
             _SidebarNav(
               iconAsset: 'assets/images/Smart Home Connection.png',
-              label: 'SMART HOME',
+              label: 'smart home',
               selected: currentSection == BemoSection.smartHome,
               onTap: () => onSectionTap(BemoSection.smartHome),
             ),
             const SizedBox(height: 8),
             _SidebarNav(
               iconAsset: 'assets/images/Chat.png',
-              label: 'CHAT HISTORY',
+              label: 'chat history',
               selected: currentSection == BemoSection.chatHistory,
               onTap: () => onSectionTap(BemoSection.chatHistory),
             ),
             const SizedBox(height: 8),
             _SidebarNav(
               iconAsset: 'assets/images/Notification.png',
-              label: 'NOTIFICATIONS',
+              label: 'notifications',
               selected: currentSection == BemoSection.notifications,
               onTap: () => onSectionTap(BemoSection.notifications),
             ),
             const SizedBox(height: 8),
             _SidebarNav(
-              iconAsset: 'assets/images/Control Panel.png',
-              label: 'SETTINGS',
+              iconAsset: 'assets/Images/Services.png',
+              label: 'settings',
               selected: currentSection == BemoSection.settings,
               onTap: () => onSectionTap(BemoSection.settings),
             ),
@@ -162,7 +203,8 @@ class BemoSidebar extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _SidebarIconOnly(
-              iconAsset: 'assets/images/Calendar 28.png',
+              iconAsset: null,
+              customIcon: CalendarDayIcon(),
               selected: currentSection == BemoSection.calendar,
               onTap: () => onSectionTap(BemoSection.calendar),
             ),
@@ -192,7 +234,7 @@ class BemoSidebar extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _SidebarIconOnly(
-              iconAsset: 'assets/images/Control Panel.png',
+              iconAsset: 'assets/Images/Services.png',
               selected: currentSection == BemoSection.settings,
               onTap: () => onSectionTap(BemoSection.settings),
             ),
@@ -216,7 +258,7 @@ class BemoSidebar extends StatelessWidget {
                       ),
                       const SizedBox(width: 16),
                       Text(
-                        userName,
+                        userName.toLowerCase(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -234,10 +276,11 @@ class BemoSidebar extends StatelessWidget {
 
 class _SidebarNav extends StatelessWidget {
   final String? iconAsset;
+  final Widget? customIcon;
   final String label;
   final bool selected;
   final VoidCallback? onTap;
-  const _SidebarNav({this.iconAsset, required this.label, this.selected = false, this.onTap});
+  const _SidebarNav({this.iconAsset, this.customIcon, required this.label, this.selected = false, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -248,15 +291,27 @@ class _SidebarNav extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            if (iconAsset != null)
+            if (selected)
+              Container(
+                width: 4,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            if (selected) const SizedBox(width: 12),
+            if (customIcon != null)
+              customIcon!
+            else if (iconAsset != null)
               Image.asset(iconAsset!, height: 28, color: Colors.white),
             const SizedBox(width: 22),
             Text(
-              label,
+              label.toLowerCase(),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
-                color: selected ? Colors.amber : Colors.white,
+                color: Colors.white,
                 letterSpacing: 1.2,
               ),
             ),
@@ -268,10 +323,11 @@ class _SidebarNav extends StatelessWidget {
 }
 
 class _SidebarIconOnly extends StatelessWidget {
-  final String iconAsset;
+  final String? iconAsset;
+  final Widget? customIcon;
   final bool selected;
   final VoidCallback? onTap;
-  const _SidebarIconOnly({required this.iconAsset, this.selected = false, this.onTap});
+  const _SidebarIconOnly({this.iconAsset, this.selected = false, this.onTap, this.customIcon});
 
   @override
   Widget build(BuildContext context) {
@@ -280,7 +336,7 @@ class _SidebarIconOnly extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Center(
-          child: Image.asset(iconAsset, height: 28, color: selected ? Colors.amber : Colors.white),
+          child: customIcon ?? (iconAsset != null ? Image.asset(iconAsset!, height: 28, color: Colors.white) : SizedBox.shrink()),
         ),
       ),
     );

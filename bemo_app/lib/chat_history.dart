@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'bemo_sidebar.dart';
 import 'user_settings.dart';
 import 'dashboard.dart';
+import 'package:intl/intl.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
   const ChatHistoryScreen({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     {
       'fromUser': true,
       'text': 'ADD "BUY GROCERIES" TO MY TASKS',
-      'time': '10:00 AM',
+      'time': '10:00 am',
     },
     {
       'fromUser': false,
@@ -39,7 +40,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     {
       'fromUser': true,
       'text': 'DO I HAVE ANY NEW EMAILS?',
-      'time': '10:48 AM',
+      'time': '10:48 am',
     },
     {
       'fromUser': false,
@@ -49,7 +50,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     {
       'fromUser': true,
       'text': 'SHOW ME SOME BOOKS TO LEARN JAPANESE',
-      'time': '3:24 PM',
+      'time': '3:24 pm',
     },
     {
       'fromUser': false,
@@ -59,7 +60,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     {
       'fromUser': true,
       "text": "WHAT'S THE CAPITAL OF NORWAY?",
-      'time': '7:03 PM',
+      'time': '7:03 pm',
     },
   ];
 
@@ -108,6 +109,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     const double baseWidth = 1820;
     const double baseHeight = 980;
     final double sidebarWidth = _collapsed ? 70 : 300;
+    final String todayDate = 'Today, ' + DateFormat('MMMM d, y').format(DateTime.now());
     return Scaffold(
       backgroundColor: const Color(0xFF2C2D30),
       body: Center(
@@ -182,16 +184,15 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                             color: Color(0xFF191919),
                             borderRadius: BorderRadius.only(
                               topRight: Radius.circular(30),
-                              topLeft: Radius.circular(0), // left is handled by sidebar
+                              topLeft: Radius.circular(0),
                             ),
                           ),
-                          child: Stack(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // Profile + BEMO + status (centered)
-                              Align(
-                                alignment: Alignment.center,
+                              Expanded(
                                 child: Row(
-                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     CircleAvatar(
                                       radius: 32,
@@ -239,49 +240,45 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                   ],
                                 ),
                               ),
-                              // Top right icons
-                              Positioned(
-                                right: 40,
-                                top: 26,
-                                child: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Image.asset(
-                                        'assets/Images/search.png',
-                                        width: 32,
-                                        height: 32,
-                                      ),
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {},
+                                    child: Image.asset(
+                                      'assets/Images/search.png',
+                                      width: 32,
+                                      height: 32,
                                     ),
-                                    const SizedBox(width: 16),
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Image.asset(
-                                        'assets/Images/copy.png',
-                                        width: 32,
-                                        height: 32,
-                                      ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  GestureDetector(
+                                    onTap: () {},
+                                    child: Image.asset(
+                                      'assets/Images/copy.png',
+                                      width: 32,
+                                      height: 32,
                                     ),
-                                    const SizedBox(width: 16),
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Image.asset(
-                                        'assets/Images/link.png',
-                                        width: 32,
-                                        height: 32,
-                                      ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  GestureDetector(
+                                    onTap: () {},
+                                    child: Image.asset(
+                                      'assets/Images/link.png',
+                                      width: 32,
+                                      height: 32,
                                     ),
-                                    const SizedBox(width: 16),
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Image.asset(
-                                        'assets/Images/popular.png',
-                                        width: 32,
-                                        height: 32,
-                                      ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  GestureDetector(
+                                    onTap: () {},
+                                    child: Image.asset(
+                                      'assets/Images/popular.png',
+                                      width: 32,
+                                      height: 32,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  const SizedBox(width: 40),
+                                ],
                               ),
                             ],
                           ),
@@ -292,38 +289,77 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                         top: 150,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 32.0),
-                          child: ListView.builder(
-                            itemCount: chatMessages.length,
-                            itemBuilder: (context, index) {
-                              final msg = chatMessages[index];
-                              final isUser = msg['fromUser'] as bool;
-                              return Align(
-                                alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(vertical: 16),
-                                  padding: const EdgeInsets.all(24),
-                                  constraints: const BoxConstraints(maxWidth: 600),
-                                  decoration: BoxDecoration(
-                                    color: isUser ? const Color(0xFF0C4111) : const Color(0xFF281636),
-                                    borderRadius: BorderRadius.only(
-                                      topLeft: const Radius.circular(30),
-                                      topRight: const Radius.circular(30),
-                                      bottomLeft: isUser ? const Radius.circular(30) : const Radius.circular(0),
-                                      bottomRight: isUser ? const Radius.circular(0) : const Radius.circular(30),
-                                    ),
-                                  ),
+                          child: Column(
+                            children: [
+                              // Day/date header
+                              Align(
+                                alignment: Alignment.topCenter,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                                   child: Text(
-                                    msg['text'],
+                                    todayDate.toLowerCase(),
                                     style: const TextStyle(
                                       color: Color(0xFFEFEFEF),
-                                      fontSize: 20,
+                                      fontSize: 18,
                                       fontFamily: 'Hyperion',
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                              );
-                            },
+                              ),
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: chatMessages.length,
+                                  itemBuilder: (context, index) {
+                                    final msg = chatMessages[index];
+                                    final isUser = msg['fromUser'] as bool;
+                                    return Align(
+                                      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                                      child: Column(
+                                        crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.symmetric(vertical: 16),
+                                            padding: const EdgeInsets.all(24),
+                                            constraints: const BoxConstraints(maxWidth: 600),
+                                            decoration: BoxDecoration(
+                                              color: isUser ? const Color(0xFF0C4111) : const Color(0xFF281636),
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: const Radius.circular(30),
+                                                topRight: const Radius.circular(30),
+                                                bottomLeft: isUser ? const Radius.circular(30) : const Radius.circular(0),
+                                                bottomRight: isUser ? const Radius.circular(0) : const Radius.circular(30),
+                                              ),
+                                            ),
+                                            child: Text(
+                                              msg['text'].toLowerCase(),
+                                              style: const TextStyle(
+                                                color: Color(0xFFEFEFEF),
+                                                fontSize: 20,
+                                                fontFamily: 'Hyperion',
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 2, left: 8, right: 8),
+                                            child: Text(
+                                              msg['time'],
+                                              style: const TextStyle(
+                                                color: Color(0xFFB0B0B0),
+                                                fontSize: 13,
+                                                fontFamily: 'Hyperion',
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),

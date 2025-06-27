@@ -116,7 +116,7 @@ class _TabButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      label,
+      label.toLowerCase(),
       style: TextStyle(
         fontFamily: 'Hyperion',
         fontWeight: FontWeight.bold,
@@ -140,7 +140,7 @@ class _ProfileSettings extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('PROFILE PICTURE',
+          Text('profile picture',
               style: TextStyle(
                 fontFamily: 'Hyperion',
                 fontWeight: FontWeight.bold,
@@ -166,13 +166,13 @@ class _ProfileSettings extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('UPLOADED IMAGE: YOUR.JPG',
+                    Text('uploaded image: your.jpg',
                         style: TextStyle(
                           fontFamily: 'Hyperion',
                           color: Colors.white,
                           fontSize: 12,
                         )),
-                    Text('SUPPORTED FILE TYPES ARE: JPG, JPEG, PNG.',
+                    Text('supported file types are: jpg, jpeg, png.',
                         style: TextStyle(
                           fontFamily: 'Hyperion',
                           color: Colors.white70,
@@ -187,7 +187,7 @@ class _ProfileSettings extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () {},
                     icon: Image.asset('assets/Images/Upload.png', width: 18, height: 18),
-                    label: const Text('CHANGE IMAGE'),
+                    label: const Text('change image'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF191919),
                       foregroundColor: Colors.white,
@@ -201,7 +201,7 @@ class _ProfileSettings extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () {},
                     icon: Image.asset('assets/Images/Clear Symbol.png', width: 18, height: 18),
-                    label: const Text('REMOVE IMAGE'),
+                    label: const Text('remove image'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF191919),
                       foregroundColor: Colors.white,
@@ -216,7 +216,7 @@ class _ProfileSettings extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          Text('PROFILE SETTINGS',
+          Text('profile settings',
               style: TextStyle(
                 fontFamily: 'Hyperion',
                 fontWeight: FontWeight.bold,
@@ -225,13 +225,13 @@ class _ProfileSettings extends StatelessWidget {
                 letterSpacing: 1.5,
               )),
           const SizedBox(height: 16),
-          _ProfileTextField(label: 'FIRST NAME', initialValue: 'BEGAD'),
-          _ProfileTextField(label: 'LAST NAME', initialValue: 'TAMIM'),
-          _ProfileTextField(label: 'NICKNAME', initialValue: 'BEGO'),
+          _ProfileTextField(label: 'first name', initialValue: 'begad'),
+          _ProfileTextField(label: 'last name', initialValue: 'tamim'),
+          _ProfileTextField(label: 'nickname', initialValue: 'bego'),
           Row(
             children: [
               Checkbox(value: false, onChanged: (_) {}),
-              const Text('JUST USE MY FULL NAME',
+              Text('just use my full name',
                   style: TextStyle(
                     fontFamily: 'Hyperion',
                     fontWeight: FontWeight.w400,
@@ -239,8 +239,8 @@ class _ProfileSettings extends StatelessWidget {
                   )),
             ],
           ),
-          _ProfileTextField(label: 'TITLE', initialValue: 'ENG'),
-          _ProfileTextField(label: 'GENDER', initialValue: 'MALE'),
+          _ProfileTextField(label: 'title', initialValue: 'eng'),
+          _ProfileTextField(label: 'gender', initialValue: 'male'),
           // Date of Birth with age and calendar icon
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -271,7 +271,7 @@ class _ProfileSettings extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text('THIS MAKES YOU\n21 YRS OLD',
+                Text('this makes you\n21 yrs old',
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontFamily: 'Hyperion',
@@ -282,8 +282,8 @@ class _ProfileSettings extends StatelessWidget {
               ],
             ),
           ),
-          _ProfileTextField(label: 'OCCUPATION', initialValue: 'DOG FOOD TESTER'),
-          _ProfileTextField(label: 'BIO', initialValue: ''),
+          _ProfileTextField(label: 'occupation', initialValue: 'dog food tester'),
+          _ProfileTextField(label: 'bio', initialValue: ''),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {},
@@ -295,7 +295,7 @@ class _ProfileSettings extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('SAVE CHANGES TO PROFILE SETTINGS'),
+            child: const Text('save changes'),
           ),
         ],
       ),
@@ -314,7 +314,7 @@ class _ProfileTextField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label,
+          Text(label.toLowerCase(),
               style: TextStyle(
                 fontFamily: 'Hyperion',
                 fontWeight: FontWeight.w400,
@@ -375,7 +375,7 @@ class _AccountSettingsRefined extends StatelessWidget {
                       color: Colors.white,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'ADD MAIL',
+                      hintText: 'add mail',
                       hintStyle: const TextStyle(
                         fontFamily: 'Hyperion',
                         color: Colors.white54,
@@ -399,14 +399,14 @@ class _AccountSettingsRefined extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 28),
                   ),
-                  child: const Text('ADD MAIL', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
+                  child: const Text('add mail', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 24),
           // CHANGE PASSWORD
-          Text('CHANGE PASSWORD',
+          Text('change password',
               style: TextStyle(
                 fontFamily: 'Hyperion',
                 fontWeight: FontWeight.bold,
@@ -414,14 +414,14 @@ class _AccountSettingsRefined extends StatelessWidget {
                 fontSize: 14,
               )),
           const SizedBox(height: 8),
-          _PasswordField(label: 'CURRENT PASSWORD'),
-          _PasswordField(label: 'NEW PASSWORD'),
-          _PasswordField(label: 'REPEAT PASSWORD'),
+          _PasswordField(label: 'current password'),
+          _PasswordField(label: 'new password'),
+          _PasswordField(label: 'repeat password'),
           Row(
             children: [
               const Icon(Icons.error, color: Colors.red, size: 18),
               const SizedBox(width: 8),
-              Text('WRONG CURRENT PASSWORD',
+              Text('wrong current password',
                   style: TextStyle(
                     fontFamily: 'Hyperion',
                     color: Colors.red,
@@ -442,12 +442,12 @@ class _AccountSettingsRefined extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('SAVE', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
+              child: const Text('save', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
             ),
           ),
           const SizedBox(height: 24),
           // CONTACT SUPPORT
-          Text('CONTACT SUPPORT',
+          Text('contact support',
               style: TextStyle(
                 fontFamily: 'Hyperion',
                 fontWeight: FontWeight.bold,
@@ -456,7 +456,7 @@ class _AccountSettingsRefined extends StatelessWidget {
               )),
           const SizedBox(height: 4),
           Text(
-            'HAVE A QUESTION OR NEED HELP WITH YOUR ACCOUNT, YOUR ROBOT, OR THE APP? FEEL FREE TO REACH OUT TO US THROUGH ANY OF THE FOLLOWING METHODS:',
+            'have a question or need help with your account, your robot, or the app? feel free to reach out to us through any of the following methods:',
             style: TextStyle(
               fontFamily: 'Hyperion',
               color: Colors.white70,
@@ -466,16 +466,16 @@ class _AccountSettingsRefined extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(child: _SupportButton(icon: 'assets/Images/Letter.png', label: 'EMAIL', white: true)),
+              Expanded(child: _SupportButton(icon: 'assets/Images/Letter.png', label: 'email', white: true)),
               const SizedBox(width: 8),
-              Expanded(child: _SupportButton(icon: 'assets/Images/WhatsApp.png', label: 'WHATSAPP', white: true)),
+              Expanded(child: _SupportButton(icon: 'assets/Images/WhatsApp.png', label: 'whatsapp', white: true)),
               const SizedBox(width: 8),
-              Expanded(child: _SupportButton(icon: 'assets/Images/Task.png', label: 'FILL A FORM', white: true)),
+              Expanded(child: _SupportButton(icon: 'assets/Images/Task.png', label: 'fill a form', white: true)),
             ],
           ),
           const SizedBox(height: 24),
           // LOGOUT
-          Text('LOG OUT FROM YOUR ACCOUNT',
+          Text('log out from your account',
               style: TextStyle(
                 fontFamily: 'Hyperion',
                 fontWeight: FontWeight.bold,
@@ -495,12 +495,12 @@ class _AccountSettingsRefined extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('LOGOUT', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
+              child: const Text('logout', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
             ),
           ),
           const SizedBox(height: 24),
           // CLOSE ACCOUNT
-          Text('CLOSE YOUR ACCOUNT',
+          Text('close your account',
               style: TextStyle(
                 fontFamily: 'Hyperion',
                 fontWeight: FontWeight.bold,
@@ -517,7 +517,7 @@ class _AccountSettingsRefined extends StatelessWidget {
                   const Text('• ', style: TextStyle(color: Colors.white, fontSize: 18)),
                   Expanded(
                     child: Text(
-                      'DO YOU WANT TO CLOSE YOUR B.E.M.O ACCOUNT? WE ARE SORRY TO SEE YOU GO! PLEASE CONSIDER CONTACTING SUPPORT TO LET US KNOW WHAT WENT WRONG.',
+                      'do you want to close your b.e.m.o account? we are sorry to see you go! please consider contacting support to let us know what went wrong.',
                       style: TextStyle(
                         fontFamily: 'Hyperion',
                         color: Colors.white70,
@@ -534,7 +534,7 @@ class _AccountSettingsRefined extends StatelessWidget {
                   const Text('• ', style: TextStyle(color: Colors.white, fontSize: 18)),
                   Expanded(
                     child: Text(
-                      'READY TO MOVE ON? YOU CAN CLOSE YOUR ACCOUNT—YOUR DATA WILL BE PERMANENTLY DELETED FROM OUR SYSTEM AFTER 30 DAYS OF INACTIVITY.',
+                      'ready to move on? you can close your account—your data will be permanently deleted from our system after 30 days of inactivity.',
                       style: TextStyle(
                         fontFamily: 'Hyperion',
                         color: Colors.white70,
@@ -559,7 +559,7 @@ class _AccountSettingsRefined extends StatelessWidget {
                 ),
               ),
               onPressed: () {},
-              child: const Text('CLOSE ACCOUNT', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
+              child: const Text('close account', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
             ),
           ),
         ],
@@ -633,7 +633,7 @@ class _SupportButton extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: () {},
       icon: Image.asset(icon, width: 22, height: 22),
-      label: Text(label,
+      label: Text(label.toLowerCase(),
         style: TextStyle(
           fontFamily: 'Hyperion',
           color: white ? Colors.black : Colors.white,
@@ -654,18 +654,18 @@ class _SupportButton extends StatelessWidget {
 
 class _EmailsBox extends StatelessWidget {
   final List<String> emails = const [
-    'BEGADTAMIM.A@GMAIL.COM',
-    'BEGADT@GMAIL.COM',
-    'MOMADOZ003@HOTMAIL.COM',
-    'NOTMOMAD00555555@GMAIL.COM',
-    'NOTMOMAD00555555@GMAIL.COM',
+    'begadtamim.a@gmail.com',
+    'begadt@gmail.com',
+    'momadoz003@hotmail.com',
+    'notmomad00555555@gmail.com',
+    'notmomad00555555@gmail.com',
   ];
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('EMAILS',
+        Text('emails',
             style: TextStyle(
               fontFamily: 'Hyperion',
               fontWeight: FontWeight.bold,
@@ -697,13 +697,45 @@ class _EmailsBox extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Image.asset('assets/Images/Connect.png', width: 22, height: 22),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        padding: const EdgeInsets.all(2),
+                        child: Image.asset('assets/Images/Connect.png', width: 22, height: 22, color: Colors.black),
+                      ),
                       const SizedBox(width: 4),
-                      Image.asset('assets/Images/Task.png', width: 22, height: 22),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        padding: const EdgeInsets.all(2),
+                        child: Image.asset('assets/Images/Task.png', width: 22, height: 22),
+                      ),
                       const SizedBox(width: 4),
-                      Image.asset('assets/Images/Crown.png', width: 22, height: 22),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        padding: const EdgeInsets.all(2),
+                        child: Image.asset('assets/Images/Crown.png', width: 22, height: 22),
+                      ),
                       const SizedBox(width: 4),
-                      Image.asset('assets/Images/Delete.png', width: 22, height: 22),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        padding: const EdgeInsets.all(2),
+                        child: Image.asset('assets/Images/Delete.png', width: 22, height: 22),
+                      ),
                     ],
                   ),
                 ],
@@ -718,7 +750,7 @@ class _EmailsBox extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(
-                  text: 'CLICK HERE',
+                  text: 'click here',
                   style: TextStyle(
                     fontFamily: 'Hyperion',
                     color: Colors.white,
@@ -726,7 +758,7 @@ class _EmailsBox extends StatelessWidget {
                   ),
                 ),
                 TextSpan(
-                  text: ' FOR MORE INFORMATION ABOUT EMAIL SETTINGS',
+                  text: ' for more information about email settings',
                   style: TextStyle(
                     fontFamily: 'Hyperion',
                     color: Colors.white70,
@@ -754,7 +786,7 @@ class _LinkedAccounts extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('LINKED ACCOUNTS',
+          Text('linked accounts',
               style: TextStyle(
                 fontFamily: 'Hyperion',
                 fontWeight: FontWeight.bold,
@@ -765,19 +797,19 @@ class _LinkedAccounts extends StatelessWidget {
           const SizedBox(height: 16),
           _LinkedAccountButton(
             icon: 'assets/Images/Google.png',
-            label: 'DISCONNECT GOOGLE',
+            label: 'disconnect google',
             connected: true,
             color: Colors.red,
           ),
           _LinkedAccountButton(
             icon: 'assets/Images/Microsoft.png',
-            label: 'DISCONNECT MICROSOFT',
+            label: 'disconnect microsoft',
             connected: true,
             color: Colors.red,
           ),
           _LinkedAccountButton(
             icon: 'assets/Images/Apple Inc.png',
-            label: 'CONNECT TO APPLE',
+            label: 'connect to apple',
             connected: false,
             color: Colors.green,
           ),
@@ -789,7 +821,7 @@ class _LinkedAccounts extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              'GOOGLE: used for quick login, mailassist, and taskflow\nMICROSOFT: used for quick login, and mailassist\nAPPLE: used for quick login only\n\nDisconnecting will remove all related data from B.E.M.O. but you may still need to revoke access on the linked service.\nConnected accounts are also listed under emails in account settings.',
+              'google: used for quick login, mailassist, and taskflow\nmicrosoft: used for quick login, and mailassist\napple: used for quick login only\n\ndisconnecting will remove all related data from B.E.M.O. but you may still need to revoke access on the linked service.\nconnected accounts are also listed under emails in account settings.',
               style: TextStyle(
                 fontFamily: 'Hyperion',
                 color: Colors.white70,
@@ -819,7 +851,7 @@ class _LinkedAccountButton extends StatelessWidget {
         child: ElevatedButton.icon(
           onPressed: () {},
           icon: Image.asset(icon, width: 24, height: 24),
-          label: Text(label,
+          label: Text(label.toLowerCase(),
             style: TextStyle(
               fontFamily: 'Hyperion',
               color: Colors.white,
