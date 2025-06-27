@@ -5,7 +5,6 @@ class UserSettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
     // Use a base size similar to your design, e.g., 1600x900
     const double baseWidth = 1600;
     const double baseHeight = 900;

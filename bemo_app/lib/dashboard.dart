@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'user_settings.dart';
+import 'chat_history.dart';
+import 'bemo_sidebar.dart';
 
 class DashboardApp extends StatelessWidget {
   const DashboardApp({super.key});
@@ -41,9 +43,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  void _onSidebarSectionTap(BemoSection section) {
+    if (section == BemoSection.dashboard) return;
+    if (section == BemoSection.chatHistory) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const ChatHistoryScreen(),
+        ),
+      );
+      return;
+    }
+    if (section == BemoSection.settings) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const UserSettingsPage(),
+        ),
+      );
+      return;
+    }
+    // Add navigation for other sections as needed
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
     const double baseWidth = 1820;
     const double baseHeight = 980;
     final double sidebarWidth = _collapsed ? collapsedWidth : expandedWidth;
@@ -64,164 +86,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Stack(
               children: [
                 // Sidebar (left)
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 300),
+                Positioned(
                   left: 0,
                   top: 0,
                   bottom: 0,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    width: sidebarWidth,
-                    height: 980,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF191919),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        bottomLeft: Radius.circular(30),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 48),
-                        GestureDetector(
-                          onTap: _toggleSidebar,
-                          child: Container(
-                            width: _collapsed ? 48 : 200,
-                            height: 60,
-                            alignment: Alignment.center,
-                            child: _collapsed
-                                ? Image.asset(
-                                    'assets/images/Robot - Inverted 1.png',
-                                    fit: BoxFit.contain,
-                                    height: 48,
-                                  )
-                                : Image.asset(
-                                    'assets/images/Logo 2 - Transparent Inverted 1 1.png',
-                                    fit: BoxFit.contain,
-                                    height: 48,
-                                  ),
-                          ),
-                        ),
-                        if (!_collapsed) ...[
-                          const SizedBox(height: 48),
-                          _SidebarNav(
-                              iconAsset: 'assets/images/Idea.png',
-                              label: 'PROJECTS'),
-                          const SizedBox(height: 8),
-                          _SidebarNav(
-                              iconAsset: 'assets/images/At sign.png',
-                              label: 'E-MAIL'),
-                          const SizedBox(height: 8),
-                          _SidebarNav(
-                              iconAsset: 'assets/images/To Do List.png',
-                              label: 'TASKS'),
-                          const SizedBox(height: 8),
-                          _SidebarNav(
-                              iconAsset: 'assets/images/Calendar 28.png',
-                              label: 'CALENDAR'),
-                          const SizedBox(height: 8),
-                          _SidebarNav(
-                              iconAsset: 'assets/images/Cloud Folder.png',
-                              label: 'DRIVE'),
-                          const SizedBox(height: 8),
-                          _SidebarNav(
-                              iconAsset:
-                                  'assets/images/Smart Home Connection.png',
-                              label: 'SMART HOME'),
-                          const SizedBox(height: 8),
-                          _SidebarNav(
-                              iconAsset: 'assets/images/Chat.png',
-                              label: 'CHAT HISTORY'),
-                          const SizedBox(height: 8),
-                          _SidebarNav(
-                              iconAsset: 'assets/images/Notification.png',
-                              label: 'NOTIFICATIONS'),
-                          const SizedBox(height: 8),
-                          _SidebarNav(
-                            iconAsset: 'assets/images/Control Panel.png',
-                            label: 'SETTINGS',
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const UserSettingsPage()),
-                              );
-                            },
-                          ),
-                        ] else ...[
-                          const SizedBox(height: 32),
-                          _SidebarIconOnly(iconAsset: 'assets/images/Idea.png'),
-                          const SizedBox(height: 16),
-                          _SidebarIconOnly(
-                              iconAsset: 'assets/images/At sign.png'),
-                          const SizedBox(height: 16),
-                          _SidebarIconOnly(
-                              iconAsset: 'assets/images/To Do List.png'),
-                          const SizedBox(height: 16),
-                          _SidebarIconOnly(
-                              iconAsset: 'assets/images/Calendar 28.png'),
-                          const SizedBox(height: 16),
-                          _SidebarIconOnly(
-                              iconAsset: 'assets/images/Cloud Folder.png'),
-                          const SizedBox(height: 16),
-                          _SidebarIconOnly(
-                              iconAsset:
-                                  'assets/images/Smart Home Connection.png'),
-                          const SizedBox(height: 16),
-                          _SidebarIconOnly(iconAsset: 'assets/images/Chat.png'),
-                          const SizedBox(height: 16),
-                          _SidebarIconOnly(
-                              iconAsset: 'assets/images/Notification.png'),
-                          const SizedBox(height: 16),
-                          _SidebarIconOnly(
-                            iconAsset: 'assets/images/Control Panel.png',
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const UserSettingsPage()),
-                              );
-                            },
-                          ),
-                        ],
-                        const Spacer(),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 32.0),
-                          child: _collapsed
-                              ? Center(
-                                  child: CircleAvatar(
-                                    radius: 28,
-                                    backgroundImage: AssetImage(
-                                        'assets/images/Robot - Inverted 1.png'),
-                                  ),
-                                )
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 28,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/Robot - Inverted 1.png'),
-                                    ),
-                                    const SizedBox(width: 16),
-                                    Text(
-                                      'Begad Tamim',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                        color: Colors.white.withOpacity(0.7),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                        ),
-                      ],
-                    ),
+                  child: BemoSidebar(
+                    collapsed: _collapsed,
+                    onToggle: _toggleSidebar,
+                    currentSection: BemoSection.dashboard,
+                    onSectionTap: _onSidebarSectionTap,
+                    userName: 'Begad Tamim',
                   ),
                 ),
                 // Vertical separator between sidebar and center
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 300),
+                Positioned(
                   left: dividerLeft,
                   top: 0,
                   bottom: 0,
@@ -244,7 +122,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       borderRadius: BorderRadius.circular(32),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Color.fromRGBO(0, 0, 0, 0.1),
                           blurRadius: 16,
                           offset: const Offset(0, 4),
                         ),
@@ -279,7 +157,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Container(
                             width: 60,
                             height: 2,
-                            color: Colors.black26,
+                            color: Color.fromRGBO(0, 0, 0, 0.26),
                             margin: const EdgeInsets.symmetric(vertical: 8),
                           ),
                           _NotificationItem(
@@ -371,7 +249,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 child: Text(
                                   'GOOD AFTERNOON!',
                                   style: TextStyle(
-                                    color: Color(0x8CEFEFEF),
+                                    color: Color.fromRGBO(255, 255, 255, 0.8),
                                     fontSize: 24,
                                     fontFamily: 'Hyperion',
                                     fontWeight: FontWeight.bold,
@@ -866,40 +744,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-class _SidebarNav extends StatelessWidget {
-  final String? iconAsset;
-  final String label;
-  final VoidCallback? onTap;
-  const _SidebarNav({this.iconAsset, required this.label, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 32.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            if (iconAsset != null)
-              Image.asset(iconAsset!, height: 28, color: Colors.white),
-            const SizedBox(width: 22),
-            Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.white,
-                letterSpacing: 1.2,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _NotificationItem extends StatelessWidget {
   final String iconAsset;
   final String title;
@@ -983,7 +827,7 @@ class _NotifActionIcon extends StatelessWidget {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.85),
+            color: Color.fromRGBO(0, 0, 0, 0.85),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
@@ -1007,26 +851,6 @@ class _NotifActionIcon extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-// Sidebar icon only widget for collapsed state
-class _SidebarIconOnly extends StatelessWidget {
-  final String iconAsset;
-  final VoidCallback? onTap;
-  const _SidebarIconOnly({required this.iconAsset, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Center(
-          child: Image.asset(iconAsset, height: 28, color: Colors.white),
-        ),
-      ),
     );
   }
 }

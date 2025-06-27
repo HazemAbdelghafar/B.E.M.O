@@ -127,6 +127,16 @@ flutter:
     - assets/Images/task_flow.png
     - assets/Images/mail_task.png
     - assets/Images/Background.png
+    - assets/Images/bemo_profile1.png
+    - assets/Images/bemo_profile2.png
+    - assets/Images/bemo_profile3.png
+    - assets/Images/bemo_profile4.png
+    - assets/Images/bemo_profile5.png
+    - assets/Images/Chat_history_Background.png
+    - assets/Images/search.png
+    - assets/Images/copy.png
+    - assets/Images/link.png
+    - assets/Images/popular.png
 
   fonts:
     - family: Hyperion
