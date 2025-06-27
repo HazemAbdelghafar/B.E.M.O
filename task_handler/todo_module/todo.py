@@ -44,7 +44,7 @@ class TasksApi(BaseMQTTHandler):
     This class now inherits from BaseMQTTHandler to enable MQTT functionality.
     """
 
-    def __init__(self, robot_id: str, timezone: str = DEFAULT_TIMEZONE) -> None:
+    def __init__(self, user_id: str, timezone: str = DEFAULT_TIMEZONE) -> None:
         """
         This method initializes the tasks API
 
@@ -59,14 +59,14 @@ class TasksApi(BaseMQTTHandler):
         super().__init__(sub_topic="task_handler/todo", name="todo")
 
         self._timezone = timezone
-        self._robot_id = robot_id
+        self._user_id = user_id
         self.is_initialized = False
 
         self._init_tasks_api()
 
     def _init_tasks_api(self):
         try:
-            self._creds = init_user_google(self._robot_id)
+            self._creds = init_user_google(self._user_id)
             self._service = build("tasks", "v1", credentials=self._creds)
         except Exception as e:
             logger.error(f"Error initializing tasks API: {e}")
@@ -1180,5 +1180,5 @@ class TasksApi(BaseMQTTHandler):
 
 
 if __name__ == "__main__":
-    tasks_api = TasksApi(robot_id="bemo-MK1")
+    tasks_api = TasksApi(user_id="user-MK1")
     tasks_api.start_mqtt()
