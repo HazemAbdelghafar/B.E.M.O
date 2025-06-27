@@ -3,6 +3,7 @@ DEFAULT_USER_DATA = {
     "full_name": "Mohamed Abdelnasser",
     "name": "Youssef",
     "preferred_name": "Youssef",
+    "primary_email": "mohamed.y.abdelnasser@gmail.com",
     "title": "Eng.",
     "gender": "Male",
     "age": "21",
