@@ -58,9 +58,22 @@ class TasksApi(BaseMQTTHandler):
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/todo", name="todo")
 
-        self._creds = init_user_google(robot_id)
-        self._service = build("tasks", "v1", credentials=self._creds)
         self._timezone = timezone
+        self._robot_id = robot_id
+        self.is_initialized = False
+
+        self._init_tasks_api()
+
+    def _init_tasks_api(self):
+        try:
+            self._creds = init_user_google(self._robot_id)
+            self._service = build("tasks", "v1", credentials=self._creds)
+        except Exception as e:
+            logger.error(f"Error initializing tasks API: {e}")
+            self.is_initialized = False
+            return
+
+        self.is_initialized = True
 
     def execute_main(self, input_data: dict) -> dict:
         """
@@ -72,6 +85,9 @@ class TasksApi(BaseMQTTHandler):
         Returns:
             dict: The result of the task operation.
         """
+        if not self.is_initialized:
+            logger.error("Tasks API not initialized")
+            return {"error": "Tasks API not initialized", "level": 2}
 
         if not isinstance(input_data, dict):
             result = {"error": "Invalid input data", "level": 2}
