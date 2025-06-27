@@ -129,15 +129,16 @@ class Mail(BaseMQTTHandler):
         else:
             raise Exception(f"Failed to acquire Outlook token: {result.get('error_description')}")
 
-    def send_email(self, to_email: str | list[str], subject: str, body: str):
-        if isinstance(to_email, str):
-            recipients = [to_email]
+    def send_email(self, recipients: str | list[str], subject: str, body: str):
+                
+        if isinstance(recipients, str):
+            recipients_ = [recipients]
         else:
-            recipients = to_email
+            recipients_ = recipients
 
         if self.provider == 'gmail':
             message = MIMEText(body)
-            message['to'] = ", ".join(recipients)
+            message['to'] = ", ".join(recipients_)
             message['subject'] = subject
             raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
             return self.service.users().messages().send(userId='me', body={'raw': raw}).execute()
@@ -156,7 +157,7 @@ class Mail(BaseMQTTHandler):
                         "content": body
                     },
                     "toRecipients": [
-                        {"emailAddress": {"address": email}} for email in recipients
+                        {"emailAddress": {"address": email}} for email in recipients_
                     ]
                 }
             }
@@ -681,13 +682,21 @@ class Mail(BaseMQTTHandler):
             dict: The result of the processing.
         """
         
+        # Todo: Check default values
+        # Todo: Change mark emails as read
+        # Todo: Add sent by bemo to send or reply
+        
         if not self.is_initialized:
             logger.error("Mail module not initialized")
             return {"error": "Mail module not initialized", "level": 2}
-        
+                
         function_name = input_data.get("function")
+        
+        logger.info(f"Executing {function_name}")
+        logger.info(f"Input data: {input_data}")
+        
         if function_name == "send_email":
-            result = self.send_email(input_data.get("to_email"), input_data.get("subject"), input_data.get("body"))
+            result = self.send_email(input_data.get("recipients"), input_data.get("subject"), input_data.get("body"))
         elif function_name == "fetch_latest_emails":
             result = self.fetch_latest_emails(input_data.get("count"))
         elif function_name == "search_emails":
