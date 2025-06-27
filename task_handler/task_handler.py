@@ -62,6 +62,8 @@ class TaskHandler(BaseMQTTHandler):
                     topic = "task_handler/general"
                 elif method == "learning_resources":
                     topic = "task_handler/learning_resources"
+                elif method == "mail":
+                    topic = "task_handler/mail"
                 else:
                     logger.error(f"Unknown method: {method}")
                     self.publish_result({"error": "Unknown method", "level": 1})
