@@ -168,7 +168,7 @@ class Mail(BaseMQTTHandler):
                         "text": response.text
                     }
 
-    def fetch_latest_emails(self, count=3):
+    def fetch_latest_emails(self, count:int=3):
         emails = []
         if self.provider == 'gmail':
             results = self.service.users().messages().list(
@@ -233,7 +233,7 @@ class Mail(BaseMQTTHandler):
                 emails.append({"sender": sender, "subject": subject, "body": body, "message_id": message_id})
         return emails
 
-    def search_emails(self, keyword=None, sender=None, max_results=5):
+    def search_emails(self, keyword:str=None, sender:str=None, max_results:int=5):
         results = []
 
         if self.provider == 'gmail':
@@ -325,7 +325,7 @@ class Mail(BaseMQTTHandler):
 
         return results
 
-    def fetch_unread_emails(self, count=5):
+    def fetch_unread_emails(self, count:int=5):
         emails = []
 
         if self.provider == 'gmail':
@@ -389,7 +389,7 @@ class Mail(BaseMQTTHandler):
         self.mark_emails_as_read([email[3] for email in emails])
         return emails
 
-    def delete_email(self, subject=None, message_id=None):
+    def delete_email(self, subject:str=None, message_id:str=None):
         if not subject and not message_id:
             print("Please provide either a subject or a message ID to delete an email.")
             return {"status": "error", "message": "Please provide either a subject or a message ID to delete an email."}
@@ -463,7 +463,7 @@ class Mail(BaseMQTTHandler):
         print("Unknown provider or error.")
         return {"status": "error", "message": "Unknown provider or error."}
 
-    def reply_to_email(self, message_id, reply_body):
+    def reply_to_email(self, message_id:str, reply_body:str):
         if self.provider == 'gmail':
             try:
                 # Get original message details
