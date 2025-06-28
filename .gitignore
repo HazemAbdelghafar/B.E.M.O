@@ -251,13 +251,3 @@ $RECYCLE.BIN/
 # test*.*
 overthinking.txt
 routes_test.py
-
-# Ignore everything
-*
-
-# But not these files/folders
-!static/
-!templates/
-!app.py
-!routes.py
-!.gitignore
