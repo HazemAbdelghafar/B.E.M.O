@@ -1,4 +1,4 @@
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPException, status, Form, Response, Cookie
 from fastapi.templating import Jinja2Templates
 from fastapi.websockets import WebSocketState
 from typing import Dict
@@ -8,6 +8,10 @@ import json
 from ast import literal_eval
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.requests import Request
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # === Logging ===
 logger = logging.getLogger("uvicorn")
@@ -320,8 +324,28 @@ def format_device(device_id, info):
     }
 
 
+# === Auth helpers ===
+def get_dashboard_credentials():
+    user = os.environ.get("DASHBOARD_USER", "bemo")
+    pw = os.environ.get("DASHBOARD_PASS", "bemo")
+    return user, pw
+
+def dashboard_auth(dashboard_user: str = Cookie(None), dashboard_pass: str = Cookie(None)):
+    real_user, real_pass = get_dashboard_credentials()
+    if dashboard_user != real_user or dashboard_pass != real_pass:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+
+@router.post("/dashboard-login")
+async def dashboard_login(response: Response, username: str = Form(...), password: str = Form(...)):
+    real_user, real_pass = get_dashboard_credentials()
+    if username == real_user and password == real_pass:
+        response.set_cookie("dashboard_user", username, httponly=True)
+        response.set_cookie("dashboard_pass", password, httponly=True)
+        return {"success": True}
+    return JSONResponse({"success": False, "error": "Invalid credentials"}, status_code=401)
+
 @router.get("/connected-devices/json", response_class=JSONResponse)
-async def get_connected_devices_json():
+async def get_connected_devices_json(request: Request, auth=Depends(dashboard_auth)):
     return JSONResponse(
         content={
             "server": (
@@ -333,7 +357,6 @@ async def get_connected_devices_json():
             "users": [format_device(id, info) for id, info in user_metadata.items()],
         }
     )
-
 
 @router.get("/connected-devices", response_class=HTMLResponse)
 async def get_connected_devices(request: Request):
@@ -350,3 +373,21 @@ async def get_connected_devices(request: Request):
             "users": [format_device(id, info) for id, info in user_metadata.items()],
         },
     )
+
+@router.post("/disconnect/{id}")
+async def disconnect_device(id: str, auth=Depends(dashboard_auth)):
+    if id == SERVER_ID:
+        return JSONResponse({"error": "Cannot disconnect main server"}, status_code=400)
+    if id in connected_robots:
+        ws = connected_robots[id]
+        await ws.close()
+        connected_robots.pop(id, None)
+        robot_metadata.pop(id, None)
+        return {"status": "disconnected", "id": id}
+    if id in connected_users:
+        ws = connected_users[id]
+        await ws.close()
+        connected_users.pop(id, None)
+        user_metadata.pop(id, None)
+        return {"status": "disconnected", "id": id}
+    return JSONResponse({"error": "ID not found"}, status_code=404)
