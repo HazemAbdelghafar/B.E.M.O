@@ -183,6 +183,14 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         if SERVER_ID not in connected_servers:
             logger.warning(f"Robot {id} connected, but server is not connected.")
             await websocket.close(code=1008, reason="Server not connected")
+
+            if id in connected_robots:
+                connected_robots.pop(id, None)
+
+            if id in robot_metadata:
+                robot_metadata.pop(id, None)
+
+            logger.info(f"Robot {id} disconnected, and removed from server.")
             return
 
         await websocket.accept()
@@ -237,6 +245,14 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         if SERVER_ID not in connected_servers:
             logger.warning(f"User {id} connected, but server is not connected.")
             await websocket.close(code=1008, reason="Server not connected")
+
+            if id in connected_users:
+                connected_users.pop(id, None)
+
+            if id in user_metadata:
+                user_metadata.pop(id, None)
+
+            logger.info(f"User {id} disconnected, and removed from server.")
             return
 
         await websocket.accept()
