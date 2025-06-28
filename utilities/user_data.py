@@ -1,18 +1,17 @@
-
 DEFAULT_USER_DATA = {
     "full_name": "Mohamed Abdelnasser",
-    "name": "Youssef",
+    "nickname": "Youssef",
     "preferred_name": "Youssef",
     "primary_email": "mohamed.y.abdelnasser@gmail.com",
     "title": "Eng.",
     "gender": "Male",
     "age": "21",
-    "date_of_birth": "28/10/2003",  # Day/Month/Year
+    "date_of_birth": "28-10-2003",
     "country": "Egypt",
     "timezone": "Africa/Cairo",
     "address": "Mandara, Alexandria, Egypt",
     "occupation": "NLP Engineer",
-    "bio": "NLP Engineer"
+    "bio": "NLP Engineer",
 }
 
 
