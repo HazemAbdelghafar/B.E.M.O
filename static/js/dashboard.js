@@ -1,3 +1,10 @@
+function formatDuration(seconds) {
+    const hrs = String(Math.floor(seconds / 3600)).padStart(2, "0");
+    const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+    const secs = String(seconds % 60).padStart(2, "0");
+    return `${hrs}:${mins}:${secs}`;
+}
+
 async function fetchDeviceData() {
     try {
         const res = await fetch("/api/connected-devices/json");
@@ -5,113 +12,107 @@ async function fetchDeviceData() {
         updatePage(data);
     } catch (err) {
         console.error("Failed to fetch device data:", err);
-        document.getElementById("server-status").innerHTML = `
-      <p class="status-disconnected">🔴 Server status: Disconnected</p>
-    `;
     }
-}
-
-function formatDuration(seconds) {
-    const hrs = Math.floor(seconds / 3600)
-        .toString()
-        .padStart(2, "0");
-    const mins = Math.floor((seconds % 3600) / 60)
-        .toString()
-        .padStart(2, "0");
-    const secs = (seconds % 60).toString().padStart(2, "0");
-    return `${hrs}:${mins}:${secs}`;
 }
 
 function updatePage(data) {
-    const { server, robots, users } = data;
+    // === Server Section ===
+    const serverDiv = document.getElementById("server-status");
+    if (serverDiv) {
+        const server = data.server;
+        let html = `<h2>🖥️ Server</h2>`;
 
-    // --- Server Status ---
-    let serverHtml = `<h2>🖥️ Server</h2>`;
-    if (server) {
-        serverHtml += `
-      <p>Status: <span class="status-connected">🟢 Connected</span></p>
-      <p>IP Address: ${server.ip}</p>
-      <p>Uptime: ⏱️ ${formatDuration(server.duration)}</p>
-      <p>Last Seen: ${new Date(server.last_seen).toLocaleString()}</p>
-    `;
-    } else {
-        serverHtml += `<p>Status: <span class="status-disconnected">🔴 Disconnected</span></p>`;
-    }
-    document.getElementById("server-status").innerHTML = serverHtml;
+        if (server) {
+            html += `
+                <p>Status: <span class="status-connected">🟢 Connected</span></p>
+                <p>IP Address: ${server.ip}</p>
+                <p>Uptime: ⏱️ ${formatDuration(server.duration)}</p>
+                <p>Last Seen: ${new Date(server.last_seen).toLocaleString()}</p>
+            `;
+        } else {
+            html += `<p>Status: <span class="status-disconnected">🔴 Disconnected</span></p>`;
+        }
 
-    // --- Robots Table ---
-    let robotsHtml = `<h2>🤖 Robots (${robots.length})</h2>`;
-    if (robots.length === 0) {
-        robotsHtml += "<p>No robots connected.</p>";
-    } else {
-        robotsHtml += `
-      <table class="device-table">
-        <thead>
-          <tr><th>ID</th><th>IP</th><th>Uptime</th><th>Last Seen</th><th>Status</th></tr>
-        </thead>
-        <tbody>
-          ${robots
-              .map(
-                  (r) => `
-              <tr>
-                <td>${r.id}</td>
-                <td>${r.ip}</td>
-                <td>${formatDuration(r.duration)}</td>
-                <td>${new Date(r.last_seen).toLocaleString()}</td>
-                <td class="${
-                    r.status === "connected"
-                        ? "status-connected"
-                        : "status-disconnected"
-                }">
-                  ${r.status === "connected" ? "🟢" : "🔴"}
-                </td>
-              </tr>
-            `
-              )
-              .join("")}
-        </tbody>
-      </table>
-    `;
+        serverDiv.innerHTML = html;
     }
-    document.getElementById("robots").innerHTML = robotsHtml;
 
-    // --- Users Table ---
-    let usersHtml = `<h2>👤 Users (${users.length})</h2>`;
-    if (users.length === 0) {
-        usersHtml += "<p>No users connected.</p>";
-    } else {
-        usersHtml += `
-      <table class="device-table">
-        <thead>
-          <tr><th>ID</th><th>IP</th><th>Uptime</th><th>Last Seen</th><th>Status</th></tr>
-        </thead>
-        <tbody>
-          ${users
-              .map(
-                  (u) => `
-              <tr>
-                <td>${u.id}</td>
-                <td>${u.ip}</td>
-                <td>${formatDuration(u.duration)}</td>
-                <td>${new Date(u.last_seen).toLocaleString()}</td>
-                <td class="${
-                    u.status === "connected"
-                        ? "status-connected"
-                        : "status-disconnected"
-                }">
-                  ${u.status === "connected" ? "🟢" : "🔴"}
-                </td>
-              </tr>
-            `
-              )
-              .join("")}
-        </tbody>
-      </table>
-    `;
+    // === Robots Section ===
+    const robotsDiv = document.getElementById("robots");
+    if (robotsDiv) {
+        const robots = data.robots || [];
+        let html = `<h2>🤖 Robots (${robots.length})</h2>`;
+
+        if (robots.length === 0) {
+            html += `<p>No robots connected.</p>`;
+        } else {
+            html += `
+                <table class="device-table">
+                    <tr><th>ID</th><th>IP</th><th>Uptime</th><th>Last Seen</th><th>Status</th></tr>
+                    ${robots
+                        .map(
+                            (r) => `
+                        <tr>
+                            <td>${r.id}</td>
+                            <td>${r.ip}</td>
+                            <td>${formatDuration(r.duration)}</td>
+                            <td>${new Date(r.last_seen).toLocaleString()}</td>
+                            <td>
+                                ${
+                                    r.status === "connected"
+                                        ? '<span class="status-connected">🟢 Connected</span>'
+                                        : '<span class="status-disconnected">🔴 Disconnected</span>'
+                                }
+                            </td>
+                        </tr>
+                    `
+                        )
+                        .join("")}
+                </table>
+            `;
+        }
+
+        robotsDiv.innerHTML = html;
     }
-    document.getElementById("users").innerHTML = usersHtml;
+
+    // === Users Section ===
+    const usersDiv = document.getElementById("users");
+    if (usersDiv) {
+        const users = data.users || [];
+        let html = `<h2>👤 Users (${users.length})</h2>`;
+
+        if (users.length === 0) {
+            html += `<p>No users connected.</p>`;
+        } else {
+            html += `
+                <table class="device-table">
+                    <tr><th>ID</th><th>IP</th><th>Uptime</th><th>Last Seen</th><th>Status</th></tr>
+                    ${users
+                        .map(
+                            (u) => `
+                        <tr>
+                            <td>${u.id}</td>
+                            <td>${u.ip}</td>
+                            <td>${formatDuration(u.duration)}</td>
+                            <td>${new Date(u.last_seen).toLocaleString()}</td>
+                            <td>
+                                ${
+                                    u.status === "connected"
+                                        ? '<span class="status-connected">🟢 Connected</span>'
+                                        : '<span class="status-disconnected">🔴 Disconnected</span>'
+                                }
+                            </td>
+                        </tr>
+                    `
+                        )
+                        .join("")}
+                </table>
+            `;
+        }
+
+        usersDiv.innerHTML = html;
+    }
 }
 
-// Initial fetch and polling every 10 seconds
+// Run initially and every 5 seconds
 fetchDeviceData();
-setInterval(fetchDeviceData, 10000);
+setInterval(fetchDeviceData, 5000);
