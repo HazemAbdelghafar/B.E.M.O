@@ -19,7 +19,7 @@ import logging
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from utilities import BaseMQTTHandler, UserData
+from utilities import BaseMQTTHandler
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -36,7 +36,7 @@ logger.addHandler(console_handler)
 
 DEFAULT_NOTE = "\nB.E.M.O"
 DEFAULT_PATH = os.path.dirname(__file__)
-DEFAULT_TIMEZONE = UserData().get_user_data("timezone")
+DEFAULT_TIMEZONE = "Africa/Cairo"
 
 
 class TasksApi(BaseMQTTHandler):
@@ -44,7 +44,7 @@ class TasksApi(BaseMQTTHandler):
     This class now inherits from BaseMQTTHandler to enable MQTT functionality.
     """
 
-    def __init__(self, user_id: str, timezone: str = DEFAULT_TIMEZONE) -> None:
+    def __init__(self, user_id: str) -> None:
         """
         This method initializes the tasks API
 
@@ -58,7 +58,7 @@ class TasksApi(BaseMQTTHandler):
         # Initialize BaseMQTTHandler with MQTT topics
         super().__init__(sub_topic="task_handler/todo", name="todo")
 
-        self._timezone = timezone
+        self._timezone = DEFAULT_TIMEZONE
         self._user_id = user_id
         self.is_initialized = False
 
