@@ -4,8 +4,8 @@ async function fetchDeviceData() {
         const data = await res.json();
         updatePage(data);
     } catch (err) {
-        console.error("Fetch failed:", err);
-        // Do not overwrite server status block if fetch fails
+        console.error("Failed to fetch device data:", err);
+        // Do not show "Error fetching data" if server is None
     }
 }
 
@@ -20,67 +20,78 @@ function formatDuration(seconds) {
     return `${h}:${m}:${s}`;
 }
 
-function renderSection(title, dataList, type) {
-    let html = `<h2>${title} (${dataList.length})</h2>`;
-    if (dataList.length === 0) {
-        html += "<p>None connected.</p>";
-    } else {
-        html += `
-            <table>
-                <tr>
-                    <th>ID</th>
-                    <th>IP</th>
-                    <th>Status</th>
-                    <th>Connected At</th>
-                    <th>Uptime</th>
-                    <th>Last Seen</th>
-                </tr>
-                ${dataList
-                    .map(
-                        (d) => `
-                        <tr>
-                            <td>${d.id}</td>
-                            <td>${d.ip}</td>
-                            <td class="${
-                                d.status === "connected"
-                                    ? "status-ok"
-                                    : "status-bad"
-                            }">${d.status}</td>
-                            <td>${d.connected_at}</td>
-                            <td>${formatDuration(d.duration)}</td>
-                            <td>${d.last_seen || "N/A"}</td>
-                        </tr>
-                    `
-                    )
-                    .join("")}
-            </table>
-        `;
-    }
-    document.getElementById(type).innerHTML = html;
-}
-
 function updatePage(data) {
     const { server, robots, users } = data;
 
+    // Server
     let serverHtml = "<h2>Server</h2>";
-    if (server && server.status === "connected") {
+    if (server) {
         serverHtml += `
             <p>Status: <span class="status-ok">Connected</span></p>
             <p>IP: ${server.ip}</p>
             <p>Connected at: ${server.connected_at}</p>
             <p>Uptime: ${formatDuration(server.duration)}</p>
-            <p>Last Seen: ${server.last_seen || "N/A"}</p>
+            <p>Last seen: ${server.last_seen || "N/A"}</p>
         `;
     } else {
         serverHtml += `<p>Status: <span class="status-bad">Disconnected</span></p>`;
     }
-
     document.getElementById("server-status").innerHTML = serverHtml;
 
-    renderSection("Robots", robots, "robots");
-    renderSection("Users", users, "users");
+    // Robots
+    let robotsHtml = `<h2>Robots (${robots.length})</h2>`;
+    if (robots.length === 0) {
+        robotsHtml += "<p>No robots connected.</p>";
+    } else {
+        robotsHtml += `
+            <table>
+                <tr><th>ID</th><th>IP</th><th>Connected At</th><th>Uptime</th><th>Last Seen</th></tr>
+                ${robots
+                    .map(
+                        (r) => `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td>${r.ip}</td>
+                        <td>${r.connected_at}</td>
+                        <td>${formatDuration(r.duration)}</td>
+                        <td>${r.last_seen || "N/A"}</td>
+                    </tr>
+                `
+                    )
+                    .join("")}
+            </table>
+        `;
+    }
+    document.getElementById("robots").innerHTML = robotsHtml;
+
+    // Users
+    let usersHtml = `<h2>Users (${users.length})</h2>`;
+    if (users.length === 0) {
+        usersHtml += "<p>No users connected.</p>";
+    } else {
+        usersHtml += `
+            <table>
+                <tr><th>ID</th><th>IP</th><th>Connected At</th><th>Uptime</th><th>Last Seen</th></tr>
+                ${users
+                    .map(
+                        (u) => `
+                    <tr>
+                        <td>${u.id}</td>
+                        <td>${u.ip}</td>
+                        <td>${u.connected_at}</td>
+                        <td>${formatDuration(u.duration)}</td>
+                        <td>${u.last_seen || "N/A"}</td>
+                    </tr>
+                `
+                    )
+                    .join("")}
+            </table>
+        `;
+    }
+    document.getElementById("users").innerHTML = usersHtml;
 }
 
-// Initial load + refresh every 10 seconds
-fetchDeviceData();
-setInterval(fetchDeviceData, 10000);
+window.onload = () => {
+    fetchDeviceData();
+    setInterval(fetchDeviceData, 10000); // every 10 seconds
+};
