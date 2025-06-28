@@ -7,6 +7,8 @@ import 'dashboard.dart';
 import 'package:intl/intl.dart';
 import 'services/websocket_service.dart';
 import 'package:flutter/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/gestures.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
   const ChatHistoryScreen({Key? key}) : super(key: key);
@@ -236,28 +238,39 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                                           ),
                                         ),
                                         const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Container(
-                                              width: 10,
-                                              height: 10,
-                                              decoration: BoxDecoration(
-                                                color: _isConnected ? Colors.green : Colors.red,
-                                                shape: BoxShape.circle,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              _isConnected ? 'connected' : 'disconnected',
-                                              style: const TextStyle(
-                                                color: Color.fromRGBO(
-                                                    255, 255, 255, 0.5),
-                                                fontSize: 14,
-                                                fontFamily: 'Hyperion',
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
+                                        StreamBuilder<Map<String, dynamic>>(
+                                          stream: WebSocketService().messages,
+                                          builder: (context, snapshot) {
+                                            bool isConnected = false;
+                                            if (snapshot.hasData && snapshot.data!['type'] == 'connection_status') {
+                                              isConnected = snapshot.data!['connected'] ?? false;
+                                            } else {
+                                              isConnected = WebSocketService().isConnected;
+                                            }
+                                            return Row(
+                                              children: [
+                                                Container(
+                                                  width: 10,
+                                                  height: 10,
+                                                  decoration: BoxDecoration(
+                                                    color: isConnected ? Colors.green : Colors.red,
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  isConnected ? 'connected' : 'disconnected',
+                                                  style: const TextStyle(
+                                                    color: Color.fromRGBO(
+                                                        255, 255, 255, 0.5),
+                                                    fontSize: 14,
+                                                    fontFamily: 'Hyperion',
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
                                         ),
                                       ],
                                     ),
@@ -321,7 +334,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                                 alignment: Alignment.topCenter,
                                 child: Padding(
                                   padding: const EdgeInsets.only(
-                                      top: 8.0, bottom: 8.0),
+                                      top: 2.0, bottom: 8.0),
                                   child: Text(
                                     todayDate.toLowerCase(),
                                     style: const TextStyle(
@@ -379,8 +392,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                                           final isUser = msg['fromUser'] as bool;
                                           
                                           // Skip empty messages
-                                          final messageText = msg['text']?.toString().trim() ?? '';
-                                          if (messageText.isEmpty) {
+                                          final cleanedMessageText = msg['text']?.toString().trim() ?? '';
+                                          if (cleanedMessageText.isEmpty) {
                                             return const SizedBox.shrink();
                                           }
                                           
@@ -416,31 +429,36 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                                                           : const Radius.circular(30),
                                                     ),
                                                   ),
-                                                  child: Text(
-                                                    messageText.toLowerCase(),
-                                                    style: TextStyle(
-                                                      color: (!isUser &&
-                                                              msg['is_server_error'] ==
-                                                                  true)
-                                                          ? Colors.red
-                                                          : const Color(0xFFEFEFEF),
-                                                      fontSize: 20,
-                                                      fontFamily: 'Hyperion',
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
-                                                  ),
+                                                  child: msg['is_learning_resources'] == true
+                                                      ? _buildLearningResourcesMessage(cleanedMessageText)
+                                                      : SelectableText(
+                                                          cleanedMessageText.toLowerCase(),
+                                                          style: TextStyle(
+                                                            color: (!isUser &&
+                                                                    msg['is_server_error'] ==
+                                                                      true)
+                                                                ? Colors.red
+                                                                : const Color(0xFFEFEFEF),
+                                                            fontSize: 20,
+                                                            fontFamily: 'Hyperion',
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                        ),
                                                 ),
                                                 if (!isUser &&
                                                     msg['is_learning_resources'] == true)
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        top: 4.0,
-                                                        left: 8.0,
-                                                        right: 8.0),
-                                                    child: Image.asset(
-                                                      'assets/Images/link.png',
-                                                      width: 28,
-                                                      height: 28,
+                                                  Align(
+                                                    alignment: Alignment.centerLeft,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.only(
+                                                          top: 0.0,
+                                                          left: 8.0,
+                                                          right: 8.0),
+                                                      child: Image.asset(
+                                                        'assets/Images/link.png',
+                                                        width: 20,
+                                                        height: 20,
+                                                      ),
                                                     ),
                                                   ),
                                                 if (!isUser &&
@@ -504,8 +522,11 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                                                     ),
                                                   ),
                                                 Padding(
-                                                  padding: const EdgeInsets.only(
-                                                      top: 2, left: 8, right: 8),
+                                                  padding: EdgeInsets.only(
+                                                    top: (!isUser && msg['is_learning_resources'] == true) ? 8 : 2,
+                                                    left: 8,
+                                                    right: 8,
+                                                  ),
                                                   child: Text(
                                                     DateFormat('hh:mm a').format(
                                                         DateTime.tryParse(
@@ -536,6 +557,68 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
             ),
           ),
         ),
+      ),
+      floatingActionButton: WebSocketService().chatMessages.isNotEmpty
+          ? Padding(
+              padding: const EdgeInsets.only(right: 48.0, bottom: 24.0),
+              child: FloatingActionButton(
+                onPressed: _scrollToBottom,
+                backgroundColor: const Color(0xFF191919),
+                child: const Icon(Icons.arrow_downward, color: Colors.white),
+              ),
+            )
+          : null,
+    );
+  }
+
+  Widget _buildLearningResourcesMessage(String messageText) {
+    final cleanedMessageText = messageText.trimRight();
+    // Split message into lines and look for URLs
+    final urlRegex = RegExp(r'(https?://[^\s]+)');
+    final lines = cleanedMessageText.split('\n');
+    List<TextSpan> spans = [];
+    for (final line in lines) {
+      final matches = urlRegex.allMatches(line);
+      if (matches.isEmpty) {
+        spans.add(TextSpan(text: line + '\n'));
+      } else {
+        int last = 0;
+        for (final match in matches) {
+          if (match.start > last) {
+            spans.add(TextSpan(text: line.substring(last, match.start)));
+          }
+          final url = match.group(0)!;
+          spans.add(
+            TextSpan(
+              text: url,
+              style: const TextStyle(
+                color: Colors.blueAccent,
+                decoration: TextDecoration.underline,
+              ),
+              recognizer: TapGestureRecognizer()
+                ..onTap = () async {
+                  final uri = Uri.parse(url);
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri);
+                  }
+                },
+            ),
+          );
+          last = match.end;
+        }
+        if (last < line.length) {
+          spans.add(TextSpan(text: line.substring(last)));
+        }
+        spans.add(const TextSpan(text: '\n'));
+      }
+    }
+    return SelectableText.rich(
+      TextSpan(children: spans),
+      style: const TextStyle(
+        color: Color(0xFFEFEFEF),
+        fontSize: 20,
+        fontFamily: 'Hyperion',
+        fontWeight: FontWeight.bold,
       ),
     );
   }

@@ -126,46 +126,48 @@ class WebSocketService {
         
         // Check if this is a learning resources response
         final taskResults = msg['task_results'];
-        final isLearningResources = taskResults != null && 
-                                   taskResults['module_name'] == 'learning_resources' &&
-                                   taskResults['resources'] != null;
+        final isLearningResources = taskResults is Map &&
+            taskResults['module_name'] == 'learning_resources' &&
+            taskResults['resources'] is List;
         
         String finalResponseText = responseText;
         
-        // If it's learning resources, append the resources as bulleted list
         if (isLearningResources) {
           final resources = taskResults['resources'] as List;
           if (resources.isNotEmpty) {
             finalResponseText += '\n\n📚 Learning Resources:\n';
-            for (int i = 0; i < resources.length; i++) {
-              final resource = resources[i];
-              final title = resource['title']?.toString() ?? '';
-              final url = resource['url']?.toString() ?? '';
-              final type = resource['type']?.toString() ?? '';
-              
-              if (title.isNotEmpty && url.isNotEmpty) {
-                finalResponseText += '\n• $title';
-                if (type.isNotEmpty) {
-                  finalResponseText += ' ($type)';
+            for (final resource in resources) {
+              if (resource is Map) {
+                final title = resource['title']?.toString() ?? '';
+                final url = resource['url']?.toString() ?? '';
+                final type = resource['type']?.toString() ?? '';
+                if (title.isNotEmpty && url.isNotEmpty) {
+                  finalResponseText += '\n• $title';
+                  if (type.isNotEmpty) {
+                    finalResponseText += ' ($type)';
+                  }
+                  finalResponseText += '\n  $url';
                 }
-                finalResponseText += '\n  $url';
               }
             }
           }
         }
         
-        // Prepare message data for streaming
-        final messageData = {
-          'fromUser': false,
-          'text': finalResponseText,
-          'time': DateTime.now().toString(),
-          'method': taskResults != null ? taskResults['module_name'] : null,
-          'is_learning_resources': isLearningResources,
-        };
+        // Print prompt and response for debugging
+        print('Prompt: \'${msg['prompt'] ?? ''}\'');
+        print('Response: $finalResponseText');
         
-        // Start streaming the response
-        startStreamingResponse(finalResponseText, messageData);
-        
+        // Add a 1 second delay before showing the bot response
+        Future.delayed(const Duration(seconds: 1), () {
+          _chatMessages.add({
+            'fromUser': false,
+            'text': finalResponseText,
+            'time': DateTime.now().toString(),
+            'method': taskResults is Map ? taskResults['module_name'] : null,
+            'is_learning_resources': isLearningResources,
+          });
+          _messageController.add({'type': 'messages_updated'});
+        });
       } else {
         print('Skipping empty or error response: "$responseText"');
       }
@@ -390,12 +392,19 @@ class WebSocketService {
     _currentStreamingText += fullResponse[_currentStreamingIndex];
     _currentStreamingIndex++;
 
-    // Update the thinking message with streaming text
+    // Update the thinking message with streaming text (accumulated)
     if (_chatMessages.isNotEmpty && _chatMessages.last['is_thinking'] == true) {
       _chatMessages.last['text'] = _currentStreamingText;
       _chatMessages.last['is_thinking'] = false;
       _messageController.add({'type': 'messages_updated'});
     }
+
+    // Print prompt and current streaming response for debugging
+    if (_currentStreamingMessage != null && _currentStreamingIndex == 1) {
+      // Print prompt only once at the start
+      print('Prompt: \'${_currentStreamingMessage!['prompt'] ?? ''}\'');
+    }
+    print('Streaming response so far: $_currentStreamingText');
 
     // Schedule next character
     _streamingTimer = Timer(const Duration(milliseconds: 50), () {
@@ -415,6 +424,8 @@ class WebSocketService {
       _chatMessages.last['is_thinking'] = false;
       _chatMessages.last['method'] = _currentStreamingMessage!['method'];
       _chatMessages.last['is_learning_resources'] = _currentStreamingMessage!['is_learning_resources'];
+      // Print final response for debugging
+      print('Final response: $_currentStreamingText');
     }
     
     _currentStreamingIndex = 0;
