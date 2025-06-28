@@ -1,101 +1,86 @@
-function formatDuration(seconds) {
-    if (!Number.isFinite(seconds)) return '<span class="status-bad">N/A</span>';
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(
-        2,
-        "0"
-    )}:${String(secs).padStart(2, "0")}`;
-}
-
 async function fetchDeviceData() {
     try {
         const res = await fetch("/api/connected-devices/json");
         const data = await res.json();
         updatePage(data);
     } catch (err) {
-        console.error("Failed to fetch device data:", err);
-        document.getElementById(
-            "status"
-        ).innerHTML = `<p style="color:red;">Error fetching data</p>`;
+        console.error("Fetch failed:", err);
+        // Do not overwrite server status block if fetch fails
     }
 }
 
-function formatField(value) {
-    return value ? value : '<span class="status-bad">N/A</span>';
+function formatDuration(seconds) {
+    const h = Math.floor(seconds / 3600)
+        .toString()
+        .padStart(2, "0");
+    const m = Math.floor((seconds % 3600) / 60)
+        .toString()
+        .padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${h}:${m}:${s}`;
 }
 
-function updatePage(data) {
-    const { server, robots } = data;
-
-    let statusHtml = "<h2>Server</h2>";
-    if (server) {
-        statusHtml += `
-            <p>Status: <span class="status-ok">Connected</span></p>
-            <p>IP: ${formatField(server.ip)}</p>
-            <p>Connected at: ${formatField(server.connected_at)}</p>
-            <p>Uptime: ${formatDuration(server.duration)}</p>
-            <p>Last Seen: ${formatField(server.last_seen)}</p>
-            <p>Last Message: <code>${formatField(
-                server.last_message
-            )}</code></p>
-        `;
+function renderSection(title, dataList, type) {
+    let html = `<h2>${title} (${dataList.length})</h2>`;
+    if (dataList.length === 0) {
+        html += "<p>None connected.</p>";
     } else {
-        statusHtml += `
-            <p>Status: <span class="status-bad">Disconnected</span></p>
-            <p>Last Connected: ${formatField(server.last_disconnected)}</p>
-        `;
-    }
-
-    document.getElementById("status").innerHTML = statusHtml;
-
-    let robotsHtml = `<h2>Robots (${robots.length})</h2>`;
-    if (robots.length === 0) {
-        robotsHtml += "<p>No robots connected.</p>";
-    } else {
-        robotsHtml += `
+        html += `
             <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Status</th>
-                        <th>IP</th>
-                        <th>Connected At</th>
-                        <th>Duration</th>
-                        <th>Last Seen</th>
-                        <th>Last Message</th>
-                        <th>Last Disconnected</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${robots
-                        .map(
-                            (r) => `
+                <tr>
+                    <th>ID</th>
+                    <th>IP</th>
+                    <th>Status</th>
+                    <th>Connected At</th>
+                    <th>Uptime</th>
+                    <th>Last Seen</th>
+                </tr>
+                ${dataList
+                    .map(
+                        (d) => `
                         <tr>
-                            <td>${r.id}</td>
-                            <td>${
-                                r.status === "connected"
-                                    ? `<span class="status-ok">Connected</span>`
-                                    : `<span class="status-bad">Disconnected</span>`
-                            }</td>
-                            <td>${formatField(r.ip)}</td>
-                            <td>${formatField(r.connected_at)}</td>
-                            <td>${formatDuration(r.duration)}</td>
-                            <td>${formatField(r.last_seen)}</td>
-                            <td><code>${formatField(r.last_message)}</code></td>
-                            <td>${formatField(r.last_disconnected)}</td>
+                            <td>${d.id}</td>
+                            <td>${d.ip}</td>
+                            <td class="${
+                                d.status === "connected"
+                                    ? "status-ok"
+                                    : "status-bad"
+                            }">${d.status}</td>
+                            <td>${d.connected_at}</td>
+                            <td>${formatDuration(d.duration)}</td>
+                            <td>${d.last_seen || "N/A"}</td>
                         </tr>
                     `
-                        )
-                        .join("")}
-                </tbody>
+                    )
+                    .join("")}
             </table>
         `;
     }
-
-    document.getElementById("robots").innerHTML = robotsHtml;
+    document.getElementById(type).innerHTML = html;
 }
 
+function updatePage(data) {
+    const { server, robots, users } = data;
+
+    let serverHtml = "<h2>Server</h2>";
+    if (server && server.status === "connected") {
+        serverHtml += `
+            <p>Status: <span class="status-ok">Connected</span></p>
+            <p>IP: ${server.ip}</p>
+            <p>Connected at: ${server.connected_at}</p>
+            <p>Uptime: ${formatDuration(server.duration)}</p>
+            <p>Last Seen: ${server.last_seen || "N/A"}</p>
+        `;
+    } else {
+        serverHtml += `<p>Status: <span class="status-bad">Disconnected</span></p>`;
+    }
+
+    document.getElementById("server-status").innerHTML = serverHtml;
+
+    renderSection("Robots", robots, "robots");
+    renderSection("Users", users, "users");
+}
+
+// Initial load + refresh every 10 seconds
 fetchDeviceData();
 setInterval(fetchDeviceData, 10000);
