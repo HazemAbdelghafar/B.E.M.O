@@ -139,11 +139,14 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     await ws.close()
                 except Exception:
                     pass
+
                 if rid in connected_robots:
                     connected_robots.pop(rid, None)
 
                 if rid in robot_metadata:
                     robot_metadata.pop(rid, None)
+
+            logger.info("Server disconnected, and removed all robot connections.")
 
             for uid, ws in list(connected_users.items()):
                 try:
@@ -158,11 +161,14 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     await ws.close()
                 except Exception:
                     pass
+
                 if uid in connected_users:
                     connected_users.pop(uid, None)
 
                 if uid in user_metadata:
                     user_metadata.pop(uid, None)
+
+            logger.info("Server disconnected, and removed all user connections.")
 
             if SERVER_ID in server_metadata:
                 server_metadata[SERVER_ID]["status"] = "disconnected"
@@ -171,16 +177,11 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             if SERVER_ID in connected_servers:
                 connected_servers.pop(SERVER_ID, None)
 
-            logger.info("Server disconnected, and removed all other connections.")
+            logger.info("Server disconnected, and removed all of its connections.")
 
     elif id.startswith("bemo"):
         if SERVER_ID not in connected_servers:
             logger.warning(f"Robot {id} connected, but server is not connected.")
-            await send_safe(
-                websocket,
-                {"error": "Server not connected.", "level": 3, "is_server_error": True},
-            )
-            await websocket.close()
             return
 
         await websocket.accept()
@@ -234,11 +235,6 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
     elif id.startswith("user"):
         if SERVER_ID not in connected_servers:
             logger.warning(f"User {id} connected, but server is not connected.")
-            await send_safe(
-                websocket,
-                {"error": "Server not connected.", "level": 3, "is_server_error": True},
-            )
-            await websocket.close()
             return
 
         await websocket.accept()
