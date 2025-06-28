@@ -11,12 +11,14 @@ class WebSocketService {
   static const String robotId = 'user-MK1';
   static const String serverUrl = 'wss://b-e-m-o.onrender.com/api/ws/';
   WebSocketChannel? _channel;
-  StreamController<Map<String, dynamic>> _messageController = StreamController.broadcast();
+  StreamController<Map<String, dynamic>> _messageController =
+      StreamController.broadcast();
   Stream<Map<String, dynamic>> get messages => _messageController.stream;
 
   // Global chat messages that persist across pages
   final List<Map<String, dynamic>> _chatMessages = [];
-  List<Map<String, dynamic>> get chatMessages => List.unmodifiable(_chatMessages);
+  List<Map<String, dynamic>> get chatMessages =>
+      List.unmodifiable(_chatMessages);
 
   bool _connected = false;
   int _retryCount = 0;
@@ -29,7 +31,8 @@ class WebSocketService {
   // Method to add message to global chat
   void addChatMessage(Map<String, dynamic> message) {
     _chatMessages.add(message);
-    print('Message added to global chat. Total messages: ${_chatMessages.length}');
+    print(
+        'Message added to global chat. Total messages: ${_chatMessages.length}');
   }
 
   // Method to clear chat messages
@@ -50,7 +53,7 @@ class WebSocketService {
       });
       return;
     }
-    
+
     // Add user prompt
     if (msg['prompt'] != null) {
       _chatMessages.add({
@@ -59,17 +62,18 @@ class WebSocketService {
         'time': DateTime.now().toString(),
       });
     }
-    
+
     // Add robot response
     if (msg['response'] != null) {
       _chatMessages.add({
         'fromUser': false,
         'text': msg['response'],
         'time': DateTime.now().toString(),
-        'method': msg['task_results'] != null ? msg['task_results']['method'] : null,
+        'method':
+            msg['task_results'] != null ? msg['task_results']['method'] : null,
       });
     }
-    
+
     // Add generic bot message
     if (msg['message'] != null) {
       _chatMessages.add({
@@ -79,28 +83,29 @@ class WebSocketService {
         'method': null,
       });
     }
-    
-    print('Message added to global chat. Total messages: ${_chatMessages.length}');
+
+    print(
+        'Message added to global chat. Total messages: ${_chatMessages.length}');
   }
 
   void connect() {
     print('Attempting to connect to WebSocket...');
     final url = serverUrl + robotId;
     print('Connecting to: $url');
-    
+
     try {
       _channel = WebSocketChannel.connect(Uri.parse(url));
       _connected = true;
       _retryCount = 0;
       print('WebSocket connected successfully!');
-      
+
       _channel!.stream.listen(
         (message) {
           try {
             final decoded = json.decode(message);
             if (decoded is Map<String, dynamic>) {
               _messageController.add(decoded);
-              
+
               // Add to global chat messages
               _addMessageToGlobalChat(decoded);
             }
@@ -170,4 +175,4 @@ class WebSocketService {
     disconnect();
     _messageController.close();
   }
-} 
+}

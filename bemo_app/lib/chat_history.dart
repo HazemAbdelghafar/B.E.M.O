@@ -37,7 +37,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
             profileImages[Random().nextInt(profileImages.length)];
       });
     });
-    
+
     // Listen to new messages to trigger UI updates
     WebSocketService().messages.listen((msg) {
       setState(() {
@@ -287,9 +287,11 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                               ),
                               Expanded(
                                 child: ListView.builder(
-                                  itemCount: WebSocketService().chatMessages.length,
+                                  itemCount:
+                                      WebSocketService().chatMessages.length,
                                   itemBuilder: (context, index) {
-                                    final msg = WebSocketService().chatMessages[index];
+                                    final msg =
+                                        WebSocketService().chatMessages[index];
                                     final isUser = msg['fromUser'] as bool;
                                     return Align(
                                       alignment: isUser
@@ -326,7 +328,9 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                             child: Text(
                                               msg['text'].toLowerCase(),
                                               style: TextStyle(
-                                                color: (!isUser && msg['is_server_error'] == true)
+                                                color: (!isUser &&
+                                                        msg['is_server_error'] ==
+                                                            true)
                                                     ? Colors.red
                                                     : const Color(0xFFEFEFEF),
                                                 fontSize: 20,
@@ -335,9 +339,14 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                               ),
                                             ),
                                           ),
-                                          if (!isUser && msg['method'] == 'learning_resources')
+                                          if (!isUser &&
+                                              msg['method'] ==
+                                                  'learning_resources')
                                             Padding(
-                                              padding: const EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
+                                              padding: const EdgeInsets.only(
+                                                  top: 4.0,
+                                                  left: 8.0,
+                                                  right: 8.0),
                                               child: Image.asset(
                                                 'assets/Images/link.png',
                                                 width: 28,
@@ -348,7 +357,10 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                             padding: const EdgeInsets.only(
                                                 top: 2, left: 8, right: 8),
                                             child: Text(
-                                              DateFormat('hh:mm a').format(DateTime.tryParse(msg['time']) ?? DateTime.now()),
+                                              DateFormat('hh:mm a').format(
+                                                  DateTime.tryParse(
+                                                          msg['time']) ??
+                                                      DateTime.now()),
                                               style: const TextStyle(
                                                 color: Color(0xFFB0B0B0),
                                                 fontSize: 13,
