@@ -5,7 +5,6 @@ async function fetchDeviceData() {
         updatePage(data);
     } catch (err) {
         console.error("Failed to fetch device data:", err);
-        // Do not show "Error fetching data" if server is None
     }
 }
 
@@ -23,7 +22,6 @@ function formatDuration(seconds) {
 function updatePage(data) {
     const { server, robots, users } = data;
 
-    // Server
     let serverHtml = "<h2>Server</h2>";
     if (server) {
         serverHtml += `
@@ -36,9 +34,10 @@ function updatePage(data) {
     } else {
         serverHtml += `<p>Status: <span class="status-bad">Disconnected</span></p>`;
     }
-    document.getElementById("server-status").innerHTML = serverHtml;
 
-    // Robots
+    const serverDiv = document.getElementById("server-status");
+    if (serverDiv) serverDiv.innerHTML = serverHtml;
+
     let robotsHtml = `<h2>Robots (${robots.length})</h2>`;
     if (robots.length === 0) {
         robotsHtml += "<p>No robots connected.</p>";
@@ -62,9 +61,10 @@ function updatePage(data) {
             </table>
         `;
     }
-    document.getElementById("robots").innerHTML = robotsHtml;
 
-    // Users
+    const robotsDiv = document.getElementById("robots");
+    if (robotsDiv) robotsDiv.innerHTML = robotsHtml;
+
     let usersHtml = `<h2>Users (${users.length})</h2>`;
     if (users.length === 0) {
         usersHtml += "<p>No users connected.</p>";
@@ -88,10 +88,12 @@ function updatePage(data) {
             </table>
         `;
     }
-    document.getElementById("users").innerHTML = usersHtml;
+
+    const usersDiv = document.getElementById("users");
+    if (usersDiv) usersDiv.innerHTML = usersHtml;
 }
 
-window.onload = () => {
+document.addEventListener("DOMContentLoaded", () => {
     fetchDeviceData();
-    setInterval(fetchDeviceData, 10000); // every 10 seconds
-};
+    setInterval(fetchDeviceData, 10000);
+});
