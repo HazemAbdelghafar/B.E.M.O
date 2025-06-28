@@ -182,6 +182,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
     elif id.startswith("bemo"):
         if SERVER_ID not in connected_servers:
             logger.warning(f"Robot {id} connected, but server is not connected.")
+            await websocket.close(code=1008, reason="Server not connected")
             return
 
         await websocket.accept()
@@ -235,6 +236,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
     elif id.startswith("user"):
         if SERVER_ID not in connected_servers:
             logger.warning(f"User {id} connected, but server is not connected.")
+            await websocket.close(code=1008, reason="Server not connected")
             return
 
         await websocket.accept()
@@ -286,6 +288,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
 
     else:
         logger.warning(f"Unknown connection: {id}")
+        await websocket.close(code=1008, reason="Unknown connection type")
 
 
 def format_device(device_id, info):
