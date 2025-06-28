@@ -1,17 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BEMO Connected Devices</title>
     <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/assets/favicon.ico">
 </head>
 
 <body>
-    <h1>BEMO Connection Dashboard</h1>
+    <header>
+        <img src="/static/assets/logo.png" alt="BEMO Logo" class="logo">
+        <h1>BEMO Connection Dashboard</h1>
+    </header>
 
-    <div id="server-status"></div>
-    <div id="robots"></div>
-    <div id="users"></div>
+    <main>
+        <section id="server-status"></section>
+        <section id="robots"></section>
+        <section id="users"></section>
+    </main>
+
+    <footer>
+        <p>© 2025 BEMO Project</p>
+    </footer>
 
     <script src="/static/js/dashboard.js"></script>
 </body>
