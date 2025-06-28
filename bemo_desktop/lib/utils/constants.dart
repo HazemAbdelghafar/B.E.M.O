@@ -1,0 +1,80 @@
+// constants.dart
+
+const List<String> titleList = ['Eng.', 'Dr.', 'Mr.', 'Ms.', 'Prof.', 'Hon.'];
+
+const List<String> genderList = ['Male', 'Female'];
+
+// You can replace these with full country/timezone lists later
+const List<String> countryList = [
+  'Device Default',
+  'United States',
+  'United Kingdom',
+  'Egypt',
+  'Germany',
+  'Japan',
+  'India',
+  'Canada',
+  'France',
+  'China',
+];
+
+const List<String> timeZoneList = [
+  'Device Default',
+  'UTC−12:00',
+  'UTC−11:00',
+  'UTC−10:00',
+  'UTC−09:00',
+  'UTC−08:00',
+  'UTC−07:00',
+  'UTC−06:00',
+  'UTC−05:00',
+  'UTC−04:00',
+  'UTC−03:00',
+  'UTC−02:00',
+  'UTC−01:00',
+  'UTC±00:00',
+  'UTC+01:00',
+  'UTC+02:00',
+  'UTC+03:00',
+  'UTC+04:00',
+  'UTC+05:00',
+  'UTC+06:00',
+  'UTC+07:00',
+  'UTC+08:00',
+  'UTC+09:00',
+  'UTC+10:00',
+  'UTC+11:00',
+  'UTC+12:00',
+  'UTC+13:00',
+  'UTC+14:00',
+];
+
+const Map<String, String> utcToIanaMap = {
+  'UTC-12:00': 'Etc/GMT+12',
+  'UTC-11:00': 'Pacific/Midway',
+  'UTC-10:00': 'Pacific/Honolulu',
+  'UTC-09:00': 'America/Anchorage',
+  'UTC-08:00': 'America/Los_Angeles',
+  'UTC-07:00': 'America/Denver',
+  'UTC-06:00': 'America/Chicago',
+  'UTC-05:00': 'America/New_York',
+  'UTC-04:00': 'America/Santiago',
+  'UTC-03:00': 'America/Buenos_Aires',
+  'UTC-02:00': 'America/Noronha',
+  'UTC-01:00': 'Atlantic/Azores',
+  'UTC+00:00': 'Africa/Abidjan',
+  'UTC+01:00': 'Africa/Lagos',
+  'UTC+02:00': 'Africa/Johannesburg',
+  'UTC+03:00': 'Africa/Cairo',
+  'UTC+04:00': 'Asia/Dubai',
+  'UTC+05:00': 'Asia/Karachi',
+  'UTC+06:00': 'Asia/Dhaka',
+  'UTC+07:00': 'Asia/Bangkok',
+  'UTC+08:00': 'Asia/Singapore',
+  'UTC+09:00': 'Asia/Tokyo',
+  'UTC+10:00': 'Australia/Sydney',
+  'UTC+11:00': 'Pacific/Noumea',
+  'UTC+12:00': 'Pacific/Auckland',
+  'UTC+13:00': 'Pacific/Tongatapu',
+  'UTC+14:00': 'Pacific/Kiritimati',
+};

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1060936658436",
+    "project_id": "b-e-m-o",
+    "storage_bucket": "b-e-m-o.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1060936658436:android:9d7fd4c34eb5c9f36a4f51",
+        "android_client_info": {
+          "package_name": "com.example.bemo_desktop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1060936658436-huo7jgtga47jp4gps80p9bl0452uejsp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlfLwwPv_IPHw7eExQKA4zC9rI8dQSvKs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1060936658436-huo7jgtga47jp4gps80p9bl0452uejsp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
