@@ -316,6 +316,7 @@ class _SidebarNav extends StatelessWidget {
             Text(
               label.toLowerCase(),
               style: TextStyle(
+                fontFamily: 'Hyperion',
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
                 color: Colors.white,

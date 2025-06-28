@@ -6,6 +6,7 @@ import 'user_settings.dart';
 import 'dashboard.dart';
 import 'package:intl/intl.dart';
 import 'services/websocket_service.dart';
+import 'package:flutter/widgets.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
   const ChatHistoryScreen({Key? key}) : super(key: key);
@@ -26,47 +27,6 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   late Timer _timer;
   bool _collapsed = false;
 
-  // Placeholder chat messages
-  final List<Map<String, dynamic>> chatMessages = [
-    {
-      'fromUser': true,
-      'text': 'ADD "BUY GROCERIES" TO MY TASKS',
-      'time': '10:00 am',
-    },
-    {
-      'fromUser': false,
-      'text': 'GOT IT! "BUY GROCERIES" IS NOW ADDED TO YOUR TO-DO LIST 🙂',
-      'time': '',
-    },
-    {
-      'fromUser': true,
-      'text': 'DO I HAVE ANY NEW EMAILS?',
-      'time': '10:48 am',
-    },
-    {
-      'fromUser': false,
-      'text':
-          'YOU HAVE 2 NEW EMAILS:\nFROM: DR. HANAN – "MEETING NOTES & SLIDES"\nFROM: AMAZON – "YOUR ORDER HAS SHIPPED"\nWOULD YOU LIKE ME TO READ ONE? 🙂',
-      'time': '',
-    },
-    {
-      'fromUser': true,
-      'text': 'SHOW ME SOME BOOKS TO LEARN JAPANESE',
-      'time': '3:24 pm',
-    },
-    {
-      'fromUser': false,
-      "text":
-          "I HAVE FOUND 7 BOOKS ON LEARNING JAPANESE, CAN'T WAIT TO HEAR YOUR FIRST 'KONNICHIWA!' 😄",
-      'time': '',
-    },
-    {
-      'fromUser': true,
-      "text": "WHAT'S THE CAPITAL OF NORWAY?",
-      'time': '7:03 pm',
-    },
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -77,11 +37,11 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
             profileImages[Random().nextInt(profileImages.length)];
       });
     });
-    // Connect to WebSocket and listen for messages
-    WebSocketService().connect();
+    
+    // Listen to new messages to trigger UI updates
     WebSocketService().messages.listen((msg) {
       setState(() {
-        chatMessages.add(msg);
+        // This will trigger a rebuild when new messages arrive
       });
     });
   }
@@ -327,9 +287,9 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                               ),
                               Expanded(
                                 child: ListView.builder(
-                                  itemCount: chatMessages.length,
+                                  itemCount: WebSocketService().chatMessages.length,
                                   itemBuilder: (context, index) {
-                                    final msg = chatMessages[index];
+                                    final msg = WebSocketService().chatMessages[index];
                                     final isUser = msg['fromUser'] as bool;
                                     return Align(
                                       alignment: isUser
@@ -365,19 +325,30 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                             ),
                                             child: Text(
                                               msg['text'].toLowerCase(),
-                                              style: const TextStyle(
-                                                color: Color(0xFFEFEFEF),
+                                              style: TextStyle(
+                                                color: (!isUser && msg['is_server_error'] == true)
+                                                    ? Colors.red
+                                                    : const Color(0xFFEFEFEF),
                                                 fontSize: 20,
                                                 fontFamily: 'Hyperion',
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                           ),
+                                          if (!isUser && msg['method'] == 'learning_resources')
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
+                                              child: Image.asset(
+                                                'assets/Images/link.png',
+                                                width: 28,
+                                                height: 28,
+                                              ),
+                                            ),
                                           Padding(
                                             padding: const EdgeInsets.only(
                                                 top: 2, left: 8, right: 8),
                                             child: Text(
-                                              msg['time'],
+                                              DateFormat('hh:mm a').format(DateTime.tryParse(msg['time']) ?? DateTime.now()),
                                               style: const TextStyle(
                                                 color: Color(0xFFB0B0B0),
                                                 fontSize: 13,

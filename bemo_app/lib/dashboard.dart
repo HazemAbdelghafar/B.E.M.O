@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'user_settings.dart';
 import 'chat_history.dart';
 import 'bemo_sidebar.dart';
+import 'services/websocket_service.dart';
 
 class DashboardApp extends StatelessWidget {
   const DashboardApp({super.key});
@@ -71,6 +72,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final double sidebarWidth = _collapsed ? collapsedWidth : expandedWidth;
     final double dividerLeft = sidebarWidth;
     final double mainContentLeft = sidebarWidth + 2;
+    
+    // Check connection status
+    final bool isConnected = WebSocketService().isConnected;
+    print('Dashboard - WebSocket connected: $isConnected');
+    
     return Scaffold(
       backgroundColor: const Color(0xFF2C2D30),
       body: Center(
