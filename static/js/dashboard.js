@@ -22,15 +22,15 @@ function updatePage(data) {
         const server = data.server;
         let html = `<h2>🖥️ Server</h2>`;
 
-        if (server) {
+        if (!server || server.status === "disconnected") {
+            html += `<p>Status: <span class="status-disconnected">🔴 Disconnected</span></p>`;
+        } else {
             html += `
                 <p>Status: <span class="status-connected">🟢 Connected</span></p>
                 <p>IP Address: ${server.ip}</p>
                 <p>Uptime: ⏱️ ${formatDuration(server.duration)}</p>
                 <p>Last Seen: ${new Date(server.last_seen).toLocaleString()}</p>
             `;
-        } else {
-            html += `<p>Status: <span class="status-disconnected">🔴 Disconnected</span></p>`;
         }
 
         serverDiv.innerHTML = html;
