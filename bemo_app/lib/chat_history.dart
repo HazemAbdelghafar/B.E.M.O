@@ -15,7 +15,7 @@ class ChatHistoryScreen extends StatefulWidget {
   State<ChatHistoryScreen> createState() => _ChatHistoryScreenState();
 }
 
-class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
+class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProviderStateMixin {
   static const List<String> profileImages = [
     'assets/Images/bemo_profile1.png',
     'assets/Images/bemo_profile2.png',
@@ -26,6 +26,10 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
   late String currentProfileImage;
   late Timer _timer;
   bool _collapsed = false;
+  bool _isConnected = false;
+  final ScrollController _scrollController = ScrollController();
+  late AnimationController _thinkingAnimationController;
+  late Animation<double> _thinkingAnimation;
 
   @override
   void initState() {
@@ -38,17 +42,50 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
       });
     });
 
+    // Initialize connection status
+    _isConnected = WebSocketService().isConnected;
+
     // Listen to new messages to trigger UI updates
     WebSocketService().messages.listen((msg) {
       setState(() {
+        // Update connection status
+        if (msg['type'] == 'connection_status') {
+          _isConnected = msg['connected'] ?? false;
+        }
         // This will trigger a rebuild when new messages arrive
       });
+      
+      // Start thinking animation if there's a thinking message
+      if (WebSocketService().chatMessages.isNotEmpty && 
+          WebSocketService().chatMessages.last['is_thinking'] == true) {
+        _thinkingAnimationController.repeat();
+      } else {
+        _thinkingAnimationController.stop();
+      }
+      
+      // Auto-scroll to bottom when new messages arrive
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _scrollToBottom();
+      });
     });
+
+    _thinkingAnimationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _thinkingAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _thinkingAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
   }
 
   @override
   void dispose() {
     _timer.cancel();
+    _scrollController.dispose();
+    _thinkingAnimationController.dispose();
     super.dispose();
   }
 
@@ -73,6 +110,17 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     // Add navigation logic for other sections if needed
     // For now, do nothing or pop
     // Navigator.of(context).pop();
+  }
+
+  // Method to scroll to bottom
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -193,15 +241,15 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                             Container(
                                               width: 10,
                                               height: 10,
-                                              decoration: const BoxDecoration(
-                                                color: Colors.green,
+                                              decoration: BoxDecoration(
+                                                color: _isConnected ? Colors.green : Colors.red,
                                                 shape: BoxShape.circle,
                                               ),
                                             ),
                                             const SizedBox(width: 6),
-                                            const Text(
-                                              'always online',
-                                              style: TextStyle(
+                                            Text(
+                                              _isConnected ? 'connected' : 'disconnected',
+                                              style: const TextStyle(
                                                 color: Color.fromRGBO(
                                                     255, 255, 255, 0.5),
                                                 fontSize: 14,
@@ -286,94 +334,196 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                 ),
                               ),
                               Expanded(
-                                child: ListView.builder(
-                                  itemCount:
-                                      WebSocketService().chatMessages.length,
-                                  itemBuilder: (context, index) {
-                                    final msg =
-                                        WebSocketService().chatMessages[index];
-                                    final isUser = msg['fromUser'] as bool;
-                                    return Align(
-                                      alignment: isUser
-                                          ? Alignment.centerRight
-                                          : Alignment.centerLeft,
-                                      child: Column(
-                                        crossAxisAlignment: isUser
-                                            ? CrossAxisAlignment.end
-                                            : CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            margin: const EdgeInsets.symmetric(
-                                                vertical: 16),
-                                            padding: const EdgeInsets.all(24),
-                                            constraints: const BoxConstraints(
-                                                maxWidth: 600),
-                                            decoration: BoxDecoration(
-                                              color: isUser
-                                                  ? const Color(0xFF0C4111)
-                                                  : const Color(0xFF281636),
-                                              borderRadius: BorderRadius.only(
-                                                topLeft:
-                                                    const Radius.circular(30),
-                                                topRight:
-                                                    const Radius.circular(30),
-                                                bottomLeft: isUser
-                                                    ? const Radius.circular(30)
-                                                    : const Radius.circular(0),
-                                                bottomRight: isUser
-                                                    ? const Radius.circular(0)
-                                                    : const Radius.circular(30),
-                                              ),
+                                child: WebSocketService().chatMessages.isEmpty
+                                    ? Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.chat_bubble_outline,
+                                              size: 64,
+                                              color: Colors.grey[600],
                                             ),
-                                            child: Text(
-                                              msg['text'].toLowerCase(),
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              'No messages yet',
                                               style: TextStyle(
-                                                color: (!isUser &&
-                                                        msg['is_server_error'] ==
-                                                            true)
-                                                    ? Colors.red
-                                                    : const Color(0xFFEFEFEF),
-                                                fontSize: 20,
+                                                color: Colors.grey[600],
+                                                fontSize: 18,
                                                 fontFamily: 'Hyperion',
-                                                fontWeight: FontWeight.bold,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                             ),
-                                          ),
-                                          if (!isUser &&
-                                              msg['method'] ==
-                                                  'learning_resources')
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 4.0,
-                                                  left: 8.0,
-                                                  right: 8.0),
-                                              child: Image.asset(
-                                                'assets/Images/link.png',
-                                                width: 28,
-                                                height: 28,
-                                              ),
-                                            ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 2, left: 8, right: 8),
-                                            child: Text(
-                                              DateFormat('hh:mm a').format(
-                                                  DateTime.tryParse(
-                                                          msg['time']) ??
-                                                      DateTime.now()),
-                                              style: const TextStyle(
-                                                color: Color(0xFFB0B0B0),
-                                                fontSize: 13,
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              _isConnected 
+                                                  ? 'Start a conversation with BEMO'
+                                                  : 'Connecting to BEMO...',
+                                              style: TextStyle(
+                                                color: Colors.grey[500],
+                                                fontSize: 14,
                                                 fontFamily: 'Hyperion',
                                                 fontWeight: FontWeight.w400,
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
+                                      )
+                                    : ListView.builder(
+                                        controller: _scrollController,
+                                        itemCount:
+                                            WebSocketService().chatMessages.length,
+                                        itemBuilder: (context, index) {
+                                          final msg =
+                                              WebSocketService().chatMessages[index];
+                                          final isUser = msg['fromUser'] as bool;
+                                          
+                                          // Skip empty messages
+                                          final messageText = msg['text']?.toString().trim() ?? '';
+                                          if (messageText.isEmpty) {
+                                            return const SizedBox.shrink();
+                                          }
+                                          
+                                          return Align(
+                                            alignment: isUser
+                                                ? Alignment.centerRight
+                                                : Alignment.centerLeft,
+                                            child: Column(
+                                              crossAxisAlignment: isUser
+                                                  ? CrossAxisAlignment.end
+                                                  : CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  margin: const EdgeInsets.symmetric(
+                                                      vertical: 16),
+                                                  padding: const EdgeInsets.all(24),
+                                                  constraints: const BoxConstraints(
+                                                      maxWidth: 600),
+                                                  decoration: BoxDecoration(
+                                                    color: isUser
+                                                        ? const Color(0xFF0C4111)
+                                                        : const Color(0xFF281636),
+                                                    borderRadius: BorderRadius.only(
+                                                      topLeft:
+                                                          const Radius.circular(30),
+                                                      topRight:
+                                                          const Radius.circular(30),
+                                                      bottomLeft: isUser
+                                                          ? const Radius.circular(30)
+                                                          : const Radius.circular(0),
+                                                      bottomRight: isUser
+                                                          ? const Radius.circular(0)
+                                                          : const Radius.circular(30),
+                                                    ),
+                                                  ),
+                                                  child: Text(
+                                                    messageText.toLowerCase(),
+                                                    style: TextStyle(
+                                                      color: (!isUser &&
+                                                              msg['is_server_error'] ==
+                                                                  true)
+                                                          ? Colors.red
+                                                          : const Color(0xFFEFEFEF),
+                                                      fontSize: 20,
+                                                      fontFamily: 'Hyperion',
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                if (!isUser &&
+                                                    msg['is_learning_resources'] == true)
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(
+                                                        top: 4.0,
+                                                        left: 8.0,
+                                                        right: 8.0),
+                                                    child: Image.asset(
+                                                      'assets/Images/link.png',
+                                                      width: 28,
+                                                      height: 28,
+                                                    ),
+                                                  ),
+                                                if (!isUser &&
+                                                    msg['is_thinking'] == true)
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(
+                                                        top: 4.0,
+                                                        left: 8.0,
+                                                        right: 8.0),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        AnimatedBuilder(
+                                                          animation: _thinkingAnimation,
+                                                          builder: (context, child) {
+                                                            return Container(
+                                                              width: 8,
+                                                              height: 8,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey[400]?.withOpacity(
+                                                                  0.3 + (_thinkingAnimation.value * 0.7)
+                                                                ),
+                                                                shape: BoxShape.circle,
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                        const SizedBox(width: 4),
+                                                        AnimatedBuilder(
+                                                          animation: _thinkingAnimation,
+                                                          builder: (context, child) {
+                                                            return Container(
+                                                              width: 8,
+                                                              height: 8,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey[400]?.withOpacity(
+                                                                  0.3 + (_thinkingAnimation.value * 0.7)
+                                                                ),
+                                                                shape: BoxShape.circle,
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                        const SizedBox(width: 4),
+                                                        AnimatedBuilder(
+                                                          animation: _thinkingAnimation,
+                                                          builder: (context, child) {
+                                                            return Container(
+                                                              width: 8,
+                                                              height: 8,
+                                                              decoration: BoxDecoration(
+                                                                color: Colors.grey[400]?.withOpacity(
+                                                                  0.3 + (_thinkingAnimation.value * 0.7)
+                                                                ),
+                                                                shape: BoxShape.circle,
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      top: 2, left: 8, right: 8),
+                                                  child: Text(
+                                                    DateFormat('hh:mm a').format(
+                                                        DateTime.tryParse(
+                                                                msg['time']) ??
+                                                            DateTime.now()),
+                                                    style: const TextStyle(
+                                                      color: Color(0xFFB0B0B0),
+                                                      fontSize: 13,
+                                                      fontFamily: 'Hyperion',
+                                                      fontWeight: FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
                                       ),
-                                    );
-                                  },
-                                ),
                               ),
                             ],
                           ),
