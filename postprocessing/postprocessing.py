@@ -20,6 +20,7 @@ from utilities import (
     POST_SYSTEM_PROMPT,
     SwitchMapping,
     UserData,
+    EmailMapping,
     LLM_MODEL,
 )
 
@@ -70,6 +71,7 @@ class PostProcessing(BaseMQTTHandler):
         self.__switch_mapping = SwitchMapping().get_all_mappings()
         self.__user_data = UserData().get_all_user_data()
         self.__output_parser = JsonOutputParser()
+        self.__email_mapping = EmailMapping().get_all_mappings()
 
     def __initialize_prompts(self) -> dict[str, PromptTemplate]:
         """
@@ -175,6 +177,7 @@ class PostProcessing(BaseMQTTHandler):
                 "user_emotions": emotions,
                 "switch_mapping": self.__switch_mapping,
                 "user_data": self.__user_data,
+                "email_mapping": self.__email_mapping,
             }
 
         try:
