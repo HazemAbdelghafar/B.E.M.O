@@ -12,7 +12,6 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    font-size: 14px;
 }
 
 th,
@@ -20,7 +19,6 @@ td {
     border: 1px solid #ccc;
     padding: 8px 12px;
     text-align: left;
-    vertical-align: top;
 }
 
 th {
@@ -37,10 +35,13 @@ th {
     font-weight: bold;
 }
 
-code {
-    font-family: monospace;
-    font-size: 13px;
-    background: #f0f0f0;
-    padding: 2px 4px;
-    border-radius: 4px;
+p {
+    font-size: 16px;
+    color: #333;
+}
+
+#server-status,
+#robots,
+#users {
+    margin-bottom: 40px;
 }
