@@ -58,14 +58,14 @@ async def send_safe(ws: WebSocket, data: dict):
 
 @router.websocket("/ws/{id}")
 async def websocket_endpoint(websocket: WebSocket, id: str):
-    await websocket.accept()
-
     logger.info(f"New connection: {id}")
 
     ip = websocket.client.host
     connected_at = now_utc_iso()
 
     if id == SERVER_ID:
+        await websocket.accept()
+
         if SERVER_ID in connected_servers:
             old_ws = connected_servers[SERVER_ID]
             logger.warning("Server already connected. Replacing it.")
@@ -183,6 +183,8 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             await websocket.close()
             return
 
+        await websocket.accept()
+
         logger.info(f"New robot connected: {id}")
 
         connected_robots[id] = websocket
@@ -239,6 +241,8 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
             await websocket.close()
             return
 
+        await websocket.accept()
+
         logger.info(f"New user connected: {id}")
 
         connected_users[id] = websocket
@@ -283,6 +287,9 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                 connected_users.pop(id, None)
 
             logger.info(f"User {id} disconnected, and removed from server.")
+
+    else:
+        logger.warning(f"Unknown connection: {id}")
 
 
 def format_device(device_id, info):
