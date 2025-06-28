@@ -104,7 +104,8 @@ class Main(BaseMQTTHandler):
     def __init__(self):
         super().__init__(SUB_TOPIC, NAME)
         self.robot_id = ""
-        self.user_id = ""
+        # self.user_id = ""
+        self.user_id = "user-MK1"  # ! For testing
 
         self.user_emotions = {}
         self.prompt = ""
@@ -119,7 +120,7 @@ class Main(BaseMQTTHandler):
         self.robot_emotion = "neutral"
 
         self.start_time = 0
-        self.end_time = 0  # Todo
+        self.end_time = 0
         self.execution_time = 0
 
         self.need_auth = False
@@ -157,6 +158,53 @@ class Main(BaseMQTTHandler):
 
         return None
 
+    def _publish_to_app(self, is_error: bool):
+        time.sleep(0.1)
+
+        if not self.user_id:
+            logger.error("User ID is missing")
+            return
+
+        logger.info(f"Publishing to app with user ID: {self.user_id}")
+
+        self.publish_result(
+            {
+                "target_user_id": self.user_id,
+                "prompt": self.prompt,
+                "user_emotions": self.user_emotions,
+                "predicted_labels": self.predicted_labels,
+                "split_prompts": self.split_prompts,
+                "preprocessed_data": self.preprocessed_data,
+                "task_results": self.task_results,
+                "response": self.response,
+                "robot_emotion": self.robot_emotion,
+                "start_time": self.start_time,
+                "end_time": self.end_time,
+                "execution_time": self.execution_time,
+                "is_error": is_error,
+            },
+            topic="server/main",
+        )
+
+        self.empty_data()
+
+    def empty_data(self):
+        self.prompt = ""
+        self.user_emotions = {}
+
+        self.predicted_labels = []
+        self.split_prompts = []
+
+        self.preprocessed_data = []
+        self.task_results = {}
+
+        self.response = ""
+        self.robot_emotion = "neutral"
+
+        self.start_time = 0
+        self.end_time = 0
+        self.execution_time = 0
+
     def _handle_error(self, input_data: dict):
         module_name = input_data.get("module_name", None)
         if not module_name:
@@ -181,16 +229,19 @@ class Main(BaseMQTTHandler):
                 return None
             self.end_time = time.time()
             self.execution_time = self.end_time - self.start_time
+            self.response = random.choice(ERROR_RESPONSES)
+            self.robot_emotion = "error"
             self.publish_result(
                 {
                     "is_error": True,
-                    "response": random.choice(ERROR_RESPONSES),
+                    "response": self.response,
                     "target_robot_id": self.robot_id,
-                    "screen": "error",
+                    "screen": self.robot_emotion,
                     "time_taken": self.execution_time,
                 },
                 topic="server/main",
             )
+            self._publish_to_app(is_error=True)
         else:
             self.publish_result(error_dict, topic="postprocessing/data")
 
@@ -199,7 +250,7 @@ class Main(BaseMQTTHandler):
     def _handle_server_module(self, input_data: dict):
         self.start_time = time.time()
         logger.info("Received server module data")
-        message = input_data.get("`message`")
+        message = input_data.get("message")
         if not message:
             error_dict = {
                 "error": "Prompt is missing from the server",
@@ -227,11 +278,12 @@ class Main(BaseMQTTHandler):
             )
             self.end_time = time.time()
             self.execution_time = self.end_time - self.start_time
+            self.robot_emotion = "good_face"
             self.publish_result(
                 {
                     "is_error": False,
                     "target_robot_id": self.robot_id,
-                    "screen": "good_face",
+                    "screen": self.robot_emotion,
                     "time_taken": self.execution_time,
                 },
                 topic="server/main",
@@ -248,32 +300,38 @@ class Main(BaseMQTTHandler):
 
                 self.end_time = time.time()
                 self.execution_time = self.end_time - self.start_time
+                self.response = random.choice(NO_FACE_RESPONSES_FINAL)
+                self.robot_emotion = "error"
                 self.publish_result(
                     {
                         "is_error": False,
                         "target_robot_id": self.robot_id,
-                        "response": random.choice(NO_FACE_RESPONSES_FINAL),
-                        "screen": "error",
+                        "response": self.response,
+                        "screen": self.robot_emotion,
                         "time_taken": self.execution_time,
                     },
                     topic="server/main",
                 )
+                self._publish_to_app(is_error=False)
             else:
                 self.no_face_counter += 1
                 self.need_auth = True
                 self.end_time = time.time()
                 self.execution_time = self.end_time - self.start_time
+                self.response = random.choice(NO_FACE_RESPONSES)
+                self.robot_emotion = "no_face"
                 self.publish_result(
                     {
                         "is_error": False,
                         "is_auth": self.need_auth,
                         "target_robot_id": self.robot_id,
-                        "response": random.choice(NO_FACE_RESPONSES),
-                        "screen": "no_face",
+                        "response": self.response,
+                        "screen": self.robot_emotion,
                         "time_taken": self.execution_time,
                     },
                     topic="server/main",
                 )
+                self._publish_to_app(is_error=False)
         else:
             logger.info("Bad face detected")
             if self.bad_face_counter >= MAX_BAD_FACE:
@@ -283,16 +341,19 @@ class Main(BaseMQTTHandler):
 
                 self.end_time = time.time()
                 self.execution_time = self.end_time - self.start_time
+                self.response = random.choice(BAD_FACE_RESPONSES_FINAL)
+                self.robot_emotion = "blocked"
                 self.publish_result(
                     {
                         "is_error": False,
                         "target_robot_id": self.robot_id,
-                        "response": random.choice(BAD_FACE_RESPONSES_FINAL),
-                        "screen": "blocked",
+                        "response": self.response,
+                        "screen": self.robot_emotion,
                         "time_taken": self.execution_time,
                     },
                     topic="server/main",
                 )
+                self._publish_to_app(is_error=False)
                 # TODO: Send email to check the robot
                 self.bad_face_counter = 0
                 self.no_face_counter = 0
@@ -301,17 +362,20 @@ class Main(BaseMQTTHandler):
                 self.need_auth = True
                 self.end_time = time.time()
                 self.execution_time = self.end_time - self.start_time
+                self.response = random.choice(BAD_FACE_RESPONSES)
+                self.robot_emotion = "bad_face"
                 self.publish_result(
                     {
                         "is_error": False,
                         "is_auth": self.need_auth,
                         "target_robot_id": self.robot_id,
-                        "response": random.choice(BAD_FACE_RESPONSES),
-                        "screen": "bad_face",
+                        "response": self.response,
+                        "screen": self.robot_emotion,
                         "time_taken": self.execution_time,
                     },
                     topic="server/main",
                 )
+                self._publish_to_app(is_error=False)
         return None
 
     def _handle_prompt_message(self, input_data: dict, message: str):
@@ -335,16 +399,19 @@ class Main(BaseMQTTHandler):
         if self.is_blocked:
             self.end_time = time.time()
             self.execution_time = self.end_time - self.start_time
+            self.response = random.choice(BLOCKED_RESPONSES)
+            self.robot_emotion = "blocked"
             self.publish_result(
                 {
                     "is_error": False,
-                    "response": random.choice(BLOCKED_RESPONSES),
+                    "response": self.response,
                     "target_robot_id": self.robot_id,
-                    "screen": "blocked",
+                    "screen": self.robot_emotion,
                     "time_taken": self.execution_time,
                 },
                 topic="server/main",
             )
+            self._publish_to_app(is_error=False)
         else:
             self.publish_result({"prompt": self.prompt}, topic="task_classifier/prompt")
         return None
@@ -379,17 +446,20 @@ class Main(BaseMQTTHandler):
             logger.info(f"Authentication required for label: {auth_label}")
             self.end_time = time.time()
             self.execution_time = self.end_time - self.start_time
+            self.response = random.choice(AUTH_RESPONSES)
+            self.robot_emotion = "auth"
             self.publish_result(
                 {
                     "is_error": False,
                     "is_auth": self.need_auth,
                     "target_robot_id": self.robot_id,
-                    "response": random.choice(AUTH_RESPONSES),
-                    "screen": "auth",
+                    "response": self.response,
+                    "screen": self.robot_emotion,
                     "time_taken": self.execution_time,
                 },
                 topic="server/main",
             )
+            self._publish_to_app(is_error=False)
         return None
 
     def _handle_preprocessing_module(self, input_data: dict):
@@ -419,19 +489,23 @@ class Main(BaseMQTTHandler):
         self.response = input_data.get("response")
         self.robot_emotion = input_data.get("robot_emotion", "neutral")
         self.robot_emotion = self.robot_emotion.lower()
+        self.task_results = self.response
         if not self.response:
             self.end_time = time.time()
             self.execution_time = self.end_time - self.start_time
+            self.response = random.choice(ERROR_RESPONSES)
+            self.robot_emotion = "error"
             self.publish_result(
                 {
                     "is_error": True,
-                    "response": random.choice(ERROR_RESPONSES),
+                    "response": self.response,
                     "target_robot_id": self.robot_id,
-                    "screen": "error",
+                    "screen": self.robot_emotion,
                     "time_taken": self.execution_time,
                 },
                 topic="server/main",
             )
+            self._publish_to_app(is_error=True)
             logger.error("Response is missing in the others method")
             return None
         logger.info("Returning the others method result to the server")
@@ -441,7 +515,7 @@ class Main(BaseMQTTHandler):
         self.execution_time = self.end_time - self.start_time
         self.publish_result(
             {
-                "status": "success",
+                "is_error": False,
                 "response": self.response,
                 "target_robot_id": self.robot_id,
                 "screen": self.robot_emotion,
@@ -449,6 +523,7 @@ class Main(BaseMQTTHandler):
             },
             topic="server/main",
         )
+        self._publish_to_app(is_error=False)
         return None
 
     def _handle_task_handler_module(self, input_data: dict):
@@ -484,16 +559,19 @@ class Main(BaseMQTTHandler):
         if not self.response:
             self.end_time = time.time()
             self.execution_time = self.end_time - self.start_time
+            self.response = random.choice(ERROR_RESPONSES)
+            self.robot_emotion = "error"
             self.publish_result(
                 {
                     "is_error": True,
-                    "response": random.choice(ERROR_RESPONSES),
+                    "response": self.response,
                     "target_robot_id": self.robot_id,
-                    "screen": "error",
+                    "screen": self.robot_emotion,
                     "time_taken": self.execution_time,
                 },
                 topic="server/main",
             )
+            self._publish_to_app(is_error=True)
             logger.error("Response is missing in the preprocessing method")
             return None
         logger.info("Returning the preprocessing method result to the server")
@@ -503,16 +581,18 @@ class Main(BaseMQTTHandler):
         if is_error:
             self.end_time = time.time()
             self.execution_time = self.end_time - self.start_time
+            self.robot_emotion = "error"
             self.publish_result(
                 {
                     "is_error": True,
                     "response": self.response,
                     "target_robot_id": self.robot_id,
-                    "screen": "error",
+                    "screen": self.robot_emotion,
                     "time_taken": self.execution_time,
                 },
                 topic="server/main",
             )
+            self._publish_to_app(is_error=True)
         else:
             self.end_time = time.time()
             self.execution_time = self.end_time - self.start_time
@@ -526,6 +606,7 @@ class Main(BaseMQTTHandler):
                 },
                 topic="server/main",
             )
+            self._publish_to_app(is_error=False)
         return None
 
 
