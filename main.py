@@ -204,6 +204,7 @@ class Main(BaseMQTTHandler):
 
         # Todo: DB
 
+        self._handle_error({"error": "Module name is not valid", "level": 2})
         return None
 
     def _handle_user_data_module(self, input_data: dict):
