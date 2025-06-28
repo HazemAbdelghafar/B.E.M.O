@@ -19,7 +19,6 @@ from utilities import (
     BaseMQTTHandler,
     PRE_SYSTEM_PROMPT,
     SwitchMapping,
-    UserData,
     EmailMapping,
     LLM_MODEL,
 )
@@ -80,7 +79,7 @@ class PreProcessing(BaseMQTTHandler):
         self.__chains = self.__initialize_chains()
         self.__chat_history = self.initialize_chat_history()  # TODO: Make it better
         self.__switch_mapping = SwitchMapping().get_all_mappings()
-        self.__user_data = UserData().get_all_user_data()
+        self.__user_data = {}
         self.__email_mapping = EmailMapping().get_all_mappings()
 
     def initialize_chat_history(self) -> dict:
@@ -176,6 +175,7 @@ class PreProcessing(BaseMQTTHandler):
         # Get the prompt and labels from the input data
         labels = input_data.get("predicted_labels")
         split_prompts = input_data.get("split_prompts")
+        user_data = input_data.get("user_data")
 
         if not labels:
             logger.error("Labels are missing")
@@ -184,6 +184,14 @@ class PreProcessing(BaseMQTTHandler):
         if not split_prompts:
             logger.error("Split prompts are missing")
             return {"error": "Split prompts are missing", "level": 2}
+
+        if not user_data:
+            logger.error("User data is missing")
+            self.__user_data = {}
+        else:
+            self.__user_data = user_data
+
+        logger.info(f"User data: {self.__user_data}")
 
         # Initialize the results
         results = []
