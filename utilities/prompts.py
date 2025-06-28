@@ -1,3 +1,7 @@
+# LLM_MODEL = "gemini-1.5-flash"
+LLM_MODEL = "gemini-2.5-flash"
+
+
 EMOTIONS = ["neutral", "happy", "sad", "angry", "surprised", "love"]
 
 PRE_SYSTEM_PROMPT = {

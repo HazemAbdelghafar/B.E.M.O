@@ -13,7 +13,7 @@ from langchain_core.runnables import chain, RunnableConfig
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from utilities import BaseMQTTHandler, GENERAL_QUESTIONS_PROMPT
+from utilities import BaseMQTTHandler, GENERAL_QUESTIONS_PROMPT, LLM_MODEL
 
 
 load_dotenv()
@@ -30,6 +30,7 @@ logging.basicConfig(
 
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
+
 
 class GeneralQuestions(BaseMQTTHandler):
     """
@@ -85,7 +86,7 @@ class GeneralQuestions(BaseMQTTHandler):
 
         if self.use_llm:
             self.llm = ChatGoogleGenerativeAI(
-                model="gemini-1.5-flash",
+                model=LLM_MODEL,
                 temperature=0,
                 max_tokens=None,
                 timeout=None,
@@ -154,7 +155,7 @@ class GeneralQuestions(BaseMQTTHandler):
             result = {"error": "Query is empty or not provided.", "level": 2}
 
         else:
-            
+
             # Todo: Fix
             @chain
             def tool_chain(user_input: str, config: RunnableConfig):

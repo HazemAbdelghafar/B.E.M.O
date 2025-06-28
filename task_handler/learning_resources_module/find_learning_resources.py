@@ -20,7 +20,7 @@ import logging
 
 # Add the root directory of the project to sys.path at the beginning
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
-from utilities import BaseMQTTHandler, LEARNING_RESOURCES_PROMPT
+from utilities import BaseMQTTHandler, LEARNING_RESOURCES_PROMPT, LLM_MODEL
 
 DEFAULT_PATH = os.path.dirname(__file__)
 
@@ -108,7 +108,7 @@ class FindLearningResources(BaseMQTTHandler):
 
         if self.use_llm:
             self.llm = ChatGoogleGenerativeAI(
-                model="gemini-1.5-flash",
+                model=LLM_MODEL,
                 temperature=0,
                 max_tokens=None,
                 timeout=None,

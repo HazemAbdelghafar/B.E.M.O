@@ -15,7 +15,14 @@ import logging
 
 # Add the root directory to sys.path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from utilities import BaseMQTTHandler, PRE_SYSTEM_PROMPT, SwitchMapping, UserData, EmailMapping
+from utilities import (
+    BaseMQTTHandler,
+    PRE_SYSTEM_PROMPT,
+    SwitchMapping,
+    UserData,
+    EmailMapping,
+    LLM_MODEL,
+)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -62,7 +69,7 @@ class PreProcessing(BaseMQTTHandler):
             "GEMINI_API_KEY_TEST"
         ]  #! Test
         self.__llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model=LLM_MODEL,
             temperature=0.9,
             max_tokens=None,
             timeout=None,
