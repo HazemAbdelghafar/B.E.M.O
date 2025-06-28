@@ -22,9 +22,6 @@ logging.basicConfig(
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
-tz = pytz.timezone(UserData().get_user_data("timezone"))
-berlin_now = datetime.now(tz)
-
 allowed_hex_colors = [
     "000000",
     "434343",
@@ -130,7 +127,7 @@ allowed_hex_colors = [
     "16a765",
 ]
 
-allowed_timezones = [tz for tz in pytz.all_timezones]
+allowed_timezones = [tz_ for tz_ in pytz.all_timezones]
 
 # Time Conversion Functions
 ## Supported Formats: RFC3339, Datetime, Date and Time, Epoch, Relative Time
