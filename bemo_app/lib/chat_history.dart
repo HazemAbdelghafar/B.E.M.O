@@ -5,6 +5,7 @@ import 'bemo_sidebar.dart';
 import 'user_settings.dart';
 import 'dashboard.dart';
 import 'package:intl/intl.dart';
+import 'services/websocket_service.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
   const ChatHistoryScreen({Key? key}) : super(key: key);
@@ -44,7 +45,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     },
     {
       'fromUser': false,
-      'text': 'YOU HAVE 2 NEW EMAILS:\nFROM: DR. HANAN – "MEETING NOTES & SLIDES"\nFROM: AMAZON – "YOUR ORDER HAS SHIPPED"\nWOULD YOU LIKE ME TO READ ONE? 🙂',
+      'text':
+          'YOU HAVE 2 NEW EMAILS:\nFROM: DR. HANAN – "MEETING NOTES & SLIDES"\nFROM: AMAZON – "YOUR ORDER HAS SHIPPED"\nWOULD YOU LIKE ME TO READ ONE? 🙂',
       'time': '',
     },
     {
@@ -54,7 +56,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     },
     {
       'fromUser': false,
-      "text": "I HAVE FOUND 7 BOOKS ON LEARNING JAPANESE, CAN'T WAIT TO HEAR YOUR FIRST 'KONNICHIWA!' 😄",
+      "text":
+          "I HAVE FOUND 7 BOOKS ON LEARNING JAPANESE, CAN'T WAIT TO HEAR YOUR FIRST 'KONNICHIWA!' 😄",
       'time': '',
     },
     {
@@ -70,7 +73,15 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     currentProfileImage = profileImages[Random().nextInt(profileImages.length)];
     _timer = Timer.periodic(const Duration(seconds: 30), (_) {
       setState(() {
-        currentProfileImage = profileImages[Random().nextInt(profileImages.length)];
+        currentProfileImage =
+            profileImages[Random().nextInt(profileImages.length)];
+      });
+    });
+    // Connect to WebSocket and listen for messages
+    WebSocketService().connect();
+    WebSocketService().messages.listen((msg) {
+      setState(() {
+        chatMessages.add(msg);
       });
     });
   }
@@ -109,7 +120,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
     const double baseWidth = 1820;
     const double baseHeight = 980;
     final double sidebarWidth = _collapsed ? 70 : 300;
-    final String todayDate = 'Today, ' + DateFormat('MMMM d, y').format(DateTime.now());
+    final String todayDate =
+        'Today, ' + DateFormat('MMMM d, y').format(DateTime.now());
     return Scaffold(
       backgroundColor: const Color(0xFF2C2D30),
       body: Center(
@@ -196,12 +208,15 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                   children: [
                                     CircleAvatar(
                                       radius: 32,
-                                      backgroundImage: AssetImage(currentProfileImage),
+                                      backgroundImage:
+                                          AssetImage(currentProfileImage),
                                     ),
                                     const SizedBox(width: 18),
                                     Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         const Text(
                                           'BEMO',
@@ -227,7 +242,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                             const Text(
                                               'always online',
                                               style: TextStyle(
-                                                color: Color.fromRGBO(255,255,255,0.5),
+                                                color: Color.fromRGBO(
+                                                    255, 255, 255, 0.5),
                                                 fontSize: 14,
                                                 fontFamily: 'Hyperion',
                                                 fontWeight: FontWeight.w500,
@@ -288,14 +304,16 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                       Positioned.fill(
                         top: 150,
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 60.0, vertical: 32.0),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 60.0, vertical: 32.0),
                           child: Column(
                             children: [
                               // Day/date header
                               Align(
                                 alignment: Alignment.topCenter,
                                 child: Padding(
-                                  padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                                  padding: const EdgeInsets.only(
+                                      top: 8.0, bottom: 8.0),
                                   child: Text(
                                     todayDate.toLowerCase(),
                                     style: const TextStyle(
@@ -314,21 +332,35 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                     final msg = chatMessages[index];
                                     final isUser = msg['fromUser'] as bool;
                                     return Align(
-                                      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                                      alignment: isUser
+                                          ? Alignment.centerRight
+                                          : Alignment.centerLeft,
                                       child: Column(
-                                        crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                        crossAxisAlignment: isUser
+                                            ? CrossAxisAlignment.end
+                                            : CrossAxisAlignment.start,
                                         children: [
                                           Container(
-                                            margin: const EdgeInsets.symmetric(vertical: 16),
+                                            margin: const EdgeInsets.symmetric(
+                                                vertical: 16),
                                             padding: const EdgeInsets.all(24),
-                                            constraints: const BoxConstraints(maxWidth: 600),
+                                            constraints: const BoxConstraints(
+                                                maxWidth: 600),
                                             decoration: BoxDecoration(
-                                              color: isUser ? const Color(0xFF0C4111) : const Color(0xFF281636),
+                                              color: isUser
+                                                  ? const Color(0xFF0C4111)
+                                                  : const Color(0xFF281636),
                                               borderRadius: BorderRadius.only(
-                                                topLeft: const Radius.circular(30),
-                                                topRight: const Radius.circular(30),
-                                                bottomLeft: isUser ? const Radius.circular(30) : const Radius.circular(0),
-                                                bottomRight: isUser ? const Radius.circular(0) : const Radius.circular(30),
+                                                topLeft:
+                                                    const Radius.circular(30),
+                                                topRight:
+                                                    const Radius.circular(30),
+                                                bottomLeft: isUser
+                                                    ? const Radius.circular(30)
+                                                    : const Radius.circular(0),
+                                                bottomRight: isUser
+                                                    ? const Radius.circular(0)
+                                                    : const Radius.circular(30),
                                               ),
                                             ),
                                             child: Text(
@@ -342,7 +374,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
                                             ),
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(top: 2, left: 8, right: 8),
+                                            padding: const EdgeInsets.only(
+                                                top: 2, left: 8, right: 8),
                                             child: Text(
                                               msg['time'],
                                               style: const TextStyle(
@@ -373,4 +406,4 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> {
       ),
     );
   }
-} 
+}

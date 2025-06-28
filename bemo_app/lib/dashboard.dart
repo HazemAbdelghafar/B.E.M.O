@@ -285,10 +285,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           width: 980,
                                           height: 290,
                                           decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(36),
+                                            borderRadius:
+                                                BorderRadius.circular(36),
                                           ),
                                           child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(36),
+                                            borderRadius:
+                                                BorderRadius.circular(36),
                                             child: Opacity(
                                               opacity: 0.95,
                                               child: Image.asset(
@@ -331,13 +333,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                   text:
                                                       'bemo mail assistant:\n',
                                                   style: TextStyle(
-                                                    color:
-                                                        Color(0xFFEFEFEF),
+                                                    color: Color(0xFFEFEFEF),
                                                     fontSize: 28,
-                                                    fontFamily:
-                                                        'Hyperion',
-                                                    fontWeight:
-                                                        FontWeight.bold,
+                                                    fontFamily: 'Hyperion',
+                                                    fontWeight: FontWeight.bold,
                                                     height: 1,
                                                   ),
                                                 ),
@@ -345,13 +344,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                   text:
                                                       'hands-free email access',
                                                   style: TextStyle(
-                                                    color:
-                                                        Color(0xFFEFEFEF),
+                                                    color: Color(0xFFEFEFEF),
                                                     fontSize: 24,
-                                                    fontFamily:
-                                                        'Hyperion',
-                                                    fontWeight:
-                                                        FontWeight.bold,
+                                                    fontFamily: 'Hyperion',
+                                                    fontWeight: FontWeight.bold,
                                                     height: 1,
                                                   ),
                                                 ),

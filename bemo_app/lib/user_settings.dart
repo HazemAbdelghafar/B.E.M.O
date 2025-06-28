@@ -41,21 +41,30 @@ class UserSettingsPage extends StatelessWidget {
                                     Row(
                                       children: [
                                         IconButton(
-                                          icon: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 28),
+                                          icon: const Icon(Icons.arrow_back_ios,
+                                              color: Colors.white, size: 28),
                                           onPressed: () {
                                             Navigator.of(context).maybePop();
                                           },
-                                          padding: const EdgeInsets.only(right: 24),
+                                          padding:
+                                              const EdgeInsets.only(right: 24),
                                         ),
                                         Expanded(
                                           child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
                                             children: [
-                                              _TabButton(label: 'APP SETTINGS', selected: false),
+                                              _TabButton(
+                                                  label: 'APP SETTINGS',
+                                                  selected: false),
                                               const SizedBox(width: 32),
-                                              _TabButton(label: 'USER SETTINGS', selected: true),
+                                              _TabButton(
+                                                  label: 'USER SETTINGS',
+                                                  selected: true),
                                               const SizedBox(width: 32),
-                                              _TabButton(label: 'ROBOT SETTINGS', selected: false),
+                                              _TabButton(
+                                                  label: 'ROBOT SETTINGS',
+                                                  selected: false),
                                             ],
                                           ),
                                         ),
@@ -186,12 +195,14 @@ class _ProfileSettings extends StatelessWidget {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () {},
-                    icon: Image.asset('assets/Images/Upload.png', width: 18, height: 18),
+                    icon: Image.asset('assets/Images/Upload.png',
+                        width: 18, height: 18),
                     label: const Text('change image'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF191919),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -200,12 +211,14 @@ class _ProfileSettings extends StatelessWidget {
                   const SizedBox(height: 8),
                   ElevatedButton.icon(
                     onPressed: () {},
-                    icon: Image.asset('assets/Images/Clear Symbol.png', width: 18, height: 18),
+                    icon: Image.asset('assets/Images/Clear Symbol.png',
+                        width: 18, height: 18),
                     label: const Text('remove image'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF191919),
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
@@ -253,11 +266,13 @@ class _ProfileSettings extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: Colors.white24),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     child: Row(
                       children: [
                         Expanded(
-                          child: Text('28/12/2003',
+                          child: Text(
+                            '28/12/2003',
                             style: TextStyle(
                               fontFamily: 'Hyperion',
                               color: Colors.white,
@@ -265,13 +280,15 @@ class _ProfileSettings extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Image.asset('assets/Images/Calendar 28.png', width: 24, height: 24),
+                        Image.asset('assets/Images/Calendar 28.png',
+                            width: 24, height: 24),
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                Text('this makes you\n21 yrs old',
+                Text(
+                  'this makes you\n21 yrs old',
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontFamily: 'Hyperion',
@@ -282,7 +299,8 @@ class _ProfileSettings extends StatelessWidget {
               ],
             ),
           ),
-          _ProfileTextField(label: 'occupation', initialValue: 'dog food tester'),
+          _ProfileTextField(
+              label: 'occupation', initialValue: 'dog food tester'),
           _ProfileTextField(label: 'bio', initialValue: ''),
           const SizedBox(height: 16),
           ElevatedButton(
@@ -336,7 +354,8 @@ class _ProfileTextField extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide.none,
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
           ),
         ],
@@ -381,7 +400,8 @@ class _AccountSettingsRefined extends StatelessWidget {
                         color: Colors.white54,
                       ),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 16),
                     ),
                   ),
                 ),
@@ -399,7 +419,9 @@ class _AccountSettingsRefined extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(horizontal: 28),
                   ),
-                  child: const Text('add mail', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
+                  child: const Text('add mail',
+                      style: TextStyle(
+                          fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -442,7 +464,9 @@ class _AccountSettingsRefined extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('save', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
+              child: const Text('save',
+                  style: TextStyle(
+                      fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
             ),
           ),
           const SizedBox(height: 24),
@@ -466,11 +490,23 @@ class _AccountSettingsRefined extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(child: _SupportButton(icon: 'assets/Images/Letter.png', label: 'email', white: true)),
+              Expanded(
+                  child: _SupportButton(
+                      icon: 'assets/Images/Letter.png',
+                      label: 'email',
+                      white: true)),
               const SizedBox(width: 8),
-              Expanded(child: _SupportButton(icon: 'assets/Images/WhatsApp.png', label: 'whatsapp', white: true)),
+              Expanded(
+                  child: _SupportButton(
+                      icon: 'assets/Images/WhatsApp.png',
+                      label: 'whatsapp',
+                      white: true)),
               const SizedBox(width: 8),
-              Expanded(child: _SupportButton(icon: 'assets/Images/Task.png', label: 'fill a form', white: true)),
+              Expanded(
+                  child: _SupportButton(
+                      icon: 'assets/Images/Task.png',
+                      label: 'fill a form',
+                      white: true)),
             ],
           ),
           const SizedBox(height: 24),
@@ -495,7 +531,9 @@ class _AccountSettingsRefined extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('logout', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
+              child: const Text('logout',
+                  style: TextStyle(
+                      fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
             ),
           ),
           const SizedBox(height: 24),
@@ -514,7 +552,8 @@ class _AccountSettingsRefined extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('• ', style: TextStyle(color: Colors.white, fontSize: 18)),
+                  const Text('• ',
+                      style: TextStyle(color: Colors.white, fontSize: 18)),
                   Expanded(
                     child: Text(
                       'do you want to close your b.e.m.o account? we are sorry to see you go! please consider contacting support to let us know what went wrong.',
@@ -531,7 +570,8 @@ class _AccountSettingsRefined extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('• ', style: TextStyle(color: Colors.white, fontSize: 18)),
+                  const Text('• ',
+                      style: TextStyle(color: Colors.white, fontSize: 18)),
                   Expanded(
                     child: Text(
                       'ready to move on? you can close your account—your data will be permanently deleted from our system after 30 days of inactivity.',
@@ -559,7 +599,9 @@ class _AccountSettingsRefined extends StatelessWidget {
                 ),
               ),
               onPressed: () {},
-              child: const Text('close account', style: TextStyle(fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
+              child: const Text('close account',
+                  style: TextStyle(
+                      fontFamily: 'Hyperion', fontWeight: FontWeight.bold)),
             ),
           ),
         ],
@@ -604,12 +646,14 @@ class _PasswordFieldState extends State<_PasswordField> {
                     fontSize: 12,
                   ),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
                 ),
               ),
             ),
             IconButton(
-              icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, color: Colors.white54),
+              icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.white54),
               onPressed: () {
                 setState(() {
                   _obscure = !_obscure;
@@ -627,13 +671,15 @@ class _SupportButton extends StatelessWidget {
   final String icon;
   final String label;
   final bool white;
-  const _SupportButton({required this.icon, required this.label, this.white = false});
+  const _SupportButton(
+      {required this.icon, required this.label, this.white = false});
   @override
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       onPressed: () {},
       icon: Image.asset(icon, width: 22, height: 22),
-      label: Text(label.toLowerCase(),
+      label: Text(
+        label.toLowerCase(),
         style: TextStyle(
           fontFamily: 'Hyperion',
           color: white ? Colors.black : Colors.white,
@@ -681,66 +727,75 @@ class _EmailsBox extends StatelessWidget {
           ),
           padding: const EdgeInsets.all(12),
           child: Column(
-            children: emails.map((email) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6.0),
-              child: Row(
-                children: [
-                  const Text('• ', style: TextStyle(color: Colors.white, fontSize: 18)),
-                  Expanded(
-                    child: Text(email,
-                      style: TextStyle(
-                        fontFamily: 'Hyperion',
-                        color: Colors.white,
-                        fontSize: 13,
+            children: emails
+                .map((email) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Row(
+                        children: [
+                          const Text('• ',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18)),
+                          Expanded(
+                            child: Text(
+                              email,
+                              style: TextStyle(
+                                fontFamily: 'Hyperion',
+                                color: Colors.white,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.white24),
+                                ),
+                                padding: const EdgeInsets.all(2),
+                                child: Image.asset('assets/Images/Connect.png',
+                                    width: 22, height: 22, color: Colors.black),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.white24),
+                                ),
+                                padding: const EdgeInsets.all(2),
+                                child: Image.asset('assets/Images/Task.png',
+                                    width: 22, height: 22),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.white24),
+                                ),
+                                padding: const EdgeInsets.all(2),
+                                child: Image.asset('assets/Images/Crown.png',
+                                    width: 22, height: 22),
+                              ),
+                              const SizedBox(width: 4),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: Colors.white24),
+                                ),
+                                padding: const EdgeInsets.all(2),
+                                child: Image.asset('assets/Images/Delete.png',
+                                    width: 22, height: 22),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Colors.white24),
-                        ),
-                        padding: const EdgeInsets.all(2),
-                        child: Image.asset('assets/Images/Connect.png', width: 22, height: 22, color: Colors.black),
-                      ),
-                      const SizedBox(width: 4),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Colors.white24),
-                        ),
-                        padding: const EdgeInsets.all(2),
-                        child: Image.asset('assets/Images/Task.png', width: 22, height: 22),
-                      ),
-                      const SizedBox(width: 4),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Colors.white24),
-                        ),
-                        padding: const EdgeInsets.all(2),
-                        child: Image.asset('assets/Images/Crown.png', width: 22, height: 22),
-                      ),
-                      const SizedBox(width: 4),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Colors.white24),
-                        ),
-                        padding: const EdgeInsets.all(2),
-                        child: Image.asset('assets/Images/Delete.png', width: 22, height: 22),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            )).toList(),
+                    ))
+                .toList(),
           ),
         ),
         const SizedBox(height: 4),
@@ -840,7 +895,11 @@ class _LinkedAccountButton extends StatelessWidget {
   final String label;
   final bool connected;
   final Color color;
-  const _LinkedAccountButton({required this.icon, required this.label, required this.connected, required this.color});
+  const _LinkedAccountButton(
+      {required this.icon,
+      required this.label,
+      required this.connected,
+      required this.color});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -851,7 +910,8 @@ class _LinkedAccountButton extends StatelessWidget {
         child: ElevatedButton.icon(
           onPressed: () {},
           icon: Image.asset(icon, width: 24, height: 24),
-          label: Text(label.toLowerCase(),
+          label: Text(
+            label.toLowerCase(),
             style: TextStyle(
               fontFamily: 'Hyperion',
               color: Colors.white,
@@ -870,4 +930,4 @@ class _LinkedAccountButton extends StatelessWidget {
       ),
     );
   }
-} 
+}

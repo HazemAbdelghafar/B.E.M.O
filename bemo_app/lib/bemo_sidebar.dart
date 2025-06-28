@@ -246,7 +246,8 @@ class BemoSidebar extends StatelessWidget {
                 ? Center(
                     child: CircleAvatar(
                       radius: 28,
-                      backgroundImage: AssetImage('assets/images/Robot - Inverted 1.png'),
+                      backgroundImage:
+                          AssetImage('assets/images/Robot - Inverted 1.png'),
                     ),
                   )
                 : Row(
@@ -254,7 +255,8 @@ class BemoSidebar extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 28,
-                        backgroundImage: AssetImage('assets/images/Robot - Inverted 1.png'),
+                        backgroundImage:
+                            AssetImage('assets/images/Robot - Inverted 1.png'),
                       ),
                       const SizedBox(width: 16),
                       Text(
@@ -280,7 +282,12 @@ class _SidebarNav extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback? onTap;
-  const _SidebarNav({this.iconAsset, this.customIcon, required this.label, this.selected = false, this.onTap});
+  const _SidebarNav(
+      {this.iconAsset,
+      this.customIcon,
+      required this.label,
+      this.selected = false,
+      this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -327,7 +334,8 @@ class _SidebarIconOnly extends StatelessWidget {
   final Widget? customIcon;
   final bool selected;
   final VoidCallback? onTap;
-  const _SidebarIconOnly({this.iconAsset, this.selected = false, this.onTap, this.customIcon});
+  const _SidebarIconOnly(
+      {this.iconAsset, this.selected = false, this.onTap, this.customIcon});
 
   @override
   Widget build(BuildContext context) {
@@ -336,9 +344,12 @@ class _SidebarIconOnly extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Center(
-          child: customIcon ?? (iconAsset != null ? Image.asset(iconAsset!, height: 28, color: Colors.white) : SizedBox.shrink()),
+          child: customIcon ??
+              (iconAsset != null
+                  ? Image.asset(iconAsset!, height: 28, color: Colors.white)
+                  : SizedBox.shrink()),
         ),
       ),
     );
   }
-} 
+}
