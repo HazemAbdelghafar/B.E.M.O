@@ -139,8 +139,11 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     await ws.close()
                 except Exception:
                     pass
-                connected_robots.pop(rid, None)
-                robot_metadata.pop(rid, None)
+                if rid in connected_robots:
+                    connected_robots.pop(rid, None)
+
+                if rid in robot_metadata:
+                    robot_metadata.pop(rid, None)
 
             for uid, ws in list(connected_users.items()):
                 try:
@@ -155,12 +158,17 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                     await ws.close()
                 except Exception:
                     pass
-                connected_users.pop(uid, None)
-                user_metadata.pop(uid, None)
+                if uid in connected_users:
+                    connected_users.pop(uid, None)
 
-            server_metadata[SERVER_ID]["status"] = "disconnected"
-            server_metadata[SERVER_ID]["last_disconnected"] = now_utc_iso()
-            connected_servers.pop(SERVER_ID, None)
+                if uid in user_metadata:
+                    user_metadata.pop(uid, None)
+            if SERVER_ID in server_metadata:
+                server_metadata[SERVER_ID]["status"] = "disconnected"
+                server_metadata[SERVER_ID]["last_disconnected"] = now_utc_iso()
+
+            if SERVER_ID in connected_servers:
+                connected_servers.pop(SERVER_ID, None)
 
             logger.info("Server disconnected, and removed all other connections.")
 
@@ -211,9 +219,13 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         except WebSocketDisconnect:
             logger.warning(f"Robot {id} disconnected.")
         finally:
-            robot_metadata[id]["status"] = "disconnected"
-            robot_metadata[id]["last_disconnected"] = now_utc_iso()
-            connected_robots.pop(id, None)
+            if id in robot_metadata:
+                robot_metadata[id]["status"] = "disconnected"
+                robot_metadata[id]["last_disconnected"] = now_utc_iso()
+
+            if id in connected_robots:
+                connected_robots.pop(id, None)
+
             logger.info(f"Robot {id} disconnected, and removed from server.")
 
     elif id.startswith("user"):
@@ -262,9 +274,13 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
         except WebSocketDisconnect:
             logger.warning(f"User {id} disconnected.")
         finally:
-            user_metadata[id]["status"] = "disconnected"
-            user_metadata[id]["last_disconnected"] = now_utc_iso()
-            connected_users.pop(id, None)
+            if id in user_metadata:
+                user_metadata[id]["status"] = "disconnected"
+                user_metadata[id]["last_disconnected"] = now_utc_iso()
+
+            if id in connected_users:
+                connected_users.pop(id, None)
+
             logger.info(f"User {id} disconnected, and removed from server.")
 
 
