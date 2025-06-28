@@ -44,9 +44,53 @@ logger.addHandler(console_handler)
 
 
 # =========================
-# Utility Functions
+# Global Variables
 # =========================
 blocked_ids = {}
+
+# robot_id -> user_id
+robot_user_mapping = {}
+
+DEFAULT_USER_MAPPING = {
+    "bemo-MK0": "user-MK0",
+    "bemo-MK1": "user-MK1",
+    "bemo-MK2": "user-MK2",
+    "bemo-MK3": "user-MK3",
+    "bemo-MK4": "user-MK4",
+    "bemo-MK5": "user-MK5",
+}
+
+# =========================
+# Utility Functions
+# =========================
+
+
+def get_user_id(robot_id: str) -> str:
+    """
+    Returns the user ID for the given robot ID.
+    """
+    global robot_user_mapping
+    return robot_user_mapping.get(robot_id, DEFAULT_USER_MAPPING.get(robot_id))
+
+
+def set_user_id(robot_id: str, user_id: str):
+    """
+    Sets the user ID for the given robot ID.
+    """
+    global robot_user_mapping
+    robot_user_mapping[robot_id] = user_id
+    logger.info(f"User ID set for robot ID {robot_id}: {user_id}")
+
+
+def get_robot_id(user_id: str) -> str:
+    """
+    Returns the robot ID for the given user ID.
+    """
+    global robot_user_mapping
+    for robot_id, user_id_ in robot_user_mapping.items():
+        if user_id_ == user_id:
+            return robot_id
+    return None
 
 
 def block_id(id: str):
@@ -104,8 +148,10 @@ class Main(BaseMQTTHandler):
     def __init__(self):
         super().__init__(SUB_TOPIC, NAME)
         self.robot_id = ""
-        # self.user_id = ""
-        self.user_id = "user-MK1"  # ! For testing
+        self.user_id = ""
+        self.user_data = {}
+
+        # self.user_id = "user-MK1"  # ! For testing
 
         self.user_emotions = {}
         self.prompt = ""
@@ -153,19 +199,34 @@ class Main(BaseMQTTHandler):
             return self._handle_task_handler_module(input_data)
         if module_name == "postprocessing":
             return self._handle_postprocessing_module(input_data)
+        if module_name == "user_data":
+            return self._handle_user_data_module(input_data)
 
         # Todo: DB
 
+        return None
+
+    def _handle_user_data_module(self, input_data: dict):
+        logger.info("Received user_data module data")
+        self.user_data = input_data.get("data")
+        logger.info(f"User data: {self.user_data}")
         return None
 
     def _publish_to_app(self, is_error: bool):
         time.sleep(0.1)
 
         if not self.user_id:
-            logger.error("User ID is missing")
-            return
+            if not self.robot_id:
+                logger.error("User ID and Robot ID are missing")
+                return
+            self.user_id = get_user_id(self.robot_id)
+            if not self.user_id:
+                logger.error("User ID is missing")
+                return
 
-        logger.info(f"Publishing to app with user ID: {self.user_id}")
+        logger.info(
+            f"Publishing to app with user ID: {self.user_id}, and robot ID: {self.robot_id}"
+        )
 
         self.publish_result(
             {
@@ -248,23 +309,76 @@ class Main(BaseMQTTHandler):
         return None
 
     def _handle_server_module(self, input_data: dict):
-        self.start_time = time.time()
         logger.info("Received server module data")
+        data = input_data.get("data")
+        if data:
+            return self._handle_data(data)
+
+        self.start_time = time.time()
         message = input_data.get("message")
-        if not message:
+
+        if message:
+            message = " ".join(message.split())
+            if message in [":|", ":)", ":("]:
+                return self._handle_face_recognition(message)
+            else:
+                return self._handle_prompt_message(input_data, message)
+        else:
             error_dict = {
-                "error": "Prompt is missing from the server",
+                "error": "Message is missing from the server module",
                 "level": 2,
             }
             self.publish_result(error_dict, topic="postprocessing/data")
-            logger.error("Prompt is missing")
+            logger.error("Message is missing from the server module")
             return None
 
-        message = " ".join(message.split())
-        if message in [":|", ":)", ":("]:
-            return self._handle_face_recognition(message)
-        else:
-            return self._handle_prompt_message(input_data, message)
+    def _handle_data(self, data: dict):
+        user_id = data.get("src_user_id")
+        if not user_id:
+            logger.error("User ID is missing from the server module")
+            return None
+
+        robot_id = data.get("robot_id")
+        if not robot_id:
+            logger.error("Robot ID is missing from the server module")
+            return None
+
+        self.user_id = user_id
+        self.robot_id = robot_id
+        set_user_id(robot_id, user_id)
+        logger.info(f"Robot ID: {self.robot_id}, User ID: {self.user_id}")
+
+        keys = []
+        values = []
+
+        for key, value in data.items():
+            keys.append(key)
+            values.append(value)
+
+        logger.info(f"Keys: {keys}")
+        logger.info(f"Values: {values}")
+
+        self.publish_result(
+            {
+                "action": "set",
+                "robot_id": self.robot_id,
+                "user_id": self.user_id,
+                "keys": keys,
+                "values": values,
+            },
+            topic="user_data/main",
+        )
+        time.sleep(0.1)
+        self.publish_result(
+            {
+                "action": "get",
+                "robot_id": self.robot_id,
+                "user_id": self.user_id,
+                "key": "all",
+            },
+            topic="user_data/main",
+        )
+        return None
 
     def _handle_face_recognition(self, message: str):
         if message == ":)":
@@ -273,6 +387,7 @@ class Main(BaseMQTTHandler):
                 {
                     "predicted_labels": self.predicted_labels,
                     "split_prompts": self.split_prompts,
+                    "user_data": self.user_data,
                 },
                 topic="preprocessing/data",
             )
@@ -414,6 +529,16 @@ class Main(BaseMQTTHandler):
             self._publish_to_app(is_error=False)
         else:
             self.publish_result({"prompt": self.prompt}, topic="task_classifier/prompt")
+
+        self.publish_result(
+            {
+                "action": "get",
+                "robot_id": self.robot_id,
+                "user_id": get_user_id(self.robot_id),
+                "key": "all",
+            },
+            topic="user_data/main",
+        )
         return None
 
     def _handle_task_classifier_module(self, input_data: dict):
@@ -439,6 +564,7 @@ class Main(BaseMQTTHandler):
                 {
                     "predicted_labels": self.predicted_labels,
                     "split_prompts": self.split_prompts,
+                    "user_data": self.user_data,
                 },
                 topic="preprocessing/data",
             )
@@ -545,6 +671,7 @@ class Main(BaseMQTTHandler):
                 "results": self.task_results,
                 "prompt": self.prompt,
                 "emotions": self.user_emotions,
+                "user_data": self.user_data,
             },
             topic="postprocessing/data",
         )
