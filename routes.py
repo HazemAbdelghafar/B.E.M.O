@@ -163,6 +163,7 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
 
                 if uid in user_metadata:
                     user_metadata.pop(uid, None)
+
             if SERVER_ID in server_metadata:
                 server_metadata[SERVER_ID]["status"] = "disconnected"
                 server_metadata[SERVER_ID]["last_disconnected"] = now_utc_iso()
