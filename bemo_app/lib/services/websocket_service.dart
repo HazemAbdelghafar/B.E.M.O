@@ -70,7 +70,7 @@ class WebSocketService {
 
   void send(dynamic data) {
     if (data is Map<String, dynamic> && !data.containsKey('src_user_id')) {
-      data['src_user_id'] = 'user-mk1';
+      data['src_user_id'] = 'user-MK1';
     }
     if (_connected && _channel != null) {
       _channel!.sink.add(json.encode(data));
