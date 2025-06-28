@@ -138,19 +138,21 @@ class Mail(BaseMQTTHandler):
                 f"Failed to acquire Outlook token: {result.get('error_description')}"
             )
 
-    def send_email(self, recipients: str | list[str] = None, subject: str = None, body: str = None) -> dict:
+    def send_email(
+        self, recipients: str | list[str] = None, subject: str = None, body: str = None
+    ) -> dict:
         if not subject:
             logging.error("Subject is required")
-            return {"error": "Subject is required", 'level': 3}
+            return {"error": "Subject is required", "level": 3}
         if not body:
             logging.error("Body is required")
-            return {"error": "Body is required", 'level': 3}
+            return {"error": "Body is required", "level": 3}
 
         body += "\n\n" + "Sent from my B.E.M.O."
 
         if not recipients:
             logging.error("Recipients are required")
-            return {"error": "Recipients are required", 'level': 3}
+            return {"error": "Recipients are required", "level": 3}
 
         if isinstance(recipients, str):
             recipients_ = [recipients]
@@ -163,12 +165,14 @@ class Mail(BaseMQTTHandler):
             message["subject"] = subject
             raw = base64.urlsafe_b64encode(message.as_bytes()).decode()
             try:
-                self.service.users().messages().send(userId="me", body={"raw": raw}).execute()
+                self.service.users().messages().send(
+                    userId="me", body={"raw": raw}
+                ).execute()
                 logging.info("Email sent successfully.")
                 return {"status": "success", "message": "Email sent successfully"}
             except Exception as e:
                 logging.error(f"Failed to send email: {e}")
-                return {"error": f"Failed to send email: {e}", 'level': 3}
+                return {"error": f"Failed to send email: {e}", "level": 3}
 
         elif self.provider == "outlook":
             url = "https://graph.microsoft.com/v1.0/me/sendMail"
@@ -194,7 +198,10 @@ class Mail(BaseMQTTHandler):
                 logging.error("Failed to send email.")
                 logging.error("Status Code:", response.status_code)
                 logging.error("Response Text:", response.text)
-                return {"error": f"Failed to send email with: Status code {response.status_code}, Response text: {response.text}", 'level': 3}
+                return {
+                    "error": f"Failed to send email with: Status code {response.status_code}, Response text: {response.text}",
+                    "level": 3,
+                }
 
     def fetch_latest_emails(self, count: int = 3) -> dict:
         emails = []
@@ -293,7 +300,7 @@ class Mail(BaseMQTTHandler):
     ) -> dict:
         if not keyword and not sender:
             logging.error("Keyword or sender is required")
-            return {"error": "Keyword or sender is required", 'level': 3}
+            return {"error": "Keyword or sender is required", "level": 3}
 
         results = []
 
@@ -485,8 +492,13 @@ class Mail(BaseMQTTHandler):
 
     def delete_email(self, subject: str = None, message_id: str = None) -> dict:
         if not subject and not message_id:
-            logging.error("Please provide either a subject or a message ID to delete an email.")
-            return {"error": "Please provide either a subject or a message ID to delete an email.", 'level': 3}
+            logging.error(
+                "Please provide either a subject or a message ID to delete an email."
+            )
+            return {
+                "error": "Please provide either a subject or a message ID to delete an email.",
+                "level": 3,
+            }
 
         if self.provider == "gmail":
             if message_id:
@@ -495,10 +507,13 @@ class Mail(BaseMQTTHandler):
                         userId="me", id=message_id
                     ).execute()
                     logging.info(f"Gmail: Deleted email with ID: {message_id}")
-                    return {"status": "success","message": "Email deleted successfully"}
+                    return {
+                        "status": "success",
+                        "message": "Email deleted successfully",
+                    }
                 except Exception as e:
                     logging.error("Failed to delete Gmail email by ID:", e)
-                    return {"error": "Failed to delete Gmail email by ID", 'level': 3}
+                    return {"error": "Failed to delete Gmail email by ID", "level": 3}
             elif subject:
                 # Search by subject
                 results = (
@@ -510,7 +525,10 @@ class Mail(BaseMQTTHandler):
                 messages = results.get("messages", [])
                 if not messages:
                     logging.error("No Gmail email found with that subject.")
-                    return {"error": "No Gmail email found with that subject.", 'level': 2}
+                    return {
+                        "error": "No Gmail email found with that subject.",
+                        "level": 2,
+                    }
                 for msg in messages:
                     try:
                         self.service.users().messages().trash(
@@ -529,11 +547,14 @@ class Mail(BaseMQTTHandler):
                 response = requests.delete(url, headers=headers)
                 if response.status_code == 204:
                     logging.info(f"Outlook: Deleted email with ID: {message_id}")
-                    return {"status": "success", "message": "Email deleted successfully"}
+                    return {
+                        "status": "success",
+                        "message": "Email deleted successfully",
+                    }
                 else:
                     logging.error("Failed to delete Outlook email by ID.")
                     logging.error("Status Code:", response.status_code)
-                    return {"error": "Failed to delete Outlook email by ID", 'level': 3}
+                    return {"error": "Failed to delete Outlook email by ID", "level": 3}
 
             elif subject:
                 search_url = f'https://graph.microsoft.com/v1.0/me/mailFolders/inbox/messages?$search="{subject}"'
@@ -544,12 +565,18 @@ class Mail(BaseMQTTHandler):
                 if search_resp.status_code != 200:
                     logging.error("Outlook: Failed to search email by subject.")
                     logging.error("Status Code:", search_resp.status_code)
-                    return {"error": "Failed to search Outlook email by subject.", 'level': 3}
+                    return {
+                        "error": "Failed to search Outlook email by subject.",
+                        "level": 3,
+                    }
 
                 emails = search_resp.json().get("value", [])
                 if not emails:
                     logging.error("No Outlook email found with that subject.")
-                    return {"error": "No Outlook email found with that subject.", 'level': 2}
+                    return {
+                        "error": "No Outlook email found with that subject.",
+                        "level": 2,
+                    }
 
                 for email in emails:
                     del_url = (
@@ -559,24 +586,27 @@ class Mail(BaseMQTTHandler):
                     if del_resp.status_code == 204:
                         logging.info(f"Outlook: Deleted email with subject: {subject}")
                     else:
-                        logging.error(f"Failed to delete Outlook email with ID: {email['id']}")
+                        logging.error(
+                            f"Failed to delete Outlook email with ID: {email['id']}"
+                        )
 
                 return {"status": "success", "message": "Email deleted successfully"}
 
         logging.error("Unknown provider or error.")
-        return {"error": "Unknown provider or error.", 'level': 3}
+        return {"error": "Unknown provider or error.", "level": 3}
 
+    # Todo: Add support for replying to emails with subject
     def reply_to_email(self, message_id: str = None, reply_body: str = None) -> dict:
         if not reply_body:
             logging.error("Reply body is required")
-            return {"error": "Reply body is required", 'level': 3}
+            return {"error": "Reply body is required", "level": 3}
 
         if not message_id:
             logging.error("Message ID is required")
-            return {"error": "Message ID is required", 'level': 3}
+            return {"error": "Message ID is required", "level": 3}
 
         reply_body += "\n\n" + "Sent from my B.E.M.O."
-        
+
         if self.provider == "gmail":
             try:
                 # Get original message details
@@ -617,7 +647,7 @@ class Mail(BaseMQTTHandler):
                 return {"status": "success", "message": "Email replied successfully"}
             except Exception as e:
                 logging.error(f"Failed to reply to Gmail email: {e}")
-                return {"error": "Failed to reply to Gmail email", 'level': 3}
+                return {"error": "Failed to reply to Gmail email", "level": 3}
 
         elif self.provider == "outlook":
             try:
@@ -630,7 +660,7 @@ class Mail(BaseMQTTHandler):
                     logging.error(
                         f"Failed to get original message. Status: {response.status_code}"
                     )
-                    return {"error": "Failed to get original message.", 'level': 3}
+                    return {"error": "Failed to get original message.", "level": 3}
 
                 msg_data = response.json()
                 reply_url = f"https://graph.microsoft.com/v1.0/me/messages/{message_id}/createReply"
@@ -641,7 +671,7 @@ class Mail(BaseMQTTHandler):
                     logging.error(
                         f"Failed to create reply draft: {create_response.status_code}"
                     )
-                    return {"error": "Failed to create reply draft.", 'level': 3}
+                    return {"error": "Failed to create reply draft.", "level": 3}
 
                 draft = create_response.json()
                 draft_id = draft["id"]
@@ -657,7 +687,7 @@ class Mail(BaseMQTTHandler):
                     logging.error(
                         f"Failed to update reply draft body: {patch_response.status_code}"
                     )
-                    return {"error": "Failed to update reply draft body.", 'level': 3}
+                    return {"error": "Failed to update reply draft body.", "level": 3}
 
                 # Step 3: Send the reply
                 send_url = (
@@ -666,18 +696,31 @@ class Mail(BaseMQTTHandler):
                 send_response = requests.post(send_url, headers=headers)
                 if send_response.status_code == 202:
                     logging.info("Reply sent to Outlook successfully.")
-                    return {"status": "success", "message": "Email replied successfully"}
+                    return {
+                        "status": "success",
+                        "message": "Email replied successfully",
+                    }
                 else:
-                    logging.error(f"Failed to send reply with status code: {send_response.status_code}")
-                    return {"error": f"Failed to send reply with status code: {send_response.status_code}", 'level': 3}
+                    logging.error(
+                        f"Failed to send reply with status code: {send_response.status_code}"
+                    )
+                    return {
+                        "error": f"Failed to send reply with status code: {send_response.status_code}",
+                        "level": 3,
+                    }
             except Exception as e:
                 logging.error(f"Failed to reply to Outlook email: {e}")
-                return {"error": f"Failed to reply to Outlook email: {e}", 'level': 3}
+                return {"error": f"Failed to reply to Outlook email: {e}", "level": 3}
 
-    def mark_emails_as_read(self, sender: str = None, subject_keyword: str = None) -> dict:
+    def mark_emails_as_read(
+        self, sender: str = None, subject_keyword: str = None
+    ) -> dict:
         if not sender and not subject_keyword:
             logging.error("Please provide at least a sender or subject keyword.")
-            return {"error": "Please provide at least a sender or subject keyword.", 'level': 3}
+            return {
+                "error": "Please provide at least a sender or subject keyword.",
+                "level": 3,
+            }
 
         if self.provider == "gmail":
             query_parts = []
@@ -704,9 +747,12 @@ class Mail(BaseMQTTHandler):
                 self.service.users().messages().batchModify(
                     userId="me", body={"ids": message_ids, "removeLabelIds": ["UNREAD"]}
                 ).execute()
-                return {"status": "success", "message": f"{len(message_ids)} emails marked as read in Gmail."}
+                return {
+                    "status": "success",
+                    "message": f"{len(message_ids)} emails marked as read in Gmail.",
+                }
             except Exception as e:
-                return {"error": f"Gmail error: {str(e)}", 'level': 3}
+                return {"error": f"Gmail error: {str(e)}", "level": 3}
 
         elif self.provider == "outlook":
             try:
@@ -760,7 +806,9 @@ class Mail(BaseMQTTHandler):
 
                 for message_id in matched_ids:
                     try:
-                        url = f"https://graph.microsoft.com/v1.0/me/messages/{message_id}"
+                        url = (
+                            f"https://graph.microsoft.com/v1.0/me/messages/{message_id}"
+                        )
                         headers = {
                             "Authorization": f"Bearer {self.graph_token}",
                             "Content-Type": "application/json",
@@ -772,23 +820,37 @@ class Mail(BaseMQTTHandler):
                             success_count += 1
                         else:
                             errors.append(
-                                {"message_id": message_id,"status_code": response.status_code,"text": response.text}
+                                {
+                                    "message_id": message_id,
+                                    "status_code": response.status_code,
+                                    "text": response.text,
+                                }
                             )
                     except Exception as e:
                         errors.append({"message_id": message_id, "exception": str(e)})
-                        logging.error(f"Failed to mark {message_id} as read with Outlook error: {str(e)}")
+                        logging.error(
+                            f"Failed to mark {message_id} as read with Outlook error: {str(e)}"
+                        )
 
                 if errors:
-                    return {"error": f"Outlook error: {str(e)}", 'level': 3}
+                    return {"error": f"Outlook error: {str(e)}", "level": 3}
                 else:
-                    return {"status": "success", "message": f"{success_count} of {len(matched_ids)} emails marked as read in Outlook."}
+                    return {
+                        "status": "success",
+                        "message": f"{success_count} of {len(matched_ids)} emails marked as read in Outlook.",
+                    }
             except Exception as e:
-                return {"error": f"Outlook error: {str(e)}", 'level': 3}
+                return {"error": f"Outlook error: {str(e)}", "level": 3}
 
-    def mark_emails_as_spam(self, sender: str = None, subject_keyword: str = None) -> dict:
+    def mark_emails_as_spam(
+        self, sender: str = None, subject_keyword: str = None
+    ) -> dict:
         if not sender and not subject_keyword:
             logging.error("Please provide at least a sender or subject keyword.")
-            return {"error": "Please provide at least a sender or subject keyword.","level": 3}
+            return {
+                "error": "Please provide at least a sender or subject keyword.",
+                "level": 3,
+            }
 
         if self.provider == "gmail":
             query_parts = []
