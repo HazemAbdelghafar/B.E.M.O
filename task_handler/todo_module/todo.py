@@ -34,7 +34,7 @@ logging.basicConfig(
 console_handler = logging.StreamHandler()
 logger.addHandler(console_handler)
 
-DEFAULT_NOTE = "\n\nB.E.M.O"
+DEFAULT_NOTE = "\nB.E.M.O"
 DEFAULT_PATH = os.path.dirname(__file__)
 DEFAULT_TIMEZONE = UserData().get_user_data("timezone")
 
@@ -759,7 +759,7 @@ class TasksApi(BaseMQTTHandler):
         if notes:
             body["notes"] = notes + DEFAULT_NOTE
         else:
-            body["notes"] = DEFAULT_NOTE
+            body["notes"] = DEFAULT_NOTE.strip()
 
         if parent_id:
             move_task = True
@@ -952,7 +952,7 @@ class TasksApi(BaseMQTTHandler):
                 else:
                     body["notes"] = notes
             else:
-                body["notes"] = DEFAULT_NOTE
+                body["notes"] = DEFAULT_NOTE.strip()
 
         if parent_id:
             self._move_task_by_list_id_task_id_parent_id(list_id, task_id, parent_id)
