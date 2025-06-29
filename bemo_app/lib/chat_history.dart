@@ -40,7 +40,6 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
   int? _selectedMessageIndex;
   TextEditingController _searchController = TextEditingController();
   String? _activeIcon;
-  Set<int> _hoveredStarIndices = {};
 
   @override
   void initState() {
