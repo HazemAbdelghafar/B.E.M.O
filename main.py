@@ -170,6 +170,8 @@ class Main(BaseMQTTHandler):
         self.end_time = 0
         self.execution_time = 0
 
+        self.empty_data_counter = 0
+
         self.need_auth = False
         self.no_face_counter = 0
         self.bad_face_counter = 0
@@ -226,8 +228,23 @@ class Main(BaseMQTTHandler):
                 logger.error("User ID is missing")
                 return
 
+        # Initialize counter if not already
+        if not hasattr(self, "_predicted_counter"):
+            self._predicted_counter = len(self.predicted_labels)
+
+        # Safety check
+        if self._predicted_counter <= 0:
+            logger.warning("Predicted labels already sent completely.")
+            return
+
+        # Get the current message to send
+        current_index = len(self.predicted_labels) - self._predicted_counter
+        current_label = self.predicted_labels[current_index]
+        current_prompt = self.split_prompts[current_index]
+
         logger.info(
-            f"Publishing to app with user ID: {self.user_id}, and robot ID: {self.robot_id}"
+            f"Publishing to app (part {current_index + 1}/{len(self.predicted_labels)}) "
+            f"with user ID: {self.user_id}, and robot ID: {self.robot_id}"
         )
 
         self.publish_result(
@@ -235,8 +252,8 @@ class Main(BaseMQTTHandler):
                 "target_user_id": self.user_id,
                 "prompt": self.prompt,
                 "user_emotions": self.user_emotions,
-                "predicted_labels": self.predicted_labels,
-                "split_prompts": self.split_prompts,
+                "predicted_labels": current_label,
+                "split_prompts": current_prompt,
                 "preprocessed_data": self.preprocessed_data,
                 "task_results": self.task_results,
                 "response": self.response,
@@ -249,9 +266,18 @@ class Main(BaseMQTTHandler):
             topic="server/main",
         )
 
-        self.empty_data()
+        self._predicted_counter -= 1
+
+        # Empty only after sending all items
+        if self._predicted_counter == 0:
+            del self._predicted_counter
+            return self.empty_data()
+
+        return None
 
     def empty_data(self):
+        logger.info("Emptying data")
+
         self.prompt = ""
         self.user_emotions = {}
 
@@ -267,6 +293,7 @@ class Main(BaseMQTTHandler):
         self.start_time = 0
         self.end_time = 0
         self.execution_time = 0
+        return None
 
     def _handle_error(self, input_data: dict):
         module_name = input_data.get("module_name", None)
@@ -487,7 +514,6 @@ class Main(BaseMQTTHandler):
                     },
                     topic="task_handler/main",
                 )
-                # TODO: Send email to check the robot
                 self.bad_face_counter = 0
                 self.no_face_counter = 0
             else:
