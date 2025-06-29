@@ -1,6 +1,6 @@
 import '../widgets/fields.dart';
 import 'package:flutter/material.dart';
-import '../services/firebase_rest_auth.dart';
+import '../services/firebase_user_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -11,7 +11,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
-  final FirebaseRestAuth _auth = FirebaseRestAuth();
+  final FirebaseUserService _auth = FirebaseUserService();
 
   bool _obscurePassword = true;
   bool darkMode = true;
@@ -160,6 +160,18 @@ class _SignupScreenState extends State<SignupScreen> {
                           });
 
                           if (_formKey.currentState!.validate()) {
+                            if (passwordController.text.trim() !=
+                                repeatPasswordController.text.trim()) {
+                              showDialog(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  title: Text("Signup Failed"),
+                                  content: Text("Passwords do not match"),
+                                ),
+                              );
+                              return;
+                            }
+
                             final result = await _auth.signUp(
                               emailController.text.trim(),
                               passwordController.text.trim(),
@@ -248,7 +260,23 @@ class _SignupScreenState extends State<SignupScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        buildIconButton(darkMode, 'assets/images/Google.png'),
+                        buildIconButton(
+                          darkMode,
+                          'assets/images/Google.png',
+                          onPressed: () async {
+                            // final result = await _auth.signUpWithGoogle();
+                            // print('result: $result');
+                            // Navigator.pushNamed(
+                            //   context,
+                            //   '/getting-started',
+                            //   arguments: {
+                            //     'uid': result['localId'],
+                            //     'idToken': result['idToken'],
+                            //     'email': result['email'],
+                            //   },
+                            // );
+                          },
+                        ),
                         const SizedBox(width: 16),
                         buildIconButton(darkMode, 'assets/images/Apple.png'),
                         const SizedBox(width: 16),
