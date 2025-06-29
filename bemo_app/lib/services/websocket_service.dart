@@ -41,6 +41,95 @@ class WebSocketService {
   // Getter for streaming status
   bool get isStreaming => _isStreaming;
 
+  // Emotion to emoji mapping
+  static const Map<String, String> _emotionEmojis = {
+    'admiration': '😍',
+    'amusement': '😄',
+    'anger': '😠',
+    'annoyance': '😤',
+    'approval': '👍',
+    'caring': '🥰',
+    'confusion': '😕',
+    'curiosity': '🤔',
+    'desire': '😏',
+    'disappointment': '😞',
+    'disapproval': '👎',
+    'disgust': '🤢',
+    'embarrassment': '😳',
+    'excitement': '🤩',
+    'fear': '😨',
+    'gratitude': '🙏',
+    'grief': '😢',
+    'joy': '😊',
+    'love': '❤️',
+    'nervousness': '😰',
+    'optimism': '😌',
+    'pride': '😎',
+    'realization': '💡',
+    'relief': '😌',
+    'remorse': '😔',
+    'sadness': '😢',
+    'surprise': '😲',
+    'neutral': '😐',
+  };
+
+  // Bot emotion to emoji mapping (including special cases)
+  static const Map<String, String> _botEmotionEmojis = {
+    // Special cases
+    'blocked': '🚫',
+    'error': '❌',
+    'no_face': '😶',
+    'bad_face': '😵',
+    'auth': '🔐',
+    
+    // Regular emotions (same as user emotions)
+    'neutral': '😐',
+    'happy': '😊',
+    'sad': '😢',
+    'angry': '😠',
+    'surprised': '😲',
+    'love': '❤️',
+  };
+
+  // Method to get dominant emotion and emoji
+  static Map<String, dynamic>? getDominantEmotion(Map<String, dynamic>? userEmotions) {
+    if (userEmotions == null || userEmotions.isEmpty) {
+      return null;
+    }
+    
+    String dominantEmotion = '';
+    double maxScore = 0.0;
+    
+    userEmotions.forEach((emotion, score) {
+      if (score is double && score > maxScore) {
+        maxScore = score;
+        dominantEmotion = emotion;
+      }
+    });
+    
+    if (dominantEmotion.isNotEmpty && maxScore > 0.3) { // Only show if confidence > 30%
+      return {
+        'emotion': dominantEmotion,
+        'score': maxScore,
+        'emoji': _emotionEmojis[dominantEmotion] ?? '😐',
+      };
+    }
+    
+    return null;
+  }
+
+  // Method to get bot emotion and emoji
+  static Map<String, dynamic>? getBotEmotion(String? robotEmotion) {
+    if (robotEmotion == null || robotEmotion.isEmpty) {
+      return null;
+    }
+    
+    return {
+      'emotion': robotEmotion,
+      'emoji': _botEmotionEmojis[robotEmotion] ?? '😐',
+    };
+  }
+
   // Method to add message to global chat
   void addChatMessage(Map<String, dynamic> message) {
     _chatMessages.add(message);
@@ -59,13 +148,14 @@ class WebSocketService {
   }
 
   // Method to add test message for debugging
-  void addTestMessage(String text, {bool isUser = false, bool isError = false}) {
+  void addTestMessage(String text, {bool isUser = false, bool isError = false, Map<String, dynamic>? emotionData}) {
     _chatMessages.add({
       'fromUser': isUser,
       'text': text,
       'time': DateTime.now().toString(),
       'method': null,
       'is_server_error': isError,
+      if (isUser && emotionData != null) 'emotion': emotionData,
     });
     print('Test message added: "$text"');
     // Notify listeners that messages have been updated
@@ -104,10 +194,15 @@ class WebSocketService {
     if (msg['prompt'] != null) {
       final promptText = msg['prompt'].toString().trim();
       if (promptText.isNotEmpty) {
+        // Extract emotion data
+        final userEmotions = msg['user_emotions'] as Map<String, dynamic>?;
+        final dominantEmotion = getDominantEmotion(userEmotions);
+        
         _chatMessages.add({
           'fromUser': true,
           'text': promptText,
           'time': DateTime.now().toString(),
+          'emotion': dominantEmotion,
         });
       }
     }
@@ -130,12 +225,16 @@ class WebSocketService {
             taskResults['module_name'] == 'learning_resources' &&
             taskResults['resources'] is List;
         
+        // Extract bot emotion
+        final robotEmotion = msg['robot_emotion'] as String?;
+        final botEmotion = getBotEmotion(robotEmotion);
+        
         String finalResponseText = responseText;
         
         if (isLearningResources) {
           final resources = taskResults['resources'] as List;
           if (resources.isNotEmpty) {
-            finalResponseText += '\n\n📚 Learning Resources:\n';
+            finalResponseText += '\n\nLearning Resources 📚:\n';
             for (final resource in resources) {
               if (resource is Map) {
                 final title = resource['title']?.toString() ?? '';
@@ -165,6 +264,7 @@ class WebSocketService {
             'time': DateTime.now().toString(),
             'method': taskResults is Map ? taskResults['module_name'] : null,
             'is_learning_resources': isLearningResources,
+            'emotion': botEmotion,  // Add bot emotion data
           });
           _messageController.add({'type': 'messages_updated'});
         });
@@ -434,4 +534,16 @@ class WebSocketService {
     
     _messageController.add({'type': 'messages_updated'});
   }
+
+  // Add this method to toggle star status
+  void toggleStarMessage(int index) {
+    if (index >= 0 && index < _chatMessages.length) {
+      _chatMessages[index]['starred'] = !(_chatMessages[index]['starred'] ?? false);
+      _messageController.add({'type': 'messages_updated'});
+    }
+  }
+
+  // Add this method to get all starred messages
+  List<Map<String, dynamic>> get starredMessages =>
+      _chatMessages.where((msg) => msg['starred'] == true).toList();
 }

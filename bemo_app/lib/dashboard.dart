@@ -49,7 +49,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (section == BemoSection.chatHistory) {
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (context) => const ChatHistoryScreen(),
+          builder: (context) => ChatHistoryScreen(
+            collapsed: _collapsed,
+            onToggle: _toggleSidebar,
+          ),
         ),
       );
       return;

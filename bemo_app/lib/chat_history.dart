@@ -9,9 +9,13 @@ import 'services/websocket_service.dart';
 import 'package:flutter/widgets.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
-  const ChatHistoryScreen({Key? key}) : super(key: key);
+  final bool collapsed;
+  final VoidCallback onToggle;
+  const ChatHistoryScreen({Key? key, required this.collapsed, required this.onToggle}) : super(key: key);
 
   @override
   State<ChatHistoryScreen> createState() => _ChatHistoryScreenState();
@@ -26,23 +30,24 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
     'assets/Images/bemo_profile5.png',
   ];
   late String currentProfileImage;
-  late Timer _timer;
   bool _collapsed = false;
   bool _isConnected = false;
   final ScrollController _scrollController = ScrollController();
   late AnimationController _thinkingAnimationController;
   late Animation<double> _thinkingAnimation;
+  bool _showSearchBar = false;
+  String _searchQuery = '';
+  bool _showLinksOnly = false;
+  bool _showStarredOnly = false;
+  int? _selectedMessageIndex;
+  TextEditingController _searchController = TextEditingController();
+  String? _activeIcon;
+  Set<int> _hoveredStarIndices = {};
 
   @override
   void initState() {
     super.initState();
     currentProfileImage = profileImages[Random().nextInt(profileImages.length)];
-    _timer = Timer.periodic(const Duration(seconds: 30), (_) {
-      setState(() {
-        currentProfileImage =
-            profileImages[Random().nextInt(profileImages.length)];
-      });
-    });
 
     // Initialize connection status
     _isConnected = WebSocketService().isConnected;
@@ -81,13 +86,14 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
         curve: Curves.easeInOut,
       ),
     );
+    _searchController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _timer.cancel();
     _scrollController.dispose();
     _thinkingAnimationController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -125,6 +131,20 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
     }
   }
 
+  List<Map<String, dynamic>> get _filteredMessages {
+    var messages = WebSocketService().chatMessages;
+    if (_showLinksOnly) {
+      messages = messages.where((msg) => (msg['text']?.contains('http') ?? false)).toList();
+    }
+    if (_showStarredOnly) {
+      messages = WebSocketService().starredMessages;
+    }
+    if (_searchQuery.isNotEmpty) {
+      messages = messages.where((msg) => (msg['text']?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false)).toList();
+    }
+    return messages;
+  }
+
   @override
   Widget build(BuildContext context) {
     const double baseWidth = 1820;
@@ -152,12 +172,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                   top: 0,
                   bottom: 0,
                   child: BemoSidebar(
-                    collapsed: _collapsed,
-                    onToggle: () {
-                      setState(() {
-                        _collapsed = !_collapsed;
-                      });
-                    },
+                    collapsed: widget.collapsed,
+                    onToggle: widget.onToggle,
                     currentSection: BemoSection.chatHistory,
                     onSectionTap: _onSidebarSectionTap,
                     userName: 'Begad Tamim',
@@ -280,38 +296,105 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                               Row(
                                 children: [
                                   GestureDetector(
-                                    onTap: () {},
-                                    child: Image.asset(
-                                      'assets/Images/search.png',
-                                      width: 32,
-                                      height: 32,
+                                    onTap: () {
+                                      setState(() {
+                                        _activeIcon = _activeIcon == 'search' ? null : 'search';
+                                        _showSearchBar = !_showSearchBar;
+                                        if (!_showSearchBar) _searchQuery = '';
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: _activeIcon == 'search' ? Colors.blue[700] : Colors.blue[100],
+                                        shape: BoxShape.circle,
+                                      ),
+                                      padding: const EdgeInsets.all(8),
+                                      child: Image.asset(
+                                        'assets/Images/search.png',
+                                        width: 24,
+                                        height: 24,
+                                        color: Colors.black,
+                                        colorBlendMode: BlendMode.srcIn,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 16),
                                   GestureDetector(
-                                    onTap: () {},
-                                    child: Image.asset(
-                                      'assets/Images/copy.png',
-                                      width: 32,
-                                      height: 32,
+                                    onTap: () async {
+                                      setState(() {
+                                        _activeIcon = 'copy';
+                                      });
+                                      final allText = WebSocketService().chatMessages.map((m) => m['text']).join('\n');
+                                      await Clipboard.setData(ClipboardData(text: allText));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('Chat copied!')),
+                                      );
+                                      await Future.delayed(const Duration(seconds: 1));
+                                      setState(() {
+                                        _activeIcon = null;
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: _activeIcon == 'copy' ? Colors.green[700] : Colors.green[100],
+                                        shape: BoxShape.circle,
+                                      ),
+                                      padding: const EdgeInsets.all(8),
+                                      child: Image.asset(
+                                        'assets/Images/copy.png',
+                                        width: 24,
+                                        height: 24,
+                                        color: Colors.black,
+                                        colorBlendMode: BlendMode.srcIn,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 16),
                                   GestureDetector(
-                                    onTap: () {},
-                                    child: Image.asset(
-                                      'assets/Images/link.png',
-                                      width: 32,
-                                      height: 32,
+                                    onTap: () {
+                                      setState(() {
+                                        _activeIcon = _activeIcon == 'link' ? null : 'link';
+                                        _showLinksOnly = !_showLinksOnly;
+                                        _showStarredOnly = false;
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: _activeIcon == 'link' ? Colors.purple[700] : Colors.purple[100],
+                                        shape: BoxShape.circle,
+                                      ),
+                                      padding: const EdgeInsets.all(8),
+                                      child: Image.asset(
+                                        'assets/Images/link.png',
+                                        width: 24,
+                                        height: 24,
+                                        color: Colors.black,
+                                        colorBlendMode: BlendMode.srcIn,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 16),
                                   GestureDetector(
-                                    onTap: () {},
-                                    child: Image.asset(
-                                      'assets/Images/popular.png',
-                                      width: 32,
-                                      height: 32,
+                                    onTap: () {
+                                      setState(() {
+                                        _activeIcon = _activeIcon == 'star' ? null : 'star';
+                                        _showStarredOnly = !_showStarredOnly;
+                                        _showLinksOnly = false;
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: _activeIcon == 'star' ? Colors.amber[800] : Colors.amber[200],
+                                        shape: BoxShape.circle,
+                                      ),
+                                      padding: const EdgeInsets.all(8),
+                                      child: Image.asset(
+                                        'assets/Images/popular.png',
+                                        width: 24,
+                                        height: 24,
+                                        color: Colors.black,
+                                        colorBlendMode: BlendMode.srcIn,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 40),
@@ -323,7 +406,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                       ),
                       // Chat messages
                       Positioned.fill(
-                        top: 150,
+                        top: 100,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 60.0, vertical: 32.0),
@@ -333,8 +416,7 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                               Align(
                                 alignment: Alignment.topCenter,
                                 child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 2.0, bottom: 8.0),
+                                  padding: const EdgeInsets.only(top: 0.0, bottom: 8.0),
                                   child: Text(
                                     todayDate.toLowerCase(),
                                     style: const TextStyle(
@@ -384,12 +466,13 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                                       )
                                     : ListView.builder(
                                         controller: _scrollController,
-                                        itemCount:
-                                            WebSocketService().chatMessages.length,
+                                        itemCount: _filteredMessages.length,
                                         itemBuilder: (context, index) {
-                                          final msg =
-                                              WebSocketService().chatMessages[index];
+                                          final msg = _filteredMessages[index];
                                           final isUser = msg['fromUser'] as bool;
+                                          final isSelected = _selectedMessageIndex == index;
+                                          // Find the original index in _chatMessages
+                                          final originalIndex = WebSocketService().chatMessages.indexWhere((m) => m['time'] == msg['time'] && m['text'] == msg['text']);
                                           
                                           // Skip empty messages
                                           final cleanedMessageText = msg['text']?.toString().trim() ?? '';
@@ -397,155 +480,227 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                                             return const SizedBox.shrink();
                                           }
                                           
-                                          return Align(
-                                            alignment: isUser
-                                                ? Alignment.centerRight
-                                                : Alignment.centerLeft,
-                                            child: Column(
-                                              crossAxisAlignment: isUser
-                                                  ? CrossAxisAlignment.end
-                                                  : CrossAxisAlignment.start,
+                                          return GestureDetector(
+                                            onDoubleTap: () {
+                                              setState(() {
+                                                _selectedMessageIndex = index;
+                                              });
+                                            },
+                                            onTap: () {
+                                              setState(() {
+                                                _selectedMessageIndex = null;
+                                              });
+                                            },
+                                            child: Stack(
                                               children: [
-                                                Container(
-                                                  margin: const EdgeInsets.symmetric(
-                                                      vertical: 16),
-                                                  padding: const EdgeInsets.all(24),
-                                                  constraints: const BoxConstraints(
-                                                      maxWidth: 600),
-                                                  decoration: BoxDecoration(
-                                                    color: isUser
-                                                        ? const Color(0xFF0C4111)
-                                                        : const Color(0xFF281636),
-                                                    borderRadius: BorderRadius.only(
-                                                      topLeft:
-                                                          const Radius.circular(30),
-                                                      topRight:
-                                                          const Radius.circular(30),
-                                                      bottomLeft: isUser
-                                                          ? const Radius.circular(30)
-                                                          : const Radius.circular(0),
-                                                      bottomRight: isUser
-                                                          ? const Radius.circular(0)
-                                                          : const Radius.circular(30),
-                                                    ),
-                                                  ),
-                                                  child: msg['is_learning_resources'] == true
-                                                      ? _buildLearningResourcesMessage(cleanedMessageText)
-                                                      : SelectableText(
-                                                          cleanedMessageText.toLowerCase(),
-                                                          style: TextStyle(
-                                                            color: (!isUser &&
-                                                                    msg['is_server_error'] ==
-                                                                      true)
-                                                                ? Colors.red
-                                                                : const Color(0xFFEFEFEF),
-                                                            fontSize: 20,
-                                                            fontFamily: 'Hyperion',
-                                                            fontWeight: FontWeight.bold,
+                                                Align(
+                                                  alignment: isUser
+                                                      ? Alignment.centerRight
+                                                      : Alignment.centerLeft,
+                                                  child: Column(
+                                                    crossAxisAlignment: isUser
+                                                        ? CrossAxisAlignment.end
+                                                        : CrossAxisAlignment.start,
+                                                    children: [
+                                                      Container(
+                                                        margin: const EdgeInsets.symmetric(
+                                                            vertical: 16),
+                                                        padding: const EdgeInsets.all(24),
+                                                        constraints: const BoxConstraints(
+                                                            maxWidth: 600),
+                                                        decoration: BoxDecoration(
+                                                          color: isUser
+                                                              ? const Color(0xFF0C4111)
+                                                              : const Color(0xFF281636),
+                                                          borderRadius: BorderRadius.only(
+                                                            topLeft:
+                                                                const Radius.circular(30),
+                                                            topRight:
+                                                                const Radius.circular(30),
+                                                            bottomLeft: isUser
+                                                                ? const Radius.circular(30)
+                                                                : const Radius.circular(0),
+                                                            bottomRight: isUser
+                                                                ? const Radius.circular(0)
+                                                                : const Radius.circular(30),
                                                           ),
                                                         ),
+                                                        child: msg['is_learning_resources'] == true
+                                                            ? _buildLearningResourcesMessage(cleanedMessageText, msg['emotion'])
+                                                            : (isUser && msg['emotion'] != null)
+                                                                ? _buildUserMessageWithEmotion(cleanedMessageText, msg['emotion'])
+                                                                : (!isUser && msg['emotion'] != null)
+                                                                    ? _buildBotMessageWithEmotion(cleanedMessageText, msg['emotion'])
+                                                                    : SelectableText(
+                                                                        cleanedMessageText.toLowerCase(),
+                                                                        style: TextStyle(
+                                                                          color: (!isUser &&
+                                                                                  msg['is_server_error'] ==
+                                                                                    true)
+                                                                              ? Colors.red
+                                                                              : const Color(0xFFEFEFEF),
+                                                                          fontSize: 20,
+                                                                          fontFamily: 'Hyperion',
+                                                                          fontWeight: FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                      ),
+                                                      if (!isUser &&
+                                                          msg['is_learning_resources'] == true)
+                                                        Align(
+                                                          alignment: Alignment.centerLeft,
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.only(
+                                                                top: 0.0,
+                                                                left: 8.0,
+                                                                right: 8.0),
+                                                            child: Image.asset(
+                                                              'assets/Images/link.png',
+                                                              width: 20,
+                                                              height: 20,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      if (!isUser &&
+                                                          msg['is_thinking'] == true)
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(
+                                                              top: 4.0,
+                                                              left: 8.0,
+                                                              right: 8.0),
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: [
+                                                              AnimatedBuilder(
+                                                                animation: _thinkingAnimation,
+                                                                builder: (context, child) {
+                                                                  return Container(
+                                                                    width: 8,
+                                                                    height: 8,
+                                                                    decoration: BoxDecoration(
+                                                                      color: Colors.grey[400]?.withOpacity(
+                                                                        0.3 + (_thinkingAnimation.value * 0.7)
+                                                                      ),
+                                                                      shape: BoxShape.circle,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                              const SizedBox(width: 4),
+                                                              AnimatedBuilder(
+                                                                animation: _thinkingAnimation,
+                                                                builder: (context, child) {
+                                                                  return Container(
+                                                                    width: 8,
+                                                                    height: 8,
+                                                                    decoration: BoxDecoration(
+                                                                      color: Colors.grey[400]?.withOpacity(
+                                                                        0.3 + (_thinkingAnimation.value * 0.7)
+                                                                      ),
+                                                                      shape: BoxShape.circle,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                              const SizedBox(width: 4),
+                                                              AnimatedBuilder(
+                                                                animation: _thinkingAnimation,
+                                                                builder: (context, child) {
+                                                                  return Container(
+                                                                    width: 8,
+                                                                    height: 8,
+                                                                    decoration: BoxDecoration(
+                                                                      color: Colors.grey[400]?.withOpacity(
+                                                                        0.3 + (_thinkingAnimation.value * 0.7)
+                                                                      ),
+                                                                      shape: BoxShape.circle,
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      Padding(
+                                                        padding: EdgeInsets.only(
+                                                          top: (!isUser && msg['is_learning_resources'] == true) ? 8 : 2,
+                                                          left: 8,
+                                                          right: 8,
+                                                        ),
+                                                        child: Text(
+                                                          DateFormat('hh:mm a').format(
+                                                              DateTime.tryParse(
+                                                                      msg['time']) ??
+                                                                  DateTime.now()),
+                                                          style: const TextStyle(
+                                                            color: Color(0xFFB0B0B0),
+                                                            fontSize: 13,
+                                                            fontFamily: 'Hyperion',
+                                                            fontWeight: FontWeight.w400,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                                if (!isUser &&
-                                                    msg['is_learning_resources'] == true)
-                                                  Align(
-                                                    alignment: Alignment.centerLeft,
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.only(
-                                                          top: 0.0,
-                                                          left: 8.0,
-                                                          right: 8.0),
-                                                      child: Image.asset(
-                                                        'assets/Images/link.png',
-                                                        width: 20,
-                                                        height: 20,
+                                                if (isSelected)
+                                                  Positioned(
+                                                    top: 8,
+                                                    right: isUser ? 8 : null,
+                                                    left: isUser ? null : 8,
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        if (originalIndex != -1) {
+                                                          WebSocketService().toggleStarMessage(originalIndex);
+                                                          setState(() {});
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        decoration: BoxDecoration(
+                                                          color: msg['starred'] == true ? Colors.yellow[700] : Colors.grey[300],
+                                                          shape: BoxShape.circle,
+                                                        ),
+                                                        padding: const EdgeInsets.all(4),
+                                                        child: Icon(
+                                                          msg['starred'] == true ? Icons.star : Icons.star_border,
+                                                          color: msg['starred'] == true ? Colors.white : Colors.black,
+                                                          size: 20,
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                if (!isUser &&
-                                                    msg['is_thinking'] == true)
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        top: 4.0,
-                                                        left: 8.0,
-                                                        right: 8.0),
-                                                    child: Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: [
-                                                        AnimatedBuilder(
-                                                          animation: _thinkingAnimation,
-                                                          builder: (context, child) {
-                                                            return Container(
-                                                              width: 8,
-                                                              height: 8,
-                                                              decoration: BoxDecoration(
-                                                                color: Colors.grey[400]?.withOpacity(
-                                                                  0.3 + (_thinkingAnimation.value * 0.7)
-                                                                ),
-                                                                shape: BoxShape.circle,
-                                                              ),
-                                                            );
-                                                          },
-                                                        ),
-                                                        const SizedBox(width: 4),
-                                                        AnimatedBuilder(
-                                                          animation: _thinkingAnimation,
-                                                          builder: (context, child) {
-                                                            return Container(
-                                                              width: 8,
-                                                              height: 8,
-                                                              decoration: BoxDecoration(
-                                                                color: Colors.grey[400]?.withOpacity(
-                                                                  0.3 + (_thinkingAnimation.value * 0.7)
-                                                                ),
-                                                                shape: BoxShape.circle,
-                                                              ),
-                                                            );
-                                                          },
-                                                        ),
-                                                        const SizedBox(width: 4),
-                                                        AnimatedBuilder(
-                                                          animation: _thinkingAnimation,
-                                                          builder: (context, child) {
-                                                            return Container(
-                                                              width: 8,
-                                                              height: 8,
-                                                              decoration: BoxDecoration(
-                                                                color: Colors.grey[400]?.withOpacity(
-                                                                  0.3 + (_thinkingAnimation.value * 0.7)
-                                                                ),
-                                                                shape: BoxShape.circle,
-                                                              ),
-                                                            );
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                    top: (!isUser && msg['is_learning_resources'] == true) ? 8 : 2,
-                                                    left: 8,
-                                                    right: 8,
-                                                  ),
-                                                  child: Text(
-                                                    DateFormat('hh:mm a').format(
-                                                        DateTime.tryParse(
-                                                                msg['time']) ??
-                                                            DateTime.now()),
-                                                    style: const TextStyle(
-                                                      color: Color(0xFFB0B0B0),
-                                                      fontSize: 13,
-                                                      fontFamily: 'Hyperion',
-                                                      fontWeight: FontWeight.w400,
-                                                    ),
-                                                  ),
-                                                ),
                                               ],
                                             ),
                                           );
                                         },
                                       ),
                               ),
+                              if (_showSearchBar)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                  child: TextField(
+                                    controller: _searchController,
+                                    autofocus: true,
+                                    decoration: InputDecoration(
+                                      hintText: 'Search messages...',
+                                      border: OutlineInputBorder(),
+                                      suffixIcon: IconButton(
+                                        icon: Icon(Icons.clear),
+                                        onPressed: () {
+                                          setState(() {
+                                            _searchQuery = '';
+                                            _searchController.clear();
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    onChanged: (val) {
+                                      setState(() {
+                                        _searchQuery = val;
+                                      });
+                                    },
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -571,12 +726,13 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
     );
   }
 
-  Widget _buildLearningResourcesMessage(String messageText) {
+  Widget _buildLearningResourcesMessage(String messageText, [Map<String, dynamic>? emotionData]) {
+    final emoji = emotionData != null ? (emotionData['emoji'] as String? ?? '😐') : null;
     final cleanedMessageText = messageText.trimRight();
     // Split message into lines and look for URLs
     final urlRegex = RegExp(r'(https?://[^\s]+)');
     final lines = cleanedMessageText.split('\n');
-    List<TextSpan> spans = [];
+    List<InlineSpan> spans = [];
     for (final line in lines) {
       final matches = urlRegex.allMatches(line);
       if (matches.isEmpty) {
@@ -612,6 +768,14 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
         spans.add(const TextSpan(text: '\n'));
       }
     }
+    if (emoji != null) {
+      spans.add(WidgetSpan(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 4),
+          child: Text(emoji, style: const TextStyle(fontSize: 20)),
+        ),
+      ));
+    }
     return SelectableText.rich(
       TextSpan(children: spans),
       style: const TextStyle(
@@ -619,6 +783,62 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
         fontSize: 20,
         fontFamily: 'Hyperion',
         fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  Widget _buildUserMessageWithEmotion(String messageText, Map<String, dynamic> emotionData) {
+    final emoji = emotionData['emoji'] as String? ?? '😐';
+    return SelectableText.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: messageText.toLowerCase(),
+            style: const TextStyle(
+              color: Color(0xFFEFEFEF),
+              fontSize: 20,
+              fontFamily: 'Hyperion',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          WidgetSpan(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Text(
+                emoji,
+                style: const TextStyle(fontSize: 20),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBotMessageWithEmotion(String messageText, Map<String, dynamic> emotionData) {
+    final emoji = emotionData['emoji'] as String? ?? '😐';
+    return SelectableText.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: messageText.toLowerCase(),
+            style: const TextStyle(
+              color: Color(0xFFEFEFEF),
+              fontSize: 20,
+              fontFamily: 'Hyperion',
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          WidgetSpan(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Text(
+                emoji,
+                style: const TextStyle(fontSize: 20),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

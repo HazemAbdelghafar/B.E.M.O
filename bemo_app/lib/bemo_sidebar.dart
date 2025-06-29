@@ -344,11 +344,28 @@ class _SidebarIconOnly extends StatelessWidget {
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Center(
-          child: customIcon ??
-              (iconAsset != null
-                  ? Image.asset(iconAsset!, height: 28, color: Colors.white)
-                  : SizedBox.shrink()),
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            if (selected)
+              Positioned(
+                left: 0,
+                child: Container(
+                  width: 4,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+            Center(
+              child: customIcon ??
+                  (iconAsset != null
+                      ? Image.asset(iconAsset!, height: 28, color: Colors.white)
+                      : SizedBox.shrink()),
+            ),
+          ],
         ),
       ),
     );
