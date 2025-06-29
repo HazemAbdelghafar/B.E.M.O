@@ -13,9 +13,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
 class ChatHistoryScreen extends StatefulWidget {
-  final bool collapsed;
-  final VoidCallback onToggle;
-  const ChatHistoryScreen({Key? key, required this.collapsed, required this.onToggle}) : super(key: key);
+  const ChatHistoryScreen({Key? key}) : super(key: key);
 
   @override
   State<ChatHistoryScreen> createState() => _ChatHistoryScreenState();
@@ -145,6 +143,12 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
     return messages;
   }
 
+  void _toggleSidebar() {
+    setState(() {
+      _collapsed = !_collapsed;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     const double baseWidth = 1820;
@@ -172,8 +176,8 @@ class _ChatHistoryScreenState extends State<ChatHistoryScreen> with TickerProvid
                   top: 0,
                   bottom: 0,
                   child: BemoSidebar(
-                    collapsed: widget.collapsed,
-                    onToggle: widget.onToggle,
+                    collapsed: _collapsed,
+                    onToggle: _toggleSidebar,
                     currentSection: BemoSection.chatHistory,
                     onSectionTap: _onSidebarSectionTap,
                     userName: 'Begad Tamim',
