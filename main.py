@@ -51,6 +51,7 @@ blocked_ids = {}
 # robot_id -> user_id
 robot_user_mapping = {}
 
+# ! For testing
 DEFAULT_USER_MAPPING = {
     "bemo-MK0": "user-MK0",
     "bemo-MK1": "user-MK1",
@@ -470,6 +471,22 @@ class Main(BaseMQTTHandler):
                     topic="server/main",
                 )
                 self._publish_to_app(is_error=False)
+
+                self.publish_result(
+                    {
+                        "preprocessed_data": [
+                            {
+                                "method": "mail",
+                                "function": "send_email",
+                                "recipients": self.user_data.get("primary_email", ""),
+                                "subject": "Check your robot for unusual activity",
+                                "body": "This is an automated email from BeMo's system.\n\nA user has attempted to access sensitive features on your robot. Please check its status to ensure everything is working as expected and no unauthorized activity has occurred.\n\nRegards,\nBeMo's Team",
+                                "module_name": "preprocessing",
+                            }
+                        ]
+                    },
+                    topic="task_handler/main",
+                )
                 # TODO: Send email to check the robot
                 self.bad_face_counter = 0
                 self.no_face_counter = 0
