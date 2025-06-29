@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/firebase_user_service.dart';
 import '../services/websocket_service.dart';
+// import '../services/firebase_rest_auth.dart';
 
 //Todo: Chagne file name of the profile picture
 //Todo: Save profile picture to firebase storage
@@ -137,6 +138,11 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
     final String uid = arguments['uid']!;
     final String idToken = arguments['idToken']!;
     final String email = arguments['email']!;
+    // final String email = FirebaseRestAuth().getUserEmail(idToken);
+
+    print('Getting Started Page: $email');
+    print('Getting Started Page: $uid');
+    print('Getting Started Page: $idToken');
 
     return Scaffold(
       body: Stack(
@@ -499,6 +505,8 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
                                         setState(() {
                                           selectedImagePath =
                                               result.files.single.path!;
+                                          selectedFileName =
+                                              result.files.single.name;
                                         });
                                       }
                                     },
@@ -538,7 +546,7 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
                                                           .substring(1),
                                                   "full_name":
                                                       "${firstNameController.text.trim()[0].toUpperCase() + firstNameController.text.trim().substring(1)} ${lastNameController.text.trim()[0].toUpperCase() + lastNameController.text.trim().substring(1)}",
-                                                  'prefered_name':
+                                                  'preferred_name':
                                                       useFullNameAsNickname
                                                       ? "${firstNameController.text.trim()[0].toUpperCase() + firstNameController.text.trim().substring(1)} ${lastNameController.text.trim()[0].toUpperCase() + lastNameController.text.trim().substring(1)}"
                                                       : nicknameController.text
@@ -548,7 +556,7 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
                                                                 .text
                                                                 .trim()
                                                                 .substring(1),
-                                                  'email':
+                                                  'primary_email':
                                                       email, //Todo: Remove this and implement firebase user service function to fetch user data
                                                   "country": selectedCountry,
                                                   "timezone":
@@ -564,30 +572,36 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
                                                   "address":
                                                       addressController.text,
                                                   "title": selectedTitle,
-                                                  "occupation":
-                                                      occupationController.text
-                                                          .split('')
-                                                          .map(
-                                                            (e) =>
-                                                                e.toUpperCase(),
-                                                          )
-                                                          .join(''),
+                                                  "occupation": occupationController
+                                                      .text
+                                                      .split('')
+                                                      .map(
+                                                        (e) =>
+                                                            e[0].toUpperCase() +
+                                                            e.substring(1),
+                                                      )
+                                                      .join(''),
                                                   "gender": selectedGender,
                                                   "bio": bioController.text,
                                                   "date_of_birth":
                                                       dobController.text,
                                                   'age':
-                                                      '22', // Todo: Calculate age from date of birth
-                                                  // 'age':
-                                                  //     DateTime.now()
-                                                  //         .difference(
-                                                  //           DateTime.parse(
-                                                  //             dobController
-                                                  //                 .text,
-                                                  //           ),
-                                                  //         )
-                                                  //         .inDays ~/
-                                                  //     365,
+                                                      (DateTime.now()
+                                                                  .difference(
+                                                                    DateTime(
+                                                                      int.parse(
+                                                                        dobController
+                                                                            .text
+                                                                            .split(
+                                                                              '-',
+                                                                            )
+                                                                            .last,
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                  .inDays ~/
+                                                              365)
+                                                          .toString(),
                                                   "robot_id":
                                                       robotIdController.text,
                                                   "src_user_id":
@@ -603,6 +617,11 @@ class _GettingStartedPageState extends State<GettingStartedPage> {
                                               Navigator.pushNamed(
                                                 context,
                                                 '/dashboard',
+                                                arguments: {
+                                                  'uid': uid,
+                                                  'idToken': idToken,
+                                                  'email': email,
+                                                },
                                               );
                                             }
                                           },

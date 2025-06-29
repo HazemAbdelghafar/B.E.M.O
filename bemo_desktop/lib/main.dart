@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'app.dart';
+import 'services/websocket_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-//Todo: Initialize websocket service here and connect to it
-
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+  WebSocketService().connect();
   runApp(BemoApp());
 }

@@ -63,13 +63,13 @@ class BemoSidebar extends StatelessWidget {
   final String userName;
 
   const BemoSidebar({
-    Key? key,
+    super.key,
     required this.collapsed,
     required this.onToggle,
     required this.currentSection,
     required this.onSectionTap,
     required this.userName,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

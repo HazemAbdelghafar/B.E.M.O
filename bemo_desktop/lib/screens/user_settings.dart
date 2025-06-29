@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
-//Todo: Display user data from firebase
-//Todo: Implement function to update user data in firebase
+import '../services/firebase_user_service.dart';
 
 class UserSettingsPage extends StatelessWidget {
   const UserSettingsPage({super.key});
@@ -11,116 +9,165 @@ class UserSettingsPage extends StatelessWidget {
     // Use a base size similar to your design, e.g., 1600x900
     const double baseWidth = 1600;
     const double baseHeight = 900;
-    return Scaffold(
-      backgroundColor: const Color(0xFF191919),
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/Background.png',
-              fit: BoxFit.cover,
-            ),
-          ),
-          Center(
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: SizedBox(
-                width: baseWidth,
-                height: baseHeight,
-                child: SafeArea(
-                  child: Stack(
-                    children: [
-                      Center(
-                        child: SingleChildScrollView(
-                          child: Container(
-                            width: baseWidth * 0.95,
-                            padding: const EdgeInsets.all(32),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                // Top navigation with back button and separator
-                                Column(
+
+    final Map<String, dynamic> arguments =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final String uid = arguments['uid']!;
+    final String idToken = arguments['idToken']!;
+
+    return FutureBuilder(
+      future: FirebaseUserService().fetchUserData(uid: uid, idToken: idToken),
+      builder: (context, snapshot) {
+        String firstName = 'Hazem';
+        String lastName = 'Abdelghafar';
+        String nickname = 'Zoma';
+        String title = 'Eng.';
+        String gender = 'Male';
+        String dob = '28-12-2003';
+        String occupation = 'Software Engineer';
+        String bio = 'I am a software engineer';
+        String age = '21';
+        if (snapshot.hasData) {
+          firstName = snapshot.data!['first_name'] ?? 'Hazem';
+          lastName = snapshot.data!['last_name'] ?? 'Abdelghafar';
+          nickname = snapshot.data!['nickname'] ?? 'Zoma';
+          title = snapshot.data!['title'] ?? 'Eng.';
+          gender = snapshot.data!['gender'] ?? 'Male';
+          dob = snapshot.data!['date_of_birth'] ?? '28-12-2003';
+          occupation = snapshot.data!['occupation'] ?? 'Software Engineer';
+          bio = snapshot.data!['bio'] ?? 'I am a software engineer';
+          age = snapshot.data!['age'] ?? '21';
+        }
+
+        return Scaffold(
+          backgroundColor: const Color(0xFF191919),
+          body: Stack(
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/Images/Background.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Center(
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: SizedBox(
+                    width: baseWidth,
+                    height: baseHeight,
+                    child: SafeArea(
+                      child: Stack(
+                        children: [
+                          Center(
+                            child: SingleChildScrollView(
+                              child: Container(
+                                width: baseWidth * 0.95,
+                                padding: const EdgeInsets.all(32),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Row(
+                                    // Top navigation with back button and separator
+                                    Column(
                                       children: [
-                                        IconButton(
-                                          icon: const Icon(
-                                            Icons.arrow_back_ios,
-                                            color: Colors.white,
-                                            size: 28,
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).maybePop();
-                                          },
-                                          padding: const EdgeInsets.only(
-                                            right: 24,
-                                          ),
+                                        Row(
+                                          children: [
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.arrow_back_ios,
+                                                color: Colors.white,
+                                                size: 28,
+                                              ),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              padding: const EdgeInsets.only(
+                                                right: 24,
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  _TabButton(
+                                                    label: 'APP SETTINGS',
+                                                    selected: false,
+                                                  ),
+                                                  const SizedBox(width: 32),
+                                                  _TabButton(
+                                                    label: 'USER SETTINGS',
+                                                    selected: true,
+                                                  ),
+                                                  const SizedBox(width: 32),
+                                                  _TabButton(
+                                                    label: 'ROBOT SETTINGS',
+                                                    selected: false,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        Expanded(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              _TabButton(
-                                                label: 'APP SETTINGS',
-                                                selected: false,
-                                              ),
-                                              const SizedBox(width: 32),
-                                              _TabButton(
-                                                label: 'USER SETTINGS',
-                                                selected: true,
-                                              ),
-                                              const SizedBox(width: 32),
-                                              _TabButton(
-                                                label: 'ROBOT SETTINGS',
-                                                selected: false,
-                                              ),
-                                            ],
-                                          ),
+                                        const SizedBox(height: 8),
+                                        Container(
+                                          width: double.infinity,
+                                          height: 2,
+                                          color: Colors.white,
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 8),
-                                    Container(
-                                      width: double.infinity,
-                                      height: 2,
-                                      color: Colors.white,
+                                    const SizedBox(height: 32),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Profile Settings
+                                        Expanded(
+                                          flex: 2,
+                                          child: _ProfileSettings(
+                                            firstName: firstName,
+                                            lastName: lastName,
+                                            nickname: nickname,
+                                            title: title,
+                                            gender: gender,
+                                            dob: dob,
+                                            occupation: occupation,
+                                            bio: bio,
+                                            age: age,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 32),
+                                        // Account Settings
+                                        Expanded(
+                                          flex: 3,
+                                          child: _AccountSettingsRefined(
+                                            uid: uid,
+                                            idToken: idToken,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 32),
+                                        // Linked Accounts
+                                        Expanded(
+                                          flex: 2,
+                                          child: _LinkedAccounts(),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 32),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Profile Settings
-                                    Expanded(
-                                      flex: 2,
-                                      child: _ProfileSettings(),
-                                    ),
-                                    const SizedBox(width: 32),
-                                    // Account Settings
-                                    Expanded(
-                                      flex: 3,
-                                      child: _AccountSettingsRefined(),
-                                    ),
-                                    const SizedBox(width: 32),
-                                    // Linked Accounts
-                                    Expanded(flex: 2, child: _LinkedAccounts()),
-                                  ],
-                                ),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -145,6 +192,26 @@ class _TabButton extends StatelessWidget {
 }
 
 class _ProfileSettings extends StatelessWidget {
+  final String firstName;
+  final String lastName;
+  final String nickname;
+  final String title;
+  final String gender;
+  final String dob;
+  final String occupation;
+  final String bio;
+  final String age;
+  const _ProfileSettings({
+    required this.firstName,
+    required this.lastName,
+    required this.nickname,
+    required this.title,
+    required this.gender,
+    required this.dob,
+    required this.occupation,
+    required this.bio,
+    required this.age,
+  });
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -173,7 +240,7 @@ class _ProfileSettings extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.asset(
-                  'assets/images/Robot - Inverted 1.png',
+                  'assets/Images/Robot - Inverted 1.png',
                   width: 80,
                   height: 80,
                   fit: BoxFit.cover,
@@ -188,6 +255,7 @@ class _ProfileSettings extends StatelessWidget {
                       'uploaded image: your.jpg',
                       style: TextStyle(
                         fontFamily: 'Hyperion',
+                        fontWeight: FontWeight.bold,
                         color: Colors.white,
                         fontSize: 12,
                       ),
@@ -196,6 +264,7 @@ class _ProfileSettings extends StatelessWidget {
                       'supported file types are: jpg, jpeg, png.',
                       style: TextStyle(
                         fontFamily: 'Hyperion',
+                        fontWeight: FontWeight.w400,
                         color: Colors.white70,
                         fontSize: 12,
                       ),
@@ -209,11 +278,17 @@ class _ProfileSettings extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () {},
                     icon: Image.asset(
-                      'assets/images/Upload.png',
+                      'assets/Images/Upload.png',
                       width: 18,
                       height: 18,
                     ),
-                    label: const Text('change image'),
+                    label: const Text(
+                      'change image',
+                      style: TextStyle(
+                        fontFamily: 'Hyperion',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF191919),
                       foregroundColor: Colors.white,
@@ -230,11 +305,17 @@ class _ProfileSettings extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () {},
                     icon: Image.asset(
-                      'assets/images/Clear Symbol.png',
+                      'assets/Images/Clear Symbol.png',
                       width: 18,
                       height: 18,
                     ),
-                    label: const Text('remove image'),
+                    label: const Text(
+                      'remove image',
+                      style: TextStyle(
+                        fontFamily: 'Hyperion',
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF191919),
                       foregroundColor: Colors.white,
@@ -263,9 +344,9 @@ class _ProfileSettings extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _ProfileTextField(label: 'first name', initialValue: 'begad'),
-          _ProfileTextField(label: 'last name', initialValue: 'tamim'),
-          _ProfileTextField(label: 'nickname', initialValue: 'bego'),
+          _ProfileTextField(label: 'first name', initialValue: firstName),
+          _ProfileTextField(label: 'last name', initialValue: lastName),
+          _ProfileTextField(label: 'nickname', initialValue: nickname),
           Row(
             children: [
               Checkbox(value: false, onChanged: (_) {}),
@@ -279,8 +360,8 @@ class _ProfileSettings extends StatelessWidget {
               ),
             ],
           ),
-          _ProfileTextField(label: 'title', initialValue: 'eng'),
-          _ProfileTextField(label: 'gender', initialValue: 'male'),
+          _ProfileTextField(label: 'title', initialValue: title),
+          _ProfileTextField(label: 'gender', initialValue: gender),
           // Date of Birth with age and calendar icon
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -301,7 +382,7 @@ class _ProfileSettings extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            '28/12/2003',
+                            dob,
                             style: TextStyle(
                               fontFamily: 'Hyperion',
                               color: Colors.white,
@@ -310,7 +391,7 @@ class _ProfileSettings extends StatelessWidget {
                           ),
                         ),
                         Image.asset(
-                          'assets/images/Calendar 28.png',
+                          'assets/Images/Calendar 28.png',
                           width: 24,
                           height: 24,
                         ),
@@ -320,7 +401,7 @@ class _ProfileSettings extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'this makes you\n21 yrs old',
+                  'this makes you\n$age yrs old',
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontFamily: 'Hyperion',
@@ -331,11 +412,8 @@ class _ProfileSettings extends StatelessWidget {
               ],
             ),
           ),
-          _ProfileTextField(
-            label: 'occupation',
-            initialValue: 'dog food tester',
-          ),
-          _ProfileTextField(label: 'bio', initialValue: ''),
+          _ProfileTextField(label: 'occupation', initialValue: occupation),
+          _ProfileTextField(label: 'bio', initialValue: bio),
           const SizedBox(height: 16),
           ElevatedButton(
             onPressed: () {},
@@ -347,7 +425,13 @@ class _ProfileSettings extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text('save changes'),
+            child: const Text(
+              'save changes',
+              style: TextStyle(
+                fontFamily: 'Hyperion',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -403,6 +487,9 @@ class _ProfileTextField extends StatelessWidget {
 }
 
 class _AccountSettingsRefined extends StatelessWidget {
+  final String uid;
+  final String idToken;
+  const _AccountSettingsRefined({required this.uid, required this.idToken});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -546,7 +633,7 @@ class _AccountSettingsRefined extends StatelessWidget {
             children: [
               Expanded(
                 child: _SupportButton(
-                  icon: 'assets/images/Letter.png',
+                  icon: 'assets/Images/Letter.png',
                   label: 'email',
                   white: true,
                 ),
@@ -554,7 +641,7 @@ class _AccountSettingsRefined extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: _SupportButton(
-                  icon: 'assets/images/WhatsApp.png',
+                  icon: 'assets/Images/WhatsApp.png',
                   label: 'whatsapp',
                   white: true,
                 ),
@@ -562,7 +649,7 @@ class _AccountSettingsRefined extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: _SupportButton(
-                  icon: 'assets/images/Task.png',
+                  icon: 'assets/Images/Task.png',
                   label: 'fill a form',
                   white: true,
                 ),
@@ -585,7 +672,9 @@ class _AccountSettingsRefined extends StatelessWidget {
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(context, '/login');
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: Colors.black,
@@ -670,7 +759,14 @@ class _AccountSettingsRefined extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                FirebaseUserService().deleteUserData(
+                  uid: uid,
+                  idToken: idToken,
+                );
+                FirebaseUserService().deleteUser(idToken);
+                Navigator.pushNamed(context, '/signup');
+              },
               child: const Text(
                 'close account',
                 style: TextStyle(
@@ -840,7 +936,7 @@ class _EmailsBox extends StatelessWidget {
                               ),
                               padding: const EdgeInsets.all(2),
                               child: Image.asset(
-                                'assets/images/Connect.png',
+                                'assets/Images/Connect.png',
                                 width: 22,
                                 height: 22,
                                 color: Colors.black,
@@ -855,7 +951,7 @@ class _EmailsBox extends StatelessWidget {
                               ),
                               padding: const EdgeInsets.all(2),
                               child: Image.asset(
-                                'assets/images/Task.png',
+                                'assets/Images/Task.png',
                                 width: 22,
                                 height: 22,
                               ),
@@ -869,7 +965,7 @@ class _EmailsBox extends StatelessWidget {
                               ),
                               padding: const EdgeInsets.all(2),
                               child: Image.asset(
-                                'assets/images/Crown.png',
+                                'assets/Images/Crown.png',
                                 width: 22,
                                 height: 22,
                               ),
@@ -883,7 +979,7 @@ class _EmailsBox extends StatelessWidget {
                               ),
                               padding: const EdgeInsets.all(2),
                               child: Image.asset(
-                                'assets/images/Delete.png',
+                                'assets/Images/Delete.png',
                                 width: 22,
                                 height: 22,
                               ),
@@ -952,19 +1048,19 @@ class _LinkedAccounts extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           _LinkedAccountButton(
-            icon: 'assets/images/Google.png',
+            icon: 'assets/Images/Google.png',
             label: 'disconnect google',
             connected: true,
             color: Colors.red,
           ),
           _LinkedAccountButton(
-            icon: 'assets/images/Microsoft.png',
+            icon: 'assets/Images/Microsoft.png',
             label: 'disconnect microsoft',
             connected: true,
             color: Colors.red,
           ),
           _LinkedAccountButton(
-            icon: 'assets/images/Apple Inc.png',
+            icon: 'assets/Images/Apple Inc.png',
             label: 'connect to apple',
             connected: false,
             color: Colors.green,
