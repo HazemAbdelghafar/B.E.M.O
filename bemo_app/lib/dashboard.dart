@@ -75,7 +75,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     // Check connection status
     final bool isConnected = WebSocketService().isConnected;
-    print('Dashboard - WebSocket connected: $isConnected');
 
     return Scaffold(
       backgroundColor: const Color(0xFF2C2D30),

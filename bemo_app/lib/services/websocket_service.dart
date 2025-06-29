@@ -133,8 +133,6 @@ class WebSocketService {
   // Method to add message to global chat
   void addChatMessage(Map<String, dynamic> message) {
     _chatMessages.add(message);
-    print(
-        'Message added to global chat. Total messages: ${_chatMessages.length}');
     // Notify listeners that messages have been updated
     _messageController.add({'type': 'messages_updated'});
   }
@@ -142,7 +140,6 @@ class WebSocketService {
   // Method to clear chat messages
   void clearChatMessages() {
     _chatMessages.clear();
-    print('Chat messages cleared');
     // Notify listeners that messages have been updated
     _messageController.add({'type': 'messages_updated'});
   }
@@ -157,7 +154,6 @@ class WebSocketService {
       'is_server_error': isError,
       if (isUser && emotionData != null) 'emotion': emotionData,
     });
-    print('Test message added: "$text"');
     // Notify listeners that messages have been updated
     _messageController.add({'type': 'messages_updated'});
   }
@@ -183,8 +179,6 @@ class WebSocketService {
             'method': null,
             'is_server_error': true,
           });
-        } else {
-          print('Filtering out connection-related error: "$errorText"');
         }
       }
       return;
@@ -252,10 +246,6 @@ class WebSocketService {
           }
         }
         
-        // Print prompt and response for debugging
-        print('Prompt: \'${msg['prompt'] ?? ''}\'');
-        print('Response: $finalResponseText');
-        
         // Add a 1 second delay before showing the bot response
         Future.delayed(const Duration(seconds: 1), () {
           _chatMessages.add({
@@ -268,8 +258,6 @@ class WebSocketService {
           });
           _messageController.add({'type': 'messages_updated'});
         });
-      } else {
-        print('Skipping empty or error response: "$responseText"');
       }
     }
 
@@ -289,34 +277,26 @@ class WebSocketService {
           'time': DateTime.now().toString(),
           'method': null,
         });
-      } else {
-        print('Skipping empty or error message: "$messageText"');
       }
     }
-
-    print('Message processed. Total messages: ${_chatMessages.length}');
     
     // Notify listeners that messages have been updated
     _messageController.add({'type': 'messages_updated'});
   }
 
   void connect() {
-    print('Attempting to connect to WebSocket...');
     final url = serverUrl + robotId;
-    print('Connecting to: $url');
 
     try {
       _channel = WebSocketChannel.connect(Uri.parse(url));
       _connected = true;
       _retryCount = 0;
-      print('WebSocket connected successfully!');
       
       // Start connection stability timer
       _connectionStabilityTimer?.cancel();
       _connectionStabilityTimer = Timer(_connectionStabilityDelay, () {
         if (_connected) {
           _connectionStable = true;
-          print('Connection is now stable');
           // Notify listeners about stable connection
           _messageController.add({
             'type': 'connection_status',
@@ -336,13 +316,12 @@ class WebSocketService {
               _addMessageToGlobalChat(decoded);
             }
           } catch (e) {
-            print('Error parsing message: $e');
+            // Error parsing message
           }
         },
         onError: (error) {
           _connected = false;
           _connectionStable = false;
-          print('WebSocket error: $error');
           
           // Cancel stability timer
           _connectionStabilityTimer?.cancel();
@@ -360,7 +339,6 @@ class WebSocketService {
         onDone: () {
           _connected = false;
           _connectionStable = false;
-          print('WebSocket connection closed');
           
           // Cancel stability timer
           _connectionStabilityTimer?.cancel();
@@ -380,7 +358,6 @@ class WebSocketService {
     } catch (e) {
       _connected = false;
       _connectionStable = false;
-      print('Failed to establish WebSocket connection: $e');
       
       // Cancel stability timer
       _connectionStabilityTimer?.cancel();
@@ -390,22 +367,17 @@ class WebSocketService {
   }
 
   void _handleError(error) {
-    print('WebSocket error: $error');
     _tryReconnect();
   }
 
   void _handleClose() {
-    print('WebSocket connection closed');
     _tryReconnect();
   }
 
   void _tryReconnect() {
     if (_retryCount < _maxRetries) {
       _retryCount++;
-      print('Attempting to reconnect ($_retryCount/$_maxRetries)...');
       Future.delayed(_retryInterval, connect);
-    } else {
-      print('Max retries reached. Connection failed permanently.');
     }
   }
 
@@ -415,19 +387,14 @@ class WebSocketService {
     }
     if (_connected && _channel != null) {
       _channel!.sink.add(json.encode(data));
-      print('Message sent: ${json.encode(data)}');
-    } else {
-      print('WebSocket not connected. Cannot send message.');
     }
   }
 
   void disconnect() {
-    print('Disconnecting WebSocket...');
     _channel?.sink.close(status.goingAway);
     _connected = false;
     _connectionStable = false;
     _connectionStabilityTimer?.cancel();
-    print('WebSocket disconnected');
   }
 
   void dispose() {
@@ -499,13 +466,6 @@ class WebSocketService {
       _messageController.add({'type': 'messages_updated'});
     }
 
-    // Print prompt and current streaming response for debugging
-    if (_currentStreamingMessage != null && _currentStreamingIndex == 1) {
-      // Print prompt only once at the start
-      print('Prompt: \'${_currentStreamingMessage!['prompt'] ?? ''}\'');
-    }
-    print('Streaming response so far: $_currentStreamingText');
-
     // Schedule next character
     _streamingTimer = Timer(const Duration(milliseconds: 50), () {
       _streamNextCharacter(fullResponse);
@@ -524,8 +484,6 @@ class WebSocketService {
       _chatMessages.last['is_thinking'] = false;
       _chatMessages.last['method'] = _currentStreamingMessage!['method'];
       _chatMessages.last['is_learning_resources'] = _currentStreamingMessage!['is_learning_resources'];
-      // Print final response for debugging
-      print('Final response: $_currentStreamingText');
     }
     
     _currentStreamingIndex = 0;
