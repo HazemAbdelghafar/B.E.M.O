@@ -21,6 +21,7 @@ import time
 # =========================
 DEFAULT_PATH = os.path.dirname(__file__)
 # AUTH_TASKS = ["todo", "mail"]
+# AUTH_TASKS = ["mail"]
 AUTH_TASKS = []  # ! For testing
 NAME = "main"
 SUB_TOPIC = "main/main"
