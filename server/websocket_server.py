@@ -63,7 +63,7 @@ class ServerWebSocketClient(BaseMQTTHandler):
         Args:
             socket (WebSocket): The WebSocket object representing the client connection.
             message (str): The message received from the client.
-        """      
+        """
         thread = threading.Thread(target=self.process_message, args=(message,))
         thread.start()
 
@@ -94,7 +94,9 @@ class ServerWebSocketClient(BaseMQTTHandler):
             on_close=self.on_close,
         )
 
-        thread = threading.Thread(target=lambda: ws.run_forever(ping_interval=60, ping_timeout=10))
+        thread = threading.Thread(
+            target=lambda: ws.run_forever(ping_interval=10, ping_timeout=5)
+        )
         thread.daemon = True
         thread.start()
         self.start_time = time.time()
@@ -141,9 +143,9 @@ class ServerWebSocketClient(BaseMQTTHandler):
             message (str): The message to process.
         """
         thread_name = threading.current_thread().name
-        
+
         logger.info(f"[{thread_name}] Received message: {message}")
-        
+
         try:
             data = json.loads(message)
         except json.JSONDecodeError:
