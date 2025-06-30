@@ -451,8 +451,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             padding: EdgeInsets.only(left: 5),
                           ),
                           onPressed: () async {
-                            final isValid =
-                                emailKey.currentState?.validate() ?? false;
+                            // final isValid =
+                            //     emailKey.currentState?.validate() ?? false;
+                            final isValid = emailController.text.isNotEmpty;
                             if (!isValid) return;
 
                             final email = emailController.text.trim();

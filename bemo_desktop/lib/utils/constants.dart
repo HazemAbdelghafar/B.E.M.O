@@ -78,3 +78,51 @@ const Map<String, String> utcToIanaMap = {
   'UTC+13:00': 'Pacific/Tongatapu',
   'UTC+14:00': 'Pacific/Kiritimati',
 };
+
+const Map<String, String> botEmotionEmojis = {
+  // Special cases
+  'blocked': '🚫',
+  'error': '❌',
+  'no_face': '😶',
+  'bad_face': '😵',
+  'auth': '🔐',
+
+  // Regular emotions (same as user emotions)
+  'neutral': '😐',
+  'happy': '😊',
+  'sad': '😢',
+  'angry': '😠',
+  'surprised': '😲',
+  'love': '❤️',
+};
+
+const Map<String, String> emotionEmojis = {
+  'admiration': '😍',
+  'amusement': '😄',
+  'anger': '😠',
+  'annoyance': '😤',
+  'approval': '👍',
+  'caring': '🥰',
+  'confusion': '😕',
+  'curiosity': '🤔',
+  'desire': '😏',
+  'disappointment': '😞',
+  'disapproval': '👎',
+  'disgust': '🤢',
+  'embarrassment': '😳',
+  'excitement': '🤩',
+  'fear': '😨',
+  'gratitude': '🙏',
+  'grief': '😢',
+  'joy': '😊',
+  'love': '❤️',
+  'nervousness': '😰',
+  'optimism': '😌',
+  'pride': '😎',
+  'realization': '💡',
+  'relief': '😌',
+  'remorse': '😔',
+  'sadness': '😢',
+  'surprise': '😲',
+  'neutral': '😐',
+};
