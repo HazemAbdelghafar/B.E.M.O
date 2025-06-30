@@ -74,6 +74,7 @@ flutter:
   assets:
  # Place your asset files here, e.g.:
     - assets/images/
+    - assets/.env
 
   fonts:
     - family: Hyperion
