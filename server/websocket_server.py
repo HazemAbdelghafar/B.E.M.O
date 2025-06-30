@@ -32,7 +32,7 @@ logger.addHandler(console_handler)
 class ServerWebSocketClient(BaseMQTTHandler):
     """ServerWebSocketClient is a class for handling WebSocket communication with a server."""
 
-    def __init__(self, max_retries: int = 3, retry_interval: int = 10):
+    def __init__(self, max_retries: int = 10, retry_interval: int = 10):
         """
         Initialize the WebSocket server.
 
