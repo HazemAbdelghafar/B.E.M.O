@@ -5,14 +5,14 @@ DEFAULT_MAPPING = {
     "abdosaaed749@gmail.com": "abdelrahman saeed",
     "mohamedelfeel62@gmail.com": "mohamed abdelraheem",
     "youssefaymanmohamed1@gmail.com": "youssef ayman",
-    
     "abouelfarag@aast.edu": "dr. ahmed abouelfarag",
-    "prof.mail.metwalli@gmail.com": "eng. ahmed metwalli",
-    "osamahesham357@gmail.com": "eng. osama hesham",
     "omar.o.shalash@aast.edu": "dr. omar shalash",
     "hanysaid2000@aast.edu": "dr. hany hanafy",
     "yhanafy@aast.edu": "dr. yasser hanafy",
     "obadawy2@gmail.com": "dr. ossama badawy",
+    "ahshaer@alexu.edu.eg": "dr. ahmed shaer",
+    "prof.mail.metwalli@gmail.com": "eng. ahmed metwalli",
+    "osamahesham357@gmail.com": "eng. osama hesham",
 }
 
 
@@ -41,7 +41,7 @@ class EmailMapping:
             str: The name of the email address.
         """
         return self.__mapping.get(email_address, "Unknown Email")
-    
+
     def get_email_address(self, name: str) -> str:
         """
         Get the email address corresponding to a name.
@@ -73,7 +73,7 @@ class EmailMapping:
             del self.__mapping[email_address]
         else:
             print(f"Email '{email_address}' not found in mapping.")
-            
+
     def remove_mapping_based_on_name(self, name: str):
         """
         Remove a mapping from the dictionary.
@@ -100,7 +100,7 @@ class EmailMapping:
             self.__mapping[email_address] = name
         else:
             print(f"Email '{email_address}' not found in mapping.")
-                        
+
     def get_all_mappings(self) -> dict:
         """
         Get all mappings in the dictionary.
