@@ -137,8 +137,9 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                         },
                     )
                     await ws.close()
+                    logger.info(f"Closed robot connection: {rid}")
                 except Exception:
-                    pass
+                    logger.warning(f"Error closing robot connection: {rid}")
 
                 if rid in connected_robots:
                     connected_robots.pop(rid, None)
@@ -159,8 +160,9 @@ async def websocket_endpoint(websocket: WebSocket, id: str):
                         },
                     )
                     await ws.close()
+                    logger.info(f"Closed user connection: {uid}")
                 except Exception:
-                    pass
+                    logger.warning(f"Error closing user connection: {uid}")
 
                 if uid in connected_users:
                     connected_users.pop(uid, None)
