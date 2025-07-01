@@ -64,9 +64,7 @@ class PreProcessing(BaseMQTTHandler):
         super().__init__(SUB_TOPIC, NAME)
 
         # Initialize the ChatGoogleGenerativeAI object
-        os.environ["GOOGLE_API_KEY"] = dotenv_values(find_dotenv())[
-            "GEMINI_API_KEY_TEST"
-        ]  #! Test
+        os.environ["GOOGLE_API_KEY"] = dotenv_values(find_dotenv())["GEMINI_API_KEY"]
         self.__llm = ChatGoogleGenerativeAI(
             model=LLM_MODEL,
             temperature=0.9,

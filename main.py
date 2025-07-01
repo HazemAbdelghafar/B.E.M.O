@@ -25,8 +25,8 @@ DEFAULT_PATH = os.path.dirname(__file__)
 AUTH_TASKS = []  # ! For testing
 NAME = "main"
 SUB_TOPIC = "main/main"
-MAX_NO_FACE = 5
-MAX_BAD_FACE = 3
+MAX_NO_FACE = 3
+MAX_BAD_FACE = 2
 BLOCK_TIME_RANGE = 15 * 60  # 15 minutes
 
 # =========================
@@ -152,8 +152,6 @@ class Main(BaseMQTTHandler):
         self.robot_id = ""
         self.user_id = ""
         self.user_data = {}
-
-        # self.user_id = "user-MK1"  # ! For testing
 
         self.user_emotions = {}
         self.prompt = ""

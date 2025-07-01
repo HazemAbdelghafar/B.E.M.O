@@ -78,14 +78,10 @@ class FindLearningResources(BaseMQTTHandler):
         self.confidence_threshold = confidence_threshold / 100
 
         # Load API keys from .env file
-        self.tavily_api_key = dotenv_values(find_dotenv())[
-            "TAVILY_API_KEY_TEST"
-        ]  #! Test
+        self.tavily_api_key = dotenv_values(find_dotenv())["TAVILY_API_KEY"]
 
         if self.use_llm:
-            self.gemini_api_key = dotenv_values(find_dotenv())[
-                "GEMINI_API_KEY_TEST"
-            ]  #! Test
+            self.gemini_api_key = dotenv_values(find_dotenv())["GEMINI_API_KEY"]
 
         # Set the API keys as environment variables
         if self.use_llm:

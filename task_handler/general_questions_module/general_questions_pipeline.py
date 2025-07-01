@@ -57,15 +57,11 @@ class GeneralQuestions(BaseMQTTHandler):
         self.clean_resources = clean_resources
         self.confidence_threshold = confidence_threshold / 100
 
-        self.__tavily_api_key = os.getenv(
-            "TAVILY_API_KEY_TEST"
-        )  #! Change API key at deployment
+        self.__tavily_api_key = os.getenv("TAVILY_API_KEY")
         self.tavily_temp = TavilyClient(api_key=self.__tavily_api_key)
 
         if self.use_llm:
-            self.__gemini_api_key = os.getenv(
-                "GEMINI_API_KEY_TEST"
-            )  #! Change API key at deployment
+            self.__gemini_api_key = os.getenv("GEMINI_API_KEY")
 
         # Set the API keys as environment variables
         if self.use_llm:

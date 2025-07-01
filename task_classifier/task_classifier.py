@@ -56,8 +56,8 @@ class TaskClassifier(BaseMQTTHandler):
         if self.use_llm:
             # Initialize the LLM model here if needed
             os.environ["GOOGLE_API_KEY"] = dotenv_values(find_dotenv())[
-                "GEMINI_API_KEY_TEST"
-            ]  #! Test
+                "GEMINI_API_KEY"
+            ]
             self.__llm = ChatGoogleGenerativeAI(
                 model=LLM_MODEL,
                 temperature=0,
