@@ -1,0 +1,89 @@
+
+DialogRPT Evaluation Report for General Questions Module
+Generated on: 2025-09-05 16:03:17
+
+========================================
+EVALUATION SUMMARY
+========================================
+
+DialogRPT Scores (Higher is Better):
+- Tavily + Gemini Responses:
+  * Mean Score: 0.3361
+  * Standard Deviation: 0.0528
+  * Min Score: 0.2589
+  * Max Score: 0.5873
+
+- Human Reference Responses:
+  * Mean Score: 0.2964
+  * Standard Deviation: 0.0203
+  * Min Score: 0.2468
+  * Max Score: 0.3605
+
+METEOR Scores (Higher is Better):
+- Mean Score: 0.3599
+- Standard Deviation: 0.1634
+- Min Score: 0.1087
+- Max Score: 0.9977
+
+========================================
+CORRELATION ANALYSIS
+========================================
+
+- DialogRPT vs METEOR Correlation: -0.2026
+- DialogRPT vs Human Reference Correlation: 0.3290
+
+========================================
+COMPARATIVE ANALYSIS
+========================================
+
+- Tavily responses scored better than human responses: 101/118 times
+- Percentage where Tavily outperformed human: 85.59%
+
+========================================
+INTERPRETATION & INSIGHTS
+========================================
+
+1. DialogRPT Score Analysis:
+   - The Tavily + Gemini system achieved an average DialogRPT score of 0.3361
+   - This indicates moderate dialogue quality
+   - The standard deviation of 0.0528 suggests consistent performance across different questions
+
+2. Comparison with Human Responses:
+   - Human responses scored an average of 0.2964
+   - The Tavily system outperformed human responses by 0.0397 points on average
+   - In 85.6% of cases, the system provided responses that DialogRPT rated higher than human responses
+
+3. Correlation with METEOR Scores:
+   - The correlation between DialogRPT and METEOR scores is -0.2026
+   - This indicates weak agreement between the two metrics
+   - This suggests the metrics capture different aspects of response quality
+
+4. Performance Insights:
+   - The system shows moderate capability in generating contextually appropriate responses
+   - High consistency across different question types
+   - Excellent performance relative to human baselines
+
+========================================
+RECOMMENDATIONS
+========================================
+
+1. System Strengths:
+   - Moderate performance in dialogue quality
+   - Consistent response quality across different question types
+   - Competitive performance against human responses
+
+2. Areas for Improvement:
+   - Maintain current consistency levels
+   - Continue current approach
+   - Investigate cases with low DialogRPT scores for pattern identification
+
+3. Future Evaluation:
+   - Consider evaluating on more diverse question types
+   - Implement real-time DialogRPT scoring for continuous monitoring
+   - Compare performance across different LLM models and configurations
+   - Analyze correlation with user satisfaction metrics
+
+========================================
+END OF REPORT
+========================================
+        
